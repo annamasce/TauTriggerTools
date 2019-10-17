@@ -10,13 +10,14 @@ class histMap():
         self.isTH2 = isTH2
         
         for WP in WPs:
-            for tauDM in tauDMs:
-                if isTH2:
-                    self.hist[(WP, tauDM)] = ROOT.TH2D(name + "_" + WP + "_" + tauDM, name + "_" + WP + "_" + tauDM, len(bins)-1, bins, len(bins)-1, bins)
-                    self.hist[(WP, tauDM)].Sumw2()
-                else:
-                    self.hist[(WP, tauDM)] = ROOT.TH1D(name + "_" + WP + "_" + tauDM, name + "_" + WP + "_" + tauDM, len(bins)-1, bins)
-                    self.hist[(WP, tauDM)].Sumw2()
+            for tau1DM in tauDMs:
+                for tau2DM in tauDMs:
+                    if isTH2:
+                        self.hist[(WP, (tau1DM, tau2DM))] = ROOT.TH2D(name + "_" + WP + "_" + tau1DM + '_' + tau2DM, name + "_" + WP + "_" + tau1DM + '_' + tau2DM, len(bins)-1, bins, len(bins)-1, bins)
+                        self.hist[(WP, (tau1DM, tau2DM))].Sumw2()
+                    else:
+                        self.hist[(WP, (tau1DM, tau2DM))] = ROOT.TH1D(name + "_" + WP + "_" + tau1DM + '_' + tau2DM, name + "_" + WP + "_" + tau1DM + '_' + tau2DM, len(bins)-1, bins)
+                        self.hist[(WP, (tau1DM, tau2DM))].Sumw2()
     
 
     def fillHist(self, WP, tauDM, values, weight = 1.):

@@ -9,17 +9,17 @@ Sample2017 = False
 Sample2018 = True
 
 saveOnlyOS=False
-#if MC:
-#	saveOnlyOS = True # True; save only OS, False; save both and store weight for bkg sub
-#	if DYJets: tauGenMatching = True
-#	if not DYJets: tauGenMatching = False
-#	excludeLumiSections = False
-#	print "==> OS events are stored and tau gen matching is applied for MC samples! <=="
-#else:
-#	saveOnlyOS = False # True; save only OS, False; save both and store weight for bkg sub
-#	tauGenMatching = False
-#	excludeLumiSections = False
-#	print "==> SS events are stored as weights and applied to suppress the bkg for Data samples! <=="
+if MC:
+	saveOnlyOS = True # True; save only OS, False; save both and store weight for bkg sub
+        if DYJets: tauGenMatching = True
+	if not DYJets: tauGenMatching = False
+	excludeLumiSections = False
+	print "==> OS events are stored and tau gen matching is applied for MC samples! <=="
+else:
+	saveOnlyOS = False # True; save only OS, False; save both and store weight for bkg sub
+	tauGenMatching = False
+	excludeLumiSections = False
+	print "==> SS events are stored as weights and applied to suppress the bkg for Data samples! <=="
 
 disabledPScolumns = False  # True; to remove the disabled columns, False; to consider all columns
 
@@ -27,11 +27,11 @@ disabledPScolumns = False  # True; to remove the disabled columns, False; to con
 path = "/user/lwezenbe/CMSSW_10_2_13/src/TauTriggerTools/TauTagAndProbe/test/"
 
 if MC:
-    fname =  path + "crabTuple_v3.root"
+    fname =  path + "crabTuple_v5.root"
 else:
 	#fname =  path + "Ntuple_SingleMuon_Run2018ABCDReReco17SepPromptRecoD_190121.root"
 	#fname =  path + "Ntuple_SingleMuon_Run2018D-PromptReco-v2_190121.root"
-	fname = path + "crabTuple_v3.root"
+	fname = path + "crabTuple_v5.root"
 	#fname = "./NTuple_SingleMu_Data_2018_filterTest_Run201.root"
 
 
@@ -196,7 +196,7 @@ for ev in range (0, nentries):
 #                    else:
 #                            hltPathTriggered_OS[numberOfHLTTriggers+6][0] = 0
 #
-#                    if ((triggerBits >> 8) & 1) == 1:
+#                    ie ((triggerBits >> 8) & 1) == 1:
 #                            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 1 # this is the path for mutau trigger. So no extra requirement is needed like: L1pt and L1iso and HLTpt
 #                    else:
 #                            hltPathTriggered_OS[numberOfHLTTriggers+7][0] = 0
@@ -234,7 +234,8 @@ for ev in range (0, nentries):
 
     bkgSubANDpuW[0] = bkgSubW[0]*puweight
 
-    if(tIn._byVLooseIsolationMVArun2v1DBoldDMwLT[0] > 0.5 and tIn._byVLooseIsolationMVArun2v1DBoldDMwLT[1] > 0.5):
+    if(tIn._byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[0] > 0.5 and tIn._byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[1] > 0.5):
+
 #        #Mass cuts, mt and mvis for DY Jets
 #	    if DYJets:
 #		    if(tIn.mT < 30 and tIn.mVis >40 and tIn.mVis < 80):

@@ -38,7 +38,7 @@ config.Data.publication = False
 config.Data.allowNonValidInputDataset = True
 
 config.section_("Site")
-config.Site.storageSite = 'T2_DE_RWTH'
+config.Site.storageSite = 'T2_BE_IIHE'
 
 
 samples2016New = ["/SingleMuon/Run2016B-17Jul2018_ver2-v1/MINIAOD", "/SingleMuon/Run2016C-17Jul2018-v1/MINIAOD", "/SingleMuon/Run2016D-17Jul2018-v1/MINIAOD", "/SingleMuon/Run2016E-17Jul2018-v1/MINIAOD", "/SingleMuon/Run2016F-17Jul2018-v1/MINIAOD", "/SingleMuon/Run2016G-17Jul2018-v1/MINIAOD", "/SingleMuon/Run2016H-17Jul2018-v1/MINIAOD"]
@@ -46,13 +46,15 @@ samples2017 = ["/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD","/SingleMuon/Run2017C
 sampleReReco2018 = ["/SingleMuon/Run2018A-17Sep2018-v2/MINIAOD","/SingleMuon/Run2018B-17Sep2018-v1/MINIAOD","/SingleMuon/Run2018C-17Sep2018-v1/MINIAOD"]
 sample2018 = ["/SingleMuon/Run2018D-PromptReco-v2/MINIAOD"]  # different global tags are used for promptreco and rereco, so they need to be run separately
 
-samples2016MC = ["/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2/MINIAODSIM", "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v2/MINIAODSIM"]
+#samples2016MC = ["/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2/MINIAODSIM", "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v2/MINIAODSIM"]
+samples2016MC = ["/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/MINIAODSIM"]
 samples2017MC = ["/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM","/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/MINIAODSIM","/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v2/MINIAODSIM"]
+#samples2018MC = ['/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM', '/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext2-v1/MINIAODSIM']
 samples2018MC = ['/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM']
 
 
 # ***** Choose which samples do you want to submit!*****
-samples = ""
+samples = samples2018MC
 #samples = samples2016MC
 
 if (samples == ""):
@@ -63,7 +65,7 @@ if (samples == ""):
 
 for index, sample in enumerate(samples):  
 
-	print "ampleS", sample
+	print "Sample", sample
 	if("Run201" in sample):
 		samplenickname = (sample.split("/",1)[-1]).replace("/","_") 
 		config.General.requestName = samplenickname[:100] + "_" + date 
@@ -74,17 +76,17 @@ for index, sample in enumerate(samples):
 		print "here", samplenickname[:100] + "_" + date 
 	# pSet files are given here depending on the 2016 or 2017 samples
 	if "2016" in sample or "Summer16" in sample:
-		config.JobType.psetName = 'test_SingleMu2016_TandP.py'
+		config.JobType.psetName = 'test_noTagAndProbe_multipleTaus.py'
 	elif "2017" in sample or "Fall17" in sample:
-		config.JobType.psetName = 'test_SingleMu297050_TandP.py'
+		config.JobType.psetName = 'test_noTagAndProbe_multipleTaus.py'
 	elif "2018" in sample or "Autumn18" in sample:
-		config.JobType.psetName = 'test_SingleMu2018_TandP.py'
+		config.JobType.psetName = 'test_noTagAndProbe_multipleTaus.py'
 	
 	#config.JobType.pyCfgParams = ['outputfilename=%s.root'%(samplenickname)]
 	#config.JobType.outputFiles = ['%s.root'%(samplenickname)]
 	
 	config.Data.inputDataset = sample
-	config.Data.outputDatasetTag = 'TagAndProbe_SingleMu_' + sample.split("/")[2]
+	config.Data.outputDatasetTag = 'noTagAndProbe_multipleTaus_' + sample.split("/")[2]
 	
 	# lumiMasks for Data samples
 	if "Run2016" in sample:

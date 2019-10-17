@@ -82,7 +82,7 @@ private:
   TTree *_triggerNamesTree;
   std::string _treeName;
   bool storeAllTriggers;
-  static const int nL_max = 4;
+  
   // -------------------------------------
   // variables to be filled in output tree
   ULong64_t       _indexevents;
@@ -91,59 +91,59 @@ private:
   float _MC_weight;
   std::vector<unsigned long> _tauTriggerBitsPerLeg;
   unsigned long _tauTriggerBits;
-  float _tauPt[nL_max];
-  float _tauEta[nL_max];
-  float _tauPhi[nL_max];
-  float _tauE[nL_max];
-  int   _tauCharge[nL_max];
-  int   _tauDecayMode[nL_max];
+  std::vector<float> _tauPt;
+  std::vector<float> _tauEta;
+  std::vector<float> _tauPhi;
+  std::vector<float> _tauE;
+  std::vector<int>   _tauCharge;
+  std::vector<int>   _tauDecayMode;
   unsigned int   _ntau;
 
-  bool _isMatched[nL_max];
-  bool _passedTriggerFilter[nL_max];
-  bool _decayModeFinding[nL_max];
-  bool _decayModeFindingNewDMs[nL_max];
+  std::vector<bool> _isMatched;
+  std::vector<bool> _passedTriggerFilter;
+  std::vector<bool> _decayModeFinding;
+  std::vector<bool> _decayModeFindingNewDMs;
   
-  bool _byLooseCombinedIsolationDeltaBetaCorr3Hits[nL_max];
-  bool _byMediumCombinedIsolationDeltaBetaCorr3Hits[nL_max];
-  bool _byTightCombinedIsolationDeltaBetaCorr3Hits[nL_max];
-  bool _byVLooseIsolationMVArun2v1DBoldDMwLT[nL_max];
-  bool _byLooseIsolationMVArun2v1DBoldDMwLT[nL_max];
-  bool _byMediumIsolationMVArun2v1DBoldDMwLT[nL_max];
-  bool _byTightIsolationMVArun2v1DBoldDMwLT[nL_max];
-  bool _byVTightIsolationMVArun2v1DBoldDMwLT[nL_max];
-  bool _byVLooseIsolationMVArun2v1DBnewDMwLT[nL_max];
-  bool _byLooseIsolationMVArun2v1DBnewDMwLT[nL_max];
-  bool _byMediumIsolationMVArun2v1DBnewDMwLT[nL_max];
-  bool _byTightIsolationMVArun2v1DBnewDMwLT[nL_max];
-  bool _byVTightIsolationMVArun2v1DBnewDMwLT[nL_max];       
-  bool _byLooseIsolationMVArun2v1DBdR03oldDMwLT[nL_max];
-  bool _byMediumIsolationMVArun2v1DBdR03oldDMwLT[nL_max];
-  bool _byTightIsolationMVArun2v1DBdR03oldDMwLT[nL_max];
-  bool _byVTightIsolationMVArun2v1DBdR03oldDMwLT[nL_max];
+  std::vector<bool> _byLooseCombinedIsolationDeltaBetaCorr3Hits;
+  std::vector<bool> _byMediumCombinedIsolationDeltaBetaCorr3Hits;
+  std::vector<bool> _byTightCombinedIsolationDeltaBetaCorr3Hits;
+  std::vector<bool> _byVLooseIsolationMVArun2v1DBoldDMwLT;
+  std::vector<bool> _byLooseIsolationMVArun2v1DBoldDMwLT;
+  std::vector<bool> _byMediumIsolationMVArun2v1DBoldDMwLT;
+  std::vector<bool> _byTightIsolationMVArun2v1DBoldDMwLT;
+  std::vector<bool> _byVTightIsolationMVArun2v1DBoldDMwLT;
+  std::vector<bool> _byVLooseIsolationMVArun2v1DBnewDMwLT;
+  std::vector<bool> _byLooseIsolationMVArun2v1DBnewDMwLT;
+  std::vector<bool> _byMediumIsolationMVArun2v1DBnewDMwLT;
+  std::vector<bool> _byTightIsolationMVArun2v1DBnewDMwLT;
+  std::vector<bool> _byVTightIsolationMVArun2v1DBnewDMwLT;       
+  std::vector<bool> _byLooseIsolationMVArun2v1DBdR03oldDMwLT;
+  std::vector<bool> _byMediumIsolationMVArun2v1DBdR03oldDMwLT;
+  std::vector<bool> _byTightIsolationMVArun2v1DBdR03oldDMwLT;
+  std::vector<bool> _byVTightIsolationMVArun2v1DBdR03oldDMwLT;
 
-  float _byIsolationMVArun2017v2DBoldDMwLTraw2017[nL_max];
-  bool _byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
-  bool _byVLooseIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
-  bool _byLooseIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
-  bool _byMediumIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
-  bool _byTightIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
-  bool _byVTightIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
-  bool _byVVTightIsolationMVArun2017v2DBoldDMwLT2017[nL_max];
+  std::vector<float> _byIsolationMVArun2017v2DBoldDMwLTraw2017;
+  std::vector<bool> _byVVLooseIsolationMVArun2017v2DBoldDMwLT2017;
+  std::vector<bool> _byVLooseIsolationMVArun2017v2DBoldDMwLT2017;
+  std::vector<bool> _byLooseIsolationMVArun2017v2DBoldDMwLT2017;
+  std::vector<bool> _byMediumIsolationMVArun2017v2DBoldDMwLT2017;
+  std::vector<bool> _byTightIsolationMVArun2017v2DBoldDMwLT2017;
+  std::vector<bool> _byVTightIsolationMVArun2017v2DBoldDMwLT2017;
+  std::vector<bool> _byVVTightIsolationMVArun2017v2DBoldDMwLT2017;
 
-  bool _againstMuonLoose3[nL_max];
-  bool _againstMuonTight3[nL_max];
-  bool _againstElectronVLooseMVA6[nL_max];
-  bool _againstElectronLooseMVA6[nL_max];
-  bool _againstElectronMediumMVA6[nL_max];
-  bool _againstElectronTightMVA6[nL_max];
-  bool _againstElectronVTightMVA6[nL_max];
+  std::vector<bool> _againstMuonLoose3;
+  std::vector<bool> _againstMuonTight3;
+  std::vector<bool> _againstElectronVLooseMVA6;
+  std::vector<bool> _againstElectronLooseMVA6;
+  std::vector<bool> _againstElectronMediumMVA6;
+  std::vector<bool> _againstElectronTightMVA6;
+  std::vector<bool> _againstElectronVTightMVA6;
 
-  float _hltPt[nL_max];
-  float _hltEta[nL_max];
-  float _hltPhi[nL_max];
-  float _hltE[nL_max];
-  float _hltMass[nL_max];
+  std::vector<float> _hltPt;
+  std::vector<float> _hltEta;
+  std::vector<float> _hltPhi;
+  std::vector<float> _hltE;
+  std::vector<float> _hltMass;
   std::vector<int> _l1tQual;
   std::vector<float> _l1tPt;
   std::vector<float> _l1tEta;
@@ -171,8 +171,8 @@ private:
   std::vector<int> _l1tRawEtJet;
 
 
-  Bool_t _hasTriggerMuonType[nL_max];
-  Bool_t _hasTriggerTauType[nL_max];
+  std::vector<Bool_t> _hasTriggerMuonType;
+  std::vector<Bool_t> _hasTriggerTauType;
   Bool_t _isOS;
   int _foundJet;
   int _Nvtx;
@@ -315,12 +315,12 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginRun(edm::Run const& iRun, edm::E
     bool found = false;
     for(unsigned int j=0; j < triggerNames.size(); j++)
       {
-	//std::cout << j << " " << triggerNames[j].find(hltPath) << " " << triggerNames[j].find(hltPath) != std::string::npos << " " <<  triggerNames.size() << std::endl;
+        //std::cout << j << " " << triggerNames[j].find(hltPath) << " " << triggerNames[j].find(hltPath) != std::string::npos << " " <<  triggerNames.size() << std::endl;
         if (triggerNames[j].find(hltPath) != std::string::npos) {
-	  found = true;
-	  parameter.hltPathIndex = j;
+          found = true;
+          parameter.hltPathIndex = j;
 
-	}
+        }
       }
     if (!found) parameter.hltPathIndex = -1;
     std::cout <<parameter.hltPathIndex << std::endl;
@@ -334,12 +334,12 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _lumi = 0;
   this -> _MC_weight = 1;
   this -> _ntau = 0;
-  // this -> _tauPt = { 0 };
-  // this -> _tauEta = { 0 };
-  // this -> _tauPhi = { 0 };
-  // this -> _tauCharge = { 0 };
-  // this -> _tauDecayMode = { 0 };
-  // this -> _isMatched = { 0 };
+  this -> _tauPt.clear();
+  this -> _tauEta.clear();
+  this -> _tauPhi.clear();
+  this -> _tauCharge.clear();
+  this -> _tauDecayMode.clear();
+  this -> _isMatched.clear();
 
   this -> _l1tPt.clear();
   this -> _l1tEta.clear();
@@ -370,33 +370,41 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _l1tTowerIPhiJet . clear();
   this -> _l1tRawEtJet . clear();
 
-  // _byLooseCombinedIsolationDeltaBetaCorr3Hits = { 0 };
-  // _byMediumCombinedIsolationDeltaBetaCorr3Hits = { 0 };
-  // _byTightCombinedIsolationDeltaBetaCorr3Hits = { 0 };
-  // _byVLooseIsolationMVArun2v1DBoldDMwLT = { 0 };
-  // _byLooseIsolationMVArun2v1DBoldDMwLT = { 0 };
-  // _byMediumIsolationMVArun2v1DBoldDMwLT = { 0 };
-  // _byTightIsolationMVArun2v1DBoldDMwLT = { 0 };
-  // _byVTightIsolationMVArun2v1DBoldDMwLT = { 0 };
-  // _byVLooseIsolationMVArun2v1DBnewDMwLT = { 0 };
-  // _byLooseIsolationMVArun2v1DBnewDMwLT = { 0 };
-  // _byMediumIsolationMVArun2v1DBnewDMwLT = { 0 };
-  // _byTightIsolationMVArun2v1DBnewDMwLT = { 0 };
-  // _byVTightIsolationMVArun2v1DBnewDMwLT = { 0 };    
-  // _byLooseIsolationMVArun2v1DBdR03oldDMwLT = { 0 };
-  // _byMediumIsolationMVArun2v1DBdR03oldDMwLT = { 0 };
-  // _byTightIsolationMVArun2v1DBdR03oldDMwLT = { 0 };
-  // _byVTightIsolationMVArun2v1DBdR03oldDMwLT = { 0 };
+  this -> _againstMuonLoose3.clear();
+  this -> _againstMuonTight3.clear();
+  this -> _againstElectronVLooseMVA6.clear();
+  this -> _againstElectronLooseMVA6.clear();
+  this -> _againstElectronMediumMVA6.clear();
+  this -> _againstElectronTightMVA6.clear();
+  this -> _againstElectronVTightMVA6.clear();
 
-  // // 2017v2 training for Fall 17
-  // _byIsolationMVArun2017v2DBoldDMwLTraw2017 = { 0 };
-  // _byVVLooseIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
-  // _byVLooseIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
-  // _byLooseIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
-  // _byMediumIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
-  // _byTightIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
-  // _byVTightIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
-  // _byVVTightIsolationMVArun2017v2DBoldDMwLT2017 = { 0 };
+  this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits.clear();
+  this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits.clear();
+  this -> _byTightCombinedIsolationDeltaBetaCorr3Hits.clear();
+  this -> _byVLooseIsolationMVArun2v1DBoldDMwLT.clear();
+  this -> _byLooseIsolationMVArun2v1DBoldDMwLT.clear();
+  this -> _byMediumIsolationMVArun2v1DBoldDMwLT.clear();
+  this -> _byTightIsolationMVArun2v1DBoldDMwLT.clear();
+  this -> _byVTightIsolationMVArun2v1DBoldDMwLT.clear();
+  this -> _byVLooseIsolationMVArun2v1DBnewDMwLT.clear();
+  this -> _byLooseIsolationMVArun2v1DBnewDMwLT.clear();
+  this -> _byMediumIsolationMVArun2v1DBnewDMwLT.clear();
+  this -> _byTightIsolationMVArun2v1DBnewDMwLT.clear();
+  this -> _byVTightIsolationMVArun2v1DBnewDMwLT.clear();    
+  this -> _byLooseIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  this -> _byMediumIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT.clear();
+  this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT.clear();
+
+  //2017v2 training for Fall 17
+  this -> _byIsolationMVArun2017v2DBoldDMwLTraw2017.clear();
+  this -> _byVVLooseIsolationMVArun2017v2DBoldDMwLT2017.clear();
+  this -> _byVLooseIsolationMVArun2017v2DBoldDMwLT2017.clear();
+  this -> _byLooseIsolationMVArun2017v2DBoldDMwLT2017.clear();
+  this -> _byMediumIsolationMVArun2017v2DBoldDMwLT2017.clear();
+  this -> _byTightIsolationMVArun2017v2DBoldDMwLT2017.clear();
+  this -> _byVTightIsolationMVArun2017v2DBoldDMwLT2017.clear();
+  this -> _byVVTightIsolationMVArun2017v2DBoldDMwLT2017.clear();
 
 
   _tauTriggerBitsPerLeg.clear();
@@ -452,56 +460,56 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
   this -> _tree -> Branch("MC_weight",&_MC_weight,"MC_weight/F");
   this -> _tree -> Branch("tauTriggerBitsPerLeg", &_tauTriggerBitsPerLeg);
   this -> _tree -> Branch("tauTriggerBits", &_tauTriggerBits, "_tauTriggerBits/l");
-  this -> _tree -> Branch("tauPt",  &_tauPt, "_tauPt[_ntau]/F");
-  this -> _tree -> Branch("tauEta", &_tauEta, "_tauEta[_ntau]/F");
-  this -> _tree -> Branch("tauPhi", &_tauPhi, "_tauPhi[_ntau]/F");
-  this -> _tree -> Branch("tauE", &_tauE, "_tauE[_ntau]/F");
-  this -> _tree -> Branch("tauCharge",  &_tauCharge, "_tauCharge[_ntau]/I");
-  this -> _tree -> Branch("tauDecayMode",  &_tauDecayMode, "_tauDecayMode[_ntau]/I");
-  this -> _tree -> Branch("decayModeFinding", &_decayModeFinding, "_decayModeFinding[_ntau]/O");
-  this -> _tree -> Branch("decayModeFindingNewDMs", &_decayModeFindingNewDMs, "_decayModeFindingNewDMs[_ntau]/O");
+  this -> _tree -> Branch("tauPt",  &_tauPt);
+  this -> _tree -> Branch("tauEta", &_tauEta);
+  this -> _tree -> Branch("tauPhi", &_tauPhi);
+  this -> _tree -> Branch("tauE", &_tauE);
+  this -> _tree -> Branch("tauCharge",  &_tauCharge);
+  this -> _tree -> Branch("tauDecayMode",  &_tauDecayMode);
+  this -> _tree -> Branch("decayModeFinding", &_decayModeFinding);
+  this -> _tree -> Branch("decayModeFindingNewDMs", &_decayModeFindingNewDMs);
   
-  this -> _tree -> Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits", &_byLooseCombinedIsolationDeltaBetaCorr3Hits, "_byLooseCombinedIsolationDeltaBetaCorr3Hits[_ntau]/O");
-  this -> _tree -> Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits", &_byMediumCombinedIsolationDeltaBetaCorr3Hits, "_byMediumCombinedIsolationDeltaBetaCorr3Hits[_ntau]/O");
-  this -> _tree -> Branch("byTightCombinedIsolationDeltaBetaCorr3Hits", &_byTightCombinedIsolationDeltaBetaCorr3Hits, "_byTightCombinedIsolationDeltaBetaCorr3Hits[_ntau]/O");
-  this -> _tree -> Branch("byVLooseIsolationMVArun2v1DBoldDMwLT", &_byVLooseIsolationMVArun2v1DBoldDMwLT, "_byVLooseIsolationMVArun2v1DBoldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byLooseIsolationMVArun2v1DBoldDMwLT", &_byLooseIsolationMVArun2v1DBoldDMwLT, "_byLooseIsolationMVArun2v1DBoldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byMediumIsolationMVArun2v1DBoldDMwLT", &_byMediumIsolationMVArun2v1DBoldDMwLT, "_byMediumIsolationMVArun2v1DBoldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byTightIsolationMVArun2v1DBoldDMwLT", &_byTightIsolationMVArun2v1DBoldDMwLT, "_byTightIsolationMVArun2v1DBoldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byVTightIsolationMVArun2v1DBoldDMwLT", &_byVTightIsolationMVArun2v1DBoldDMwLT, "_byVTightIsolationMVArun2v1DBoldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byVLooseIsolationMVArun2v1DBnewDMwLT", &_byVLooseIsolationMVArun2v1DBnewDMwLT, "_byVLooseIsolationMVArun2v1DBnewDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byLooseIsolationMVArun2v1DBnewDMwLT", &_byLooseIsolationMVArun2v1DBnewDMwLT, "_byLooseIsolationMVArun2v1DBnewDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byMediumIsolationMVArun2v1DBnewDMwLT", &_byMediumIsolationMVArun2v1DBnewDMwLT, "_byMediumIsolationMVArun2v1DBnewDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byTightIsolationMVArun2v1DBnewDMwLT", &_byTightIsolationMVArun2v1DBnewDMwLT, "_byTightIsolationMVArun2v1DBnewDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byVTightIsolationMVArun2v1DBnewDMwLT", &_byVTightIsolationMVArun2v1DBnewDMwLT, "_byVTightIsolationMVArun2v1DBnewDMwLT[_ntau]/O");    
-  this -> _tree -> Branch("byLooseIsolationMVArun2v1DBdR03oldDMwLT", &_byLooseIsolationMVArun2v1DBdR03oldDMwLT, "_byLooseIsolationMVArun2v1DBdR03oldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byMediumIsolationMVArun2v1DBdR03oldDMwLT", &_byMediumIsolationMVArun2v1DBdR03oldDMwLT, "_byMediumIsolationMVArun2v1DBdR03oldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byTightIsolationMVArun2v1DBdR03oldDMwLT", &_byTightIsolationMVArun2v1DBdR03oldDMwLT, "_byTightIsolationMVArun2v1DBdR03oldDMwLT[_ntau]/O");
-  this -> _tree -> Branch("byVTightIsolationMVArun2v1DBdR03oldDMwLT", &_byVTightIsolationMVArun2v1DBdR03oldDMwLT, "_byVTightIsolationMVArun2v1DBdR03oldDMwLT[_ntau]/O");
+  this -> _tree -> Branch("byLooseCombinedIsolationDeltaBetaCorr3Hits", &_byLooseCombinedIsolationDeltaBetaCorr3Hits);
+  this -> _tree -> Branch("byMediumCombinedIsolationDeltaBetaCorr3Hits", &_byMediumCombinedIsolationDeltaBetaCorr3Hits);
+  this -> _tree -> Branch("byTightCombinedIsolationDeltaBetaCorr3Hits", &_byTightCombinedIsolationDeltaBetaCorr3Hits);
+  this -> _tree -> Branch("byVLooseIsolationMVArun2v1DBoldDMwLT", &_byVLooseIsolationMVArun2v1DBoldDMwLT);
+  this -> _tree -> Branch("byLooseIsolationMVArun2v1DBoldDMwLT", &_byLooseIsolationMVArun2v1DBoldDMwLT);
+  this -> _tree -> Branch("byMediumIsolationMVArun2v1DBoldDMwLT", &_byMediumIsolationMVArun2v1DBoldDMwLT);
+  this -> _tree -> Branch("byTightIsolationMVArun2v1DBoldDMwLT", &_byTightIsolationMVArun2v1DBoldDMwLT);
+  this -> _tree -> Branch("byVTightIsolationMVArun2v1DBoldDMwLT", &_byVTightIsolationMVArun2v1DBoldDMwLT);
+  this -> _tree -> Branch("byVLooseIsolationMVArun2v1DBnewDMwLT", &_byVLooseIsolationMVArun2v1DBnewDMwLT);
+  this -> _tree -> Branch("byLooseIsolationMVArun2v1DBnewDMwLT", &_byLooseIsolationMVArun2v1DBnewDMwLT);
+  this -> _tree -> Branch("byMediumIsolationMVArun2v1DBnewDMwLT", &_byMediumIsolationMVArun2v1DBnewDMwLT);
+  this -> _tree -> Branch("byTightIsolationMVArun2v1DBnewDMwLT", &_byTightIsolationMVArun2v1DBnewDMwLT);
+  this -> _tree -> Branch("byVTightIsolationMVArun2v1DBnewDMwLT", &_byVTightIsolationMVArun2v1DBnewDMwLT);    
+  this -> _tree -> Branch("byLooseIsolationMVArun2v1DBdR03oldDMwLT", &_byLooseIsolationMVArun2v1DBdR03oldDMwLT);
+  this -> _tree -> Branch("byMediumIsolationMVArun2v1DBdR03oldDMwLT", &_byMediumIsolationMVArun2v1DBdR03oldDMwLT);
+  this -> _tree -> Branch("byTightIsolationMVArun2v1DBdR03oldDMwLT", &_byTightIsolationMVArun2v1DBdR03oldDMwLT);
+  this -> _tree -> Branch("byVTightIsolationMVArun2v1DBdR03oldDMwLT", &_byVTightIsolationMVArun2v1DBdR03oldDMwLT);
 
-  this -> _tree -> Branch("byIsolationMVArun2017v2DBoldDMwLTraw2017", &_byIsolationMVArun2017v2DBoldDMwLTraw2017, "byIsolationMVArun2017v2DBoldDMwLTraw2017[_ntau]/F");
-  this -> _tree -> Branch("byVVLooseIsolationMVArun2017v2DBoldDMwLT2017", &_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017, "byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
-  this -> _tree -> Branch("byVLooseIsolationMVArun2017v2DBoldDMwLT2017", &_byVLooseIsolationMVArun2017v2DBoldDMwLT2017, "byVLooseIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
-  this -> _tree -> Branch("byLooseIsolationMVArun2017v2DBoldDMwLT2017", &_byLooseIsolationMVArun2017v2DBoldDMwLT2017, "byLooseIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
-  this -> _tree -> Branch("byMediumIsolationMVArun2017v2DBoldDMwLT2017", &_byMediumIsolationMVArun2017v2DBoldDMwLT2017, "byMediumIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
-  this -> _tree -> Branch("byTightIsolationMVArun2017v2DBoldDMwLT2017", &_byTightIsolationMVArun2017v2DBoldDMwLT2017, "byTightIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
-  this -> _tree -> Branch("byVTightIsolationMVArun2017v2DBoldDMwLT2017", &_byVTightIsolationMVArun2017v2DBoldDMwLT2017, "byVTightIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
-  this -> _tree -> Branch("byVVTightIsolationMVArun2017v2DBoldDMwLT2017", &_byVVTightIsolationMVArun2017v2DBoldDMwLT2017, "byVVTightIsolationMVArun2017v2DBoldDMwLT2017[_ntau]/O");
+  this -> _tree -> Branch("byIsolationMVArun2017v2DBoldDMwLTraw2017", &_byIsolationMVArun2017v2DBoldDMwLTraw2017);
+  this -> _tree -> Branch("byVVLooseIsolationMVArun2017v2DBoldDMwLT2017", &_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017);
+  this -> _tree -> Branch("byVLooseIsolationMVArun2017v2DBoldDMwLT2017", &_byVLooseIsolationMVArun2017v2DBoldDMwLT2017);
+  this -> _tree -> Branch("byLooseIsolationMVArun2017v2DBoldDMwLT2017", &_byLooseIsolationMVArun2017v2DBoldDMwLT2017);
+  this -> _tree -> Branch("byMediumIsolationMVArun2017v2DBoldDMwLT2017", &_byMediumIsolationMVArun2017v2DBoldDMwLT2017);
+  this -> _tree -> Branch("byTightIsolationMVArun2017v2DBoldDMwLT2017", &_byTightIsolationMVArun2017v2DBoldDMwLT2017);
+  this -> _tree -> Branch("byVTightIsolationMVArun2017v2DBoldDMwLT2017", &_byVTightIsolationMVArun2017v2DBoldDMwLT2017);
+  this -> _tree -> Branch("byVVTightIsolationMVArun2017v2DBoldDMwLT2017", &_byVVTightIsolationMVArun2017v2DBoldDMwLT2017);
 
 
-  this -> _tree -> Branch("againstMuonLoose3", &_againstMuonLoose3, "_againstMuonLoose3[_ntau]/O");
-  this -> _tree -> Branch("againstMuonTight3", &_againstMuonTight3, "_againstMuonTight3[_ntau]/O");
-  this -> _tree -> Branch("againstElectronVLooseMVA6", &_againstElectronVLooseMVA6, "_againstElectronVLooseMVA6[_ntau]/O");
-  this -> _tree -> Branch("againstElectronLooseMVA6", &_againstElectronLooseMVA6, "_againstElectronLooseMVA6[_ntau]/O");
-  this -> _tree -> Branch("againstElectronMediumMVA6", &_againstElectronMediumMVA6, "_againstElectronMediumMVA6[_ntau]/O");
-  this -> _tree -> Branch("againstElectronTightMVA6", &_againstElectronTightMVA6, "_againstElectronTightMVA6[_ntau]/O");
-  this -> _tree -> Branch("againstElectronVTightMVA6", &_againstElectronVTightMVA6, "_againstElectronVTightMVA6[_ntau]/O");
+  this -> _tree -> Branch("againstMuonLoose3", &_againstMuonLoose3);
+  this -> _tree -> Branch("againstMuonTight3", &_againstMuonTight3);
+  this -> _tree -> Branch("againstElectronVLooseMVA6", &_againstElectronVLooseMVA6);
+  this -> _tree -> Branch("againstElectronLooseMVA6", &_againstElectronLooseMVA6);
+  this -> _tree -> Branch("againstElectronMediumMVA6", &_againstElectronMediumMVA6);
+  this -> _tree -> Branch("againstElectronTightMVA6", &_againstElectronTightMVA6);
+  this -> _tree -> Branch("againstElectronVTightMVA6", &_againstElectronVTightMVA6);
 
-  this -> _tree -> Branch("hltPt",  &_hltPt, "_hltPt[_ntau]/F");
-  this -> _tree -> Branch("hltEta", &_hltEta, "_hltEta[_ntau]/F");
-  this -> _tree -> Branch("hltPhi", &_hltPhi, "_hltPhi[_ntau]/F");
-  this -> _tree -> Branch("hltE", &_hltE, "_hltE[_ntau]/F");
-  this -> _tree -> Branch("hltMass", &_hltMass, "_hltMass[_ntau]/F");
+  this -> _tree -> Branch("hltPt",  &_hltPt);
+  this -> _tree -> Branch("hltEta", &_hltEta);
+  this -> _tree -> Branch("hltPhi", &_hltPhi);
+  this -> _tree -> Branch("hltE", &_hltE);
+  this -> _tree -> Branch("hltMass", &_hltMass);
   this -> _tree -> Branch("l1tPt",  &_l1tPt);
   this -> _tree -> Branch("l1tEta", &_l1tEta);
   this -> _tree -> Branch("l1tPhi", &_l1tPhi);
@@ -529,9 +537,9 @@ void Ntuplizer_noTagAndProbe_multipleTaus::beginJob()
   this -> _tree -> Branch("l1tTowerIPhiJet", &_l1tTowerIPhiJet);
   this -> _tree -> Branch("l1tRawEtJet", &_l1tRawEtJet);
 
-  this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType, "hasTriggerMuonType[_ntau]/O");
-  this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType, "hasTriggerTauType[_ntau]/O");
-  this -> _tree -> Branch("isMatched", &_isMatched, "isMatched[_ntau]/O");
+  this -> _tree -> Branch("hasTriggerMuonType", &_hasTriggerMuonType);
+  this -> _tree -> Branch("hasTriggerTauType", &_hasTriggerTauType);
+  this -> _tree -> Branch("isMatched", &_isMatched);
   this -> _tree -> Branch("isOS", &_isOS, "isOS/O");
   this -> _tree -> Branch("foundJet", &_foundJet, "foundJet/I");
   this -> _tree -> Branch("Nvtx", &_Nvtx, "Nvtx/I");
@@ -649,102 +657,161 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
      this -> _l1tQual .push_back (bx0TauIt->hwQual());
    }
 
-  std::vector<int> matchedObjIndexes;
-  matchedObjIndexes.clear(); 
   const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  std::vector<pat::TauRef> selected_pair;  
+  bool isFirstPair = true;
 
-  for(UInt_t iTau = 0 ; iTau < tauHandle->size() ; ++iTau){
-    const pat::TauRef tau = (*tauHandle)[iTau] ;
-    _tauTriggerBitSetPerLeg.reset();
-   // for(std::vector<int>::const_iterator k = matchedObjIndexes.begin(); k!= matchedObjIndexes.end(); ++k) std::cout << *k << " ";
+  for(UInt_t iTau1 = 0 ; iTau1 < tauHandle->size() ; ++iTau1){
+    pat::TauRef tau1 = (*tauHandle)[iTau1];
+    if(!tau1->genJet()) continue;
+      for(UInt_t iTau2 = iTau1 + 1 ; iTau2 < tauHandle->size() ; ++iTau2){
+        pat::TauRef tau2 = (*tauHandle)[iTau2] ;
+        if(!tau2->genJet()) continue;
 
-    //std::cout << "offline object kinematics " << tau->pt() << " " << tau->eta() << " " << tau->phi() << " " << tau->energy() << std::endl;
-    int i = 0;
-    //Check for match with triggerObjects 
-    for (pat::TriggerObjectStandAlone  obj : *triggerObjects){
-      obj.unpackPathNames(names);
-      obj.unpackFilterLabels(iEvent, *triggerBits);
-      const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
-     
-      //Ignore objects that were already matched to avoid double counting
-      if (std::find(matchedObjIndexes.begin(), matchedObjIndexes.end(), i) != matchedObjIndexes.end()) continue;
-        //std::cout << "New object" << std::endl;
-      const float dR = deltaR (*tau, obj);
+        const float dR = deltaR (*tau1, *tau2);
+        if(dR < 0.5) continue;
 
-      if ( dR < 0.5){
-            this ->_isMatched[_ntau] = true;
-            this -> _hasTriggerTauType[_ntau] = obj.hasTriggerObjectType(trigger::TriggerTau);
-            this -> _hasTriggerMuonType[_ntau] = obj.hasTriggerObjectType(trigger::TriggerMuon);
-            //for(std::vector<string>::const_iterator i = paths.begin(); i!= paths.end(); ++i) std::cout << *i << " ";
-            unsigned int x = 0;
-            for (const tParameterSet& parameter : _parameters){
-              if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false))){
-                const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
-                if (this -> hasFilters(obj, filters)){
-                     _tauTriggerBitSetPerLeg[x] = true;
-                     _hltPt[_ntau] = obj.pt();
-                     _hltEta[_ntau] = obj.eta();
-                     _hltPhi[_ntau] = obj.phi();
-                     _hltE[_ntau] = obj.energy();
+        std::vector<pat::TauRef> tau_pair;
+        if(tau1->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017") < tau2->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017")){
+            tau_pair.push_back(tau1);
+            tau_pair.push_back(tau2);
+        }else{
+            tau_pair.push_back(tau2);
+            tau_pair.push_back(tau1);
+        }
+
+        if(isFirstPair){
+            selected_pair.push_back(tau_pair[0]);           
+            selected_pair.push_back(tau_pair[1]);       
+            isFirstPair = false;    
+        } else {
+            if(tau_pair[0]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017") < selected_pair[0]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017")){
+                selected_pair.clear(); 
+                selected_pair.push_back(tau_pair[0]);           
+                selected_pair.push_back(tau_pair[1]);       
+            } else if (tau_pair[0]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017") > selected_pair[0]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017")) {
+                continue;
+            } else {
+                if (tau_pair[0]->pt() > selected_pair[0]->pt()){
+                    selected_pair.clear(); 
+                    selected_pair.push_back(tau_pair[0]);           
+                    selected_pair.push_back(tau_pair[1]); 
+                } else if(tau_pair[0]->pt() < selected_pair[0]->pt()) {
+                    continue;
+                } else {
+                    if(tau_pair[1]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017") < selected_pair[1]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017")){
+                        selected_pair.clear(); 
+                        selected_pair.push_back(tau_pair[0]);           
+                        selected_pair.push_back(tau_pair[1]);       
+                    } else if (tau_pair[1]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017") > selected_pair[1]->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017")) {
+                        continue;
+                    } else {
+                        if (tau_pair[1]->pt() > selected_pair[1]->pt()){
+                            selected_pair.clear();
+                            selected_pair.push_back(tau_pair[0]);        
+                            selected_pair.push_back(tau_pair[1]);
+                        } else if(tau_pair[1]->pt() < selected_pair[1]->pt()) {
+                            continue;
+                        }
+                    }
                 }
-              }
-              x++;
+
             }
-        if(matchedObjIndexes.size() > _ntau){matchedObjIndexes[_ntau] = i;}
-        else{matchedObjIndexes.push_back(i);}
-          }
-        i++;
+        }
+      }
     }
-    if (!this ->_isMatched[_ntau]) continue;
-    //std::cout << _hltPt[_ntau] << " " <<  _hltEta[_ntau] << "    " << tau->pt() << " " << tau->eta() <<  " "  << _tauTriggerBitSetPerLeg.to_ulong() << std::endl;
-    _tauTriggerBitsPerLeg.push_back(_tauTriggerBitSetPerLeg.to_ulong());
-    //std::cout << this->_tauTriggerBitSetPerLeg.to_ulong() << " " << this -> _tauTriggerBitsPerLeg[_ntau] << std::endl;
+    
+    std::vector<int> matchedObjIndexes;
+    matchedObjIndexes.clear();
 
-    _tauPt[_ntau] = tau -> pt();
-    _tauEta[_ntau] = tau -> eta();
-    _tauPhi[_ntau] = tau -> phi();
-    _tauE[_ntau] = tau -> energy();
-    _tauCharge[_ntau] = tau -> charge();
-    _tauDecayMode[_ntau] = tau -> decayMode();
-    _decayModeFinding[_ntau] =tau->tauID("decayModeFinding");
-    _decayModeFindingNewDMs[_ntau] =tau->tauID("decayModeFindingNewDMs");
-  
-    this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits[_ntau] =tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits");
-    this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits[_ntau] =tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits");
-    this -> _byTightCombinedIsolationDeltaBetaCorr3Hits[_ntau] =tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits");
-    this -> _byVLooseIsolationMVArun2v1DBoldDMwLT[_ntau] =tau->tauID("byVLooseIsolationMVArun2v1DBoldDMwLT");
-    this -> _byLooseIsolationMVArun2v1DBoldDMwLT[_ntau] =tau->tauID("byLooseIsolationMVArun2v1DBoldDMwLT");
-    this -> _byMediumIsolationMVArun2v1DBoldDMwLT[_ntau] =tau->tauID("byMediumIsolationMVArun2v1DBoldDMwLT");
-    this -> _byTightIsolationMVArun2v1DBoldDMwLT[_ntau] =tau->tauID("byTightIsolationMVArun2v1DBoldDMwLT");
-    this -> _byVTightIsolationMVArun2v1DBoldDMwLT[_ntau] =tau->tauID("byVTightIsolationMVArun2v1DBoldDMwLT");
-    this -> _byVLooseIsolationMVArun2v1DBnewDMwLT[_ntau] =tau->tauID("byVLooseIsolationMVArun2v1DBnewDMwLT");
-    this -> _byLooseIsolationMVArun2v1DBnewDMwLT[_ntau] =tau->tauID("byLooseIsolationMVArun2v1DBnewDMwLT");
-    this -> _byMediumIsolationMVArun2v1DBnewDMwLT[_ntau] =tau->tauID("byMediumIsolationMVArun2v1DBnewDMwLT");
-    this -> _byTightIsolationMVArun2v1DBnewDMwLT[_ntau] =tau->tauID("byTightIsolationMVArun2v1DBnewDMwLT");
-    this -> _byVTightIsolationMVArun2v1DBnewDMwLT[_ntau] =tau->tauID("byVTightIsolationMVArun2v1DBnewDMwLT");
-    this -> _byLooseIsolationMVArun2v1DBdR03oldDMwLT[_ntau] =tau->tauID("byLooseIsolationMVArun2v1DBdR03oldDMwLT");
-    this -> _byMediumIsolationMVArun2v1DBdR03oldDMwLT[_ntau] =tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT");
-    this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT[_ntau] =tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT");
-    this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT[_ntau] =tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT");
+    if(!isFirstPair){
+ 
+    for(int nt = 0; nt < 2; nt++){
+        pat::TauRef tau = selected_pair[nt]; 
+        _tauTriggerBitSetPerLeg.reset();
+        int i = 0;
+        //Check for match with triggerObjects 
+        for (pat::TriggerObjectStandAlone  obj : *triggerObjects){
+          obj.unpackPathNames(names);
+          obj.unpackFilterLabels(iEvent, *triggerBits);
+          const edm::TriggerNames::Strings& triggerNames = names.triggerNames();
+         
+          //Ignore objects that were already matched to avoid double counting
+          if (std::find(matchedObjIndexes.begin(), matchedObjIndexes.end(), i) != matchedObjIndexes.end()) continue;
+          const float dR = deltaR (*tau, obj);
 
-    _byIsolationMVArun2017v2DBoldDMwLTraw2017[_ntau]  = tau->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017");
-    _byVVLooseIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byVVLooseIsolationMVArun2017v2DBoldDMwLT2017");
-    _byVLooseIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byVLooseIsolationMVArun2017v2DBoldDMwLT2017");
-    _byLooseIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byLooseIsolationMVArun2017v2DBoldDMwLT2017");
-    _byMediumIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byMediumIsolationMVArun2017v2DBoldDMwLT2017");
-    _byTightIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byTightIsolationMVArun2017v2DBoldDMwLT2017");
-    _byVTightIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byVTightIsolationMVArun2017v2DBoldDMwLT2017");
-    _byVVTightIsolationMVArun2017v2DBoldDMwLT2017[_ntau] = tau->tauID("byVVTightIsolationMVArun2017v2DBoldDMwLT2017");
+          if ( dR < 0.5){
+                this ->_isMatched.push_back(true);
+                this -> _hasTriggerTauType.push_back(obj.hasTriggerObjectType(trigger::TriggerTau));
+                this -> _hasTriggerMuonType.push_back(obj.hasTriggerObjectType(trigger::TriggerMuon));
+                unsigned int x = 0;
+                for (const tParameterSet& parameter : _parameters){
+                  if ((parameter.hltPathIndex >= 0)&&(obj.hasPathName(triggerNames[parameter.hltPathIndex], true, false))){
+                    const std::vector<std::string>& filters = (parameter.leg1 == 15)? (parameter.hltFilters1):(parameter.hltFilters2);
+                    if (this -> hasFilters(obj, filters)){
+                         _tauTriggerBitSetPerLeg[x] = true;
+                         _hltPt.push_back(obj.pt());
+                         _hltEta.push_back(obj.eta());
+                         _hltPhi.push_back(obj.phi());
+                         _hltE.push_back(obj.energy());
+                    }
+                  }
+                  x++;
+                }
+            if(matchedObjIndexes.size() > _ntau){matchedObjIndexes[_ntau] = i;}
+            else{matchedObjIndexes.push_back(i);}
+              }
+            i++;
+        }
+        _tauTriggerBitsPerLeg.push_back(_tauTriggerBitSetPerLeg.to_ulong());
 
-    this -> _againstMuonLoose3[_ntau] =tau->tauID("againstMuonLoose3");
-    this -> _againstMuonTight3[_ntau] =tau->tauID("againstMuonTight3");
-    this -> _againstElectronVLooseMVA6[_ntau] =tau->tauID("againstElectronVLooseMVA6");
-    this -> _againstElectronLooseMVA6[_ntau] =tau->tauID("againstElectronLooseMVA6");
-    this -> _againstElectronMediumMVA6[_ntau] =tau->tauID("againstElectronMediumMVA6");
-    this -> _againstElectronTightMVA6[_ntau] =tau->tauID("againstElectronTightMVA6");
-    this -> _againstElectronVTightMVA6[_ntau] =tau->tauID("againstElectronVTightMVA6");
-    ++_ntau;
-  }
+        _tauPt.push_back(tau -> pt());
+        _tauEta.push_back(tau -> eta());
+        _tauPhi.push_back(tau -> phi());
+        _tauE.push_back(tau -> energy());
+        _tauCharge.push_back(tau -> charge());
+        _tauDecayMode.push_back(tau -> decayMode());
+        _decayModeFinding.push_back(tau->tauID("decayModeFinding"));
+        _decayModeFindingNewDMs.push_back(tau->tauID("decayModeFindingNewDMs"));
+      
+        this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits"));
+        this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"));
+        this -> _byTightCombinedIsolationDeltaBetaCorr3Hits.push_back(tau->tauID("byTightCombinedIsolationDeltaBetaCorr3Hits"));
+        this -> _byVLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBoldDMwLT"));
+        this -> _byLooseIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBoldDMwLT"));
+        this -> _byMediumIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBoldDMwLT"));
+        this -> _byTightIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBoldDMwLT"));
+        this -> _byVTightIsolationMVArun2v1DBoldDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBoldDMwLT"));
+        this -> _byVLooseIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byVLooseIsolationMVArun2v1DBnewDMwLT"));
+        this -> _byLooseIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBnewDMwLT"));
+        this -> _byMediumIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBnewDMwLT"));
+        this -> _byTightIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBnewDMwLT"));
+        this -> _byVTightIsolationMVArun2v1DBnewDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBnewDMwLT"));
+        this -> _byLooseIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byLooseIsolationMVArun2v1DBdR03oldDMwLT"));
+        this -> _byMediumIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byMediumIsolationMVArun2v1DBdR03oldDMwLT"));
+        this -> _byTightIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byTightIsolationMVArun2v1DBdR03oldDMwLT"));
+        this -> _byVTightIsolationMVArun2v1DBdR03oldDMwLT.push_back(tau->tauID("byVTightIsolationMVArun2v1DBdR03oldDMwLT"));
+
+        _byIsolationMVArun2017v2DBoldDMwLTraw2017.push_back(tau->tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017"));
+        _byVVLooseIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byVVLooseIsolationMVArun2017v2DBoldDMwLT2017"));
+        _byVLooseIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byVLooseIsolationMVArun2017v2DBoldDMwLT2017"));
+        _byLooseIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byLooseIsolationMVArun2017v2DBoldDMwLT2017"));
+        _byMediumIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byMediumIsolationMVArun2017v2DBoldDMwLT2017"));
+        _byTightIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byTightIsolationMVArun2017v2DBoldDMwLT2017"));
+        _byVTightIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byVTightIsolationMVArun2017v2DBoldDMwLT2017"));
+        _byVVTightIsolationMVArun2017v2DBoldDMwLT2017.push_back( tau->tauID("byVVTightIsolationMVArun2017v2DBoldDMwLT2017"));
+
+        this -> _againstMuonLoose3.push_back(tau->tauID("againstMuonLoose3"));
+        this -> _againstMuonTight3.push_back(tau->tauID("againstMuonTight3"));
+        this -> _againstElectronVLooseMVA6.push_back(tau->tauID("againstElectronVLooseMVA6"));
+        this -> _againstElectronLooseMVA6.push_back(tau->tauID("againstElectronLooseMVA6"));
+        this -> _againstElectronMediumMVA6.push_back(tau->tauID("againstElectronMediumMVA6"));
+        this -> _againstElectronTightMVA6.push_back(tau->tauID("againstElectronTightMVA6"));
+        this -> _againstElectronVTightMVA6.push_back(tau->tauID("againstElectronVTightMVA6"));
+        ++_ntau;
+      }
+
+  this -> _isOS = (_tauCharge[0] != _tauCharge[1]);
 
   this -> _Nvtx = vertexes->size();
 
@@ -756,8 +823,8 @@ void Ntuplizer_noTagAndProbe_multipleTaus::analyze(const edm::Event& iEvent, con
   _numberOfJets = FillJet(jets,iEvent, &jecUnc);
 
 
-  if(_ntau > 1)  this -> _tree -> Fill();
-
+  this -> _tree -> Fill(); 
+}
 }
 
 bool Ntuplizer_noTagAndProbe_multipleTaus::hasFilters(const pat::TriggerObjectStandAlone&  obj , const std::vector<std::string>& filtersToLookFor) {

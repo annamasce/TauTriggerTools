@@ -12,7 +12,7 @@ import argparse
 
 argParser = argparse.ArgumentParser(description = "Argument parser")
 argParser.add_argument('--subJob',              action='store',         default=0)
-argParser.add_argument('--isTest',              action='store',         default=False)
+argParser.add_argument('--isTest',              action='store_true')
 
 args = argParser.parse_args()
 
@@ -39,19 +39,21 @@ gStyle.SetPadRightMargin(0.05)
 
 #WPs = ["vvlooseTauMVA", "vlooseTauMVA", "looseTauMVA", "mediumTauMVA", "tightTauMVA", "vtightTauMVA", "vvtightTauMVA"]
 WPs = ["vlooseTauMVA", "looseTauMVA", "mediumTauMVA", "tightTauMVA", "vtightTauMVA"]
-tauDMs = ["splitPerDM"]
+tauDMs = ["inclusive", "dm0", "dm1", "dm10"]
 
 isDMspesific = True
 
-outputname = "/storage_mnt/storage/user/lwezenbe/CMSSW_10_2_13/src/TauTriggerTools/TauTagAndProbe/test/Factorization/data/tauTriggerFactorization2018_"+str(args.subJob)+".root"
+outputname = "/storage_mnt/storage/user/lwezenbe/CMSSW_10_2_13/src/TauTriggerTools/TauTagAndProbe/test/Factorization/data/Output/tauTriggerFactorization2018_"+str(args.subJob)+".root"
 
 
 # get binning from binning2017.py and binning2018.py files.
 from binning2018 import getbinning2018
 bins = getbinning2018()
 	
-bin2D = bins.getBinning()["ditau"]
-bin2DDM = bins.getBinning()["ditau"]
+#bin2D = bins.getBinning()["ditau"]
+#bin2DDM = bins.getBinning()["ditau"]
+bin2D = np.linspace(40, 100, 10)
+bin2DDM = np.linspace(40, 100, 10)
 bin1D = np.linspace(0, 200, 50)
 bin1DDM = np.linspace(0, 200, 50)
 	
@@ -99,9 +101,13 @@ for iEv in eventRange:
     p2 = TLorentzVector()
     p2.SetPtEtaPhiE(tauPt[1], tauEta[1], tauPhi[1], tauE[1])
     mass = (p1+p2).M()
+    highestPtIndex = 0
+    if p2.Pt() > p1.Pt():
+        highestPtIndex = 1
+        
     pt_values = sorted([p1.Pt(), p2.Pt()], reverse=True)
 
-    passed_ditau_trigger = tree.hasHLTPath_18
+    passed_ditau_trigger = tree.hasHLTPath_20
 
     Nevents = tree.EventNumber
     Nevts =Nevts + 1
@@ -109,37 +115,54 @@ for iEv in eventRange:
     bkgSubW = 1.
     weight = bkgSubW*puweight
 
-    WPoints = {"vvlooseTauMVA":"vvlooseMVAv2", "vlooseTauMVA":"vlooseMVAv2", "looseTauMVA":"looseMVAv2", "mediumTauMVA":"mediumMVAv2", "tightTauMVA":"tightMVAv2", "vtightTauMVA":"vtightMVAv2", "vvtightTauMVA":"vvtightMVAv2"}
+    WPointNames = {"vvlooseTauMVA":"vvlooseMVAv2", "vlooseTauMVA":"vlooseMVAv2", "looseTauMVA":"looseMVAv2", "mediumTauMVA":"mediumMVAv2", "tightTauMVA":"tightMVAv2", "vtightTauMVA":"vtightMVAv2", "vvtightTauMVA":"vvtightMVAv2"}
+    WPoints = {"vvlooseTauMVA":vlooseWP, "vlooseTauMVA":vlooseWP, "looseTauMVA":looseWP, "mediumTauMVA":mediumWP, "tightTauMVA":tightWP, "vtightTauMVA":vtightWP, "vvtightTauMVA":vtightWP}
     DMmap = {0:'dm0', 1:'dm1', 10:'dm10'}
 
     # Filling the histograms
     for WP in WPs:
 
-        eff_curve_leg1 = eff_file.Get('ditau_'+WPoints[WP]+"_"+DMmap[tauDM[0]]+'_MC_fit')
-        eff_curve_leg2 = eff_file.Get('ditau_'+WPoints[WP]+"_"+DMmap[tauDM[1]]+'_MC_fit')
+        if not WPoints[WP][0] or not WPoints[WP][1]: continue
 
-        efficiency_leg1_DM = eff_curve_leg1.Eval(tauPt[0])
-        efficiency_leg2_DM = eff_curve_leg2.Eval(tauPt[1])
-        weightedDitauHists_1D.fillHist(WP, 'splitPerDM', mass, weight*efficiency_leg1_DM*efficiency_leg2_DM)
-        weightedDitauHists_2D.fillHist(WP, 'splitPerDM', pt_values, weight*efficiency_leg1_DM*efficiency_leg2_DM)
-        denomHists_1D.fillHist(WP, 'splitPerDM', mass, weight)
-        denomHists_2D.fillHist(WP, 'splitPerDM', pt_values, weight)
+        eff_curve_leg1 = eff_file.Get('ditau_'+WPointNames[WP]+"_"+DMmap[tauDM[highestPtIndex]]+'_MC_fit')
+        eff_curve_leg2 = eff_file.Get('ditau_'+WPointNames[WP]+"_"+DMmap[tauDM[abs(highestPtIndex-1)]]+'_MC_fit')
+
+        efficiency_leg1_DM = eff_curve_leg1.Eval(tauPt[highestPtIndex])
+        efficiency_leg2_DM = eff_curve_leg2.Eval(tauPt[abs(highestPtIndex-1)])
+        weightedDitauHists_1D.fillHist(WP, ('inclusive', 'inclusive'), mass, weight*efficiency_leg1_DM*efficiency_leg2_DM)
+        weightedDitauHists_2D.fillHist(WP, ('inclusive', 'inclusive'), pt_values, weight*efficiency_leg1_DM*efficiency_leg2_DM)
+        weightedDitauHists_1D.fillHist(WP, (DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), mass, weight*efficiency_leg1_DM*efficiency_leg2_DM)
+        weightedDitauHists_2D.fillHist(WP,  (DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), pt_values, weight*efficiency_leg1_DM*efficiency_leg2_DM)
+        denomHists_1D.fillHist(WP,('inclusive', 'inclusive'), mass, weight)
+        denomHists_2D.fillHist(WP,('inclusive', 'inclusive'), pt_values, weight)
+        denomHists_1D.fillHist(WP,(DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), mass, weight)
+        denomHists_2D.fillHist(WP,(DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), pt_values, weight)
         
 
         if(passed_ditau_trigger):
-            ditauTriggeredHists_1D.fillHist(WP, 'splitPerDM', mass, weight)
-            ditauTriggeredHists_2D.fillHist(WP, 'splitPerDM', pt_values, weight)
+            ditauTriggeredHists_1D.fillHist(WP, ('inclusive', 'inclusive'), mass, weight)
+            ditauTriggeredHists_2D.fillHist(WP, ('inclusive', 'inclusive'), pt_values, weight)
+            ditauTriggeredHists_1D.fillHist(WP, (DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), mass, weight)
+            ditauTriggeredHists_2D.fillHist(WP, (DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), pt_values, weight)
 
 if not args.isTest: 
     out_file = TFile( outputname, 'recreate')
 
     for WP in WPs:
-        ditauTriggeredHists_1D.returnHist(WP, 'splitPerDM').Write(ditauTriggeredHists_1D.name + "_" +WP + "_inclusive")
-        ditauTriggeredHists_2D.returnHist(WP, 'splitPerDM').Write(ditauTriggeredHists_2D.name + "_" +WP + "_inclusive")
-        weightedDitauHists_1D.returnHist(WP, 'splitPerDM').Write(weightedDitauHists_1D.name + "_" +WP + "_inclusive")
-        weightedDitauHists_2D.returnHist(WP, 'splitPerDM').Write(weightedDitauHists_2D.name + "_" +WP + "_inclusive")
-        denomHists_1D.returnHist(WP, 'splitPerDM').Write(denomHists_1D.name + "_" +WP + "_inclusive")
-        denomHists_2D.returnHist(WP, 'splitPerDM').Write(denomHists_2D.name + "_" +WP + "_inclusive")
+        ditauTriggeredHists_1D.returnHist(WP, ('inclusive', 'inclusive')).Write(ditauTriggeredHists_1D.name + "_" +WP + "_inclusive")
+        ditauTriggeredHists_2D.returnHist(WP, ('inclusive', 'inclusive')).Write(ditauTriggeredHists_2D.name + "_" +WP + "_inclusive")
+        weightedDitauHists_1D.returnHist(WP, ('inclusive', 'inclusive')).Write(weightedDitauHists_1D.name + "_" +WP + "_inclusive")
+        weightedDitauHists_2D.returnHist(WP, ('inclusive', 'inclusive')).Write(weightedDitauHists_2D.name + "_" +WP + "_inclusive")
+        denomHists_1D.returnHist(WP, ('inclusive', 'inclusive')).Write(denomHists_1D.name + "_" +WP + "_inclusive")
+        denomHists_2D.returnHist(WP, ('inclusive', 'inclusive')).Write(denomHists_2D.name + "_" +WP + "_inclusive")
+        for tau1DM in tauDMs[1:]:
+            for tau2DM in tauDMs[1:]:
+                ditauTriggeredHists_1D.returnHist(WP, (tau1DM, tau2DM)).Write(ditauTriggeredHists_1D.name + "_" +WP + "_tau1_" + tau1DM + "_tau2_" + tau2DM)
+                ditauTriggeredHists_2D.returnHist(WP, (tau1DM, tau2DM)).Write(ditauTriggeredHists_2D.name + "_" +WP + "_tau1_" + tau1DM + "_tau2_" + tau2DM)
+                weightedDitauHists_1D.returnHist(WP, (tau1DM, tau2DM)).Write(weightedDitauHists_1D.name + "_" +WP + "_tau1_" + tau1DM + "_tau2_" + tau2DM)
+                weightedDitauHists_2D.returnHist(WP, (tau1DM, tau2DM)).Write(weightedDitauHists_2D.name + "_" +WP + "_tau1_" + tau1DM + "_tau2_" + tau2DM)
+                denomHists_1D.returnHist(WP, (tau1DM, tau2DM)).Write(denomHists_1D.name + "_" +WP + "_tau1_" + tau1DM + "_tau2_" + tau2DM)
+                denomHists_2D.returnHist(WP, (tau1DM, tau2DM)).Write(denomHists_2D.name + "_" +WP + "_tau1_" + tau1DM + "_tau2_" + tau2DM)
 
     out_file.Close()
     print "The output ROOT file has been created: " + outputname
