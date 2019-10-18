@@ -33,7 +33,7 @@ tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
                     updatedTauName = updatedTauName,
                     toKeep = ["2017v1", "2017v2", "newDM2017v2","dR0p32017v2" #classic MVAIso tau-Ids
                                ])
-tauIdEmbedder.runTauID(n)
+tauIdEmbedder.runTauID()
 
 
 if not isMC: # will use 80X
