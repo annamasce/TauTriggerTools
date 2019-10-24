@@ -334,13 +334,24 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _lumi = 0;
   this -> _MC_weight = 1;
   this -> _ntau = 0;
+  this -> _tauTriggerBits = 0;
+  this -> _tauTriggerBitsPerLeg.clear();
   this -> _tauPt.clear();
   this -> _tauEta.clear();
   this -> _tauPhi.clear();
+  this -> _tauE.clear();
   this -> _tauCharge.clear();
   this -> _tauDecayMode.clear();
+  this -> _decayModeFinding.clear();
+  this -> _decayModeFindingNewDMs.clear();
   this -> _isMatched.clear();
+  this -> _isOS = 0;
 
+  this -> _hltPt.clear();
+  this -> _hltEta.clear();
+  this -> _hltPhi.clear();
+  this -> _hltE.clear();
+  this -> _hltMass.clear();
   this -> _l1tPt.clear();
   this -> _l1tEta.clear();
   this -> _l1tPhi.clear();
@@ -377,6 +388,9 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _againstElectronMediumMVA6.clear();
   this -> _againstElectronTightMVA6.clear();
   this -> _againstElectronVTightMVA6.clear();
+  
+  this -> _hasTriggerMuonType.clear();
+  this -> _hasTriggerTauType.clear();
 
   this -> _byLooseCombinedIsolationDeltaBetaCorr3Hits.clear();
   this -> _byMediumCombinedIsolationDeltaBetaCorr3Hits.clear();
@@ -406,8 +420,7 @@ void Ntuplizer_noTagAndProbe_multipleTaus::Initialize() {
   this -> _byVTightIsolationMVArun2017v2DBoldDMwLT2017.clear();
   this -> _byVVTightIsolationMVArun2017v2DBoldDMwLT2017.clear();
 
-
-  _tauTriggerBitsPerLeg.clear();
+  this -> _foundJet = 0;
   _jets_px.clear();
   _jets_py.clear();
   _jets_pz.clear();
