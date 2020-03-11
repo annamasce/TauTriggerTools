@@ -80,6 +80,133 @@ std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauC
     return result;
 }
 
+bool IsGoodBaselineTau(const pat::Tau& tau, const LorentzVectorM& muon_p4, double deltaR2Thr){
+    auto leadChargedHadrCand = dynamic_cast<const pat::PackedCandidate*>(tau.leadChargedHadrCand().get());
+    return (tau.polarP4().pt() > 18 && std::abs(tau.polarP4().eta()) < 2.3
+            && leadChargedHadrCand && std::abs(leadChargedHadrCand->dz()) < 0.2
+            && reco::deltaR2(muon_p4, tau.polarP4()) > deltaR2Thr);
+}
+
+bool IsBetterTauPair(std::vector<const pat::Tau*>& tau_pair_1, const std::vector<const pat::Tau*>& tau_pair_2, const std::string IdName){
+    if(tau_pair_1[0]->tauID(IdName) > tau_pair_2[0]->tauID(IdName)){
+        return true;
+    } else if(tau_pair_1[0]->tauID(IdName) == tau_pair_2[0]->tauID(IdName)) {
+        if(tau_pair_1[0]->pt() < tau_pair_2[0]->pt()) {
+            return true;
+        } else if(tau_pair_1[0]->pt() == tau_pair_2[0]->pt()) {
+            if(tau_pair_1[1]->tauID(IdName) > tau_pair_2[1]->tauID(IdName)){
+                return true;
+            } else if(tau_pair_1[1]->tauID(IdName) == tau_pair_2[1]->tauID(IdName)){
+                if(tau_pair_1[1]->pt() < tau_pair_2[1]->pt()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+        
+    }
+
+}
+
+std::vector<TauEntry> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr)
+{
+
+    static const std::string mvaIdName = "byIsolationMVArun2017v2DBoldDMwLTraw2017";
+    static const std::string deepIdName = "byDeepTau2017v2p1VSjetraw";
+    std::map<TauSelection, std::vector<const pat::Tau*>> best_tau_pair;
+    int tau1_index = 0;
+    for(const auto& tau1 : taus) {
+        tau1_index++;
+        if(!IsGoodBaselineTau(tau1, muon_p4, deltaR2Thr)) continue;
+        const bool pass_mva_sel_tau1 = tau1.tauID("againstMuonLoose3") > 0.5f;
+        const bool pass_deep_sel_tau1 = tau1.isTauIDAvailable("byDeepTau2017v2p1VSjetraw")
+            && tau1.tauID("byVVVLooseDeepTau2017v2p1VSe") > 0.5f
+            && tau1.tauID("byVLooseDeepTau2017v2p1VSmu") > 0.5f;
+        int tau2_index = 0;
+        for(const auto& tau2 : taus) {
+            tau2_index++;
+            if (tau2_index <= tau1_index)       continue;
+            if(!IsGoodBaselineTau(tau2, muon_p4, deltaR2Thr)) continue;
+            const bool pass_mva_sel_tau2 = tau2.tauID("againstMuonLoose3") > 0.5f;
+            const bool pass_deep_sel_tau2 = tau2.isTauIDAvailable("byDeepTau2017v2p1VSjetraw")
+                && tau2.tauID("byVVVLooseDeepTau2017v2p1VSe") > 0.5f
+                && tau2.tauID("byVLooseDeepTau2017v2p1VSmu") > 0.5f;
+
+            const float dR = deltaR (tau1, tau2);
+            if(dR < 0.5) continue; 
+            
+        
+            if(pass_deep_sel_tau1 && pass_deep_sel_tau2){
+                std::vector<const pat::Tau*> tau_pair;
+                if(tau1.tauID(deepIdName) < tau2.tauID(deepIdName)){
+                    tau_pair.push_back(&tau1);
+                    tau_pair.push_back(&tau2);
+                }else{
+                    tau_pair.push_back(&tau2);
+                    tau_pair.push_back(&tau1);
+                }
+                if(!best_tau_pair.count(TauSelection::DeepTau)){
+                    best_tau_pair[TauSelection::DeepTau] = tau_pair;
+                } else if(IsBetterTauPair(best_tau_pair[TauSelection::DeepTau], tau_pair, deepIdName)) {
+                    best_tau_pair[TauSelection::DeepTau] = tau_pair;
+                }
+
+            }
+
+            if(pass_mva_sel_tau1 && pass_mva_sel_tau2){
+                std::vector<const pat::Tau*> tau_pair;
+                if(tau1.tauID(mvaIdName) < tau2.tauID(mvaIdName)){
+                    tau_pair.push_back(&tau1);
+                    tau_pair.push_back(&tau2);
+                }else{
+                    tau_pair.push_back(&tau2);
+                    tau_pair.push_back(&tau1);
+                }
+                if(!best_tau_pair.count(TauSelection::MVA)){
+                    best_tau_pair[TauSelection::MVA] = tau_pair;
+                } else if(IsBetterTauPair(best_tau_pair[TauSelection::MVA], tau_pair, mvaIdName)) {
+                    best_tau_pair[TauSelection::MVA] = tau_pair;
+                }
+            }
+        }
+    }
+    
+    std::map<const pat::Tau*, TauEntry> selected_taus;
+    for(const auto& entry : best_tau_pair){
+        const pat::Tau* reco_tau1 = entry.second[0];
+        const pat::Tau* reco_tau2 = entry.second[1];
+        if(!selected_taus.count(reco_tau1)) {
+            const auto gen_tau = gen_truth::LeptonGenMatch(reco_tau1->polarP4(), genLeptons);
+            selected_taus[reco_tau1] = TauEntry{reco_tau1, gen_tau, 0};
+        }
+        selected_taus[reco_tau1].selection |= static_cast<unsigned>(entry.first);
+        selected_taus[reco_tau1].best_tau_in_pair |= static_cast<unsigned>(entry.first);
+ 
+        if(!selected_taus.count(reco_tau2)) {
+            const auto gen_tau = gen_truth::LeptonGenMatch(reco_tau2->polarP4(), genLeptons);
+            selected_taus[reco_tau2] = TauEntry{reco_tau2, gen_tau, 0};
+        }
+        selected_taus[reco_tau2].selection |= static_cast<unsigned>(entry.first);
+
+    }
+
+    std::vector<TauEntry> result;
+    for(const auto& entry : selected_taus){
+        result.push_back(entry.second);
+    }
+    return result;
+
+}
+
+
 bool PassBtagVeto(const LorentzVectorM& muon_p4, const LorentzVectorM& tau_p4,
                   const pat::JetCollection& jets, double btagThreshold, double deltaR2Thr)
 {

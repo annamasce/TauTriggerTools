@@ -61,6 +61,7 @@ public:
             data->getExpressTuple()->Write();
         SummaryTuple& summaryTuple = *data->getSummaryTuple();
         const auto& filters = data->getFilters();
+        std::cout << filters.size() << std::endl;
         for(const auto& entry : filters) {
             summaryTuple().filter_name.push_back(entry.first);
             summaryTuple().filter_hash.push_back(entry.second);

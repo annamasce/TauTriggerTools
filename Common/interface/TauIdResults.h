@@ -121,7 +121,7 @@ struct TauIdDescriptor {
         const std::string disc_name = ::analysis::ToString(discriminator);
         if(has_raw) {
             const float value = tau && tau->isTauIDAvailable(raw_name) ? tau->tauID(raw_name) : default_value;
-            tuple.template get<float>(prefix + disc_name + raw_suffix) = value;
+            tuple.template get<std::vector<float>>(prefix + disc_name + raw_suffix).push_back(value);
         }
         if(!working_points.empty()) {
             TauIdResults id_results;
@@ -129,7 +129,7 @@ struct TauIdDescriptor {
                 const bool result = tau && tau->isTauIDAvailable(wp_entry.second) && tau->tauID(wp_entry.second) > 0.5f;
                 id_results.SetResult(wp_entry.first, result);
             }
-            tuple.template get<TauIdResults::BitsContainer>(prefix + disc_name) = id_results.GetResultBits();
+            tuple.template get<std::vector<TauIdResults::BitsContainer>>(prefix + disc_name).push_back(id_results.GetResultBits());
         }
     }
 };

@@ -38,7 +38,6 @@
             [ "hltSelectedPFTau35TrackPt1MediumChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24MediumChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg" ]
         ],
         "leg_types": [ "mu", "tau" ],
-        "target_channels": [ "ditau" ],
         "selection_ditau": { "hltObj_pt": 40 },
         "max_run": 317509,
         "sample_types": [ "data" ]
@@ -49,7 +48,6 @@
             [ "hltSelectedPFTau35TrackPt1TightChargedIsolationL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoPFTau35MonitoringReg" ]
         ],
         "leg_types": [ "mu", "tau" ],
-        "target_channels": [ "ditau" ],
         "selection_ditau": { "hltObj_pt": 40 },
         "max_run": 317509,
         "sample_types": [ "data" ]
@@ -60,7 +58,6 @@
             [ "hltSelectedPFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsL1HLTMatchedReg", "hltOverlapFilterIsoMu24TightChargedIsoAndTightOOSCPhotonsPFTau35MonitoringReg" ]
         ],
         "leg_types": [ "mu", "tau" ],
-        "target_channels": [ "ditau" ],
         "max_run": 317509,
         "sample_types": [ "data" ]
     },
@@ -169,7 +166,6 @@
             [ "hltHpsSelectedPFTau35TrackPt1MediumChargedIsolationL1HLTMatchedReg", "hltHpsOverlapFilterIsoMu24MediumChargedIsoPFTau35MonitoringReg" ]
         ],
         "leg_types": [ "mu", "tau" ],
-        "target_channels": [ "ditau" ],
         "min_run": 317509,
         "sample_types": [ "data", "mc" ]
     },
@@ -220,5 +216,35 @@
             [ "hltSelectedPFTau180MediumChargedIsolationL1HLTMatched" ]
         ],
         "leg_types": [ "tau" ]
+    },
+    "HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v": {
+        "filters": [
+            ["hltHpsDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg"],
+            ["hltHpsDoublePFTau35TrackPt1TightChargedIsolationAndTightOOSCPhotonsDz02Reg"]
+        ],
+        "leg_types": ["tau", "tau"]
+    },
+    "HLT_DoubleMediumChargedIsoPFTauHPS40_Trk1_TightID_eta2p1_Reg_v": {
+        "filters": [
+            ["hltHpsDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg"],
+            ["hltHpsDoublePFTau40TrackPt1MediumChargedIsolationAndTightOOSCPhotonsDz02Reg"]
+        ],
+        "leg_types": ["tau", "tau"]
+    },
+    "HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v": {
+        "filters": [
+            ["hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg"],
+            ["hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg"]
+        ],
+        "leg_types": ["tau", "tau"]
+    },
+    "HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v": {
+        "filters": [
+            ["hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"],
+            ["hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"]
+        ],
+        "target_channels": [ "ditau" ],
+        "leg_types": ["tau", "tau"]
     }
+
 }

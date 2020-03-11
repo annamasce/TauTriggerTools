@@ -49,9 +49,39 @@ def _CreateDictionary(summary, key_name, value_name, name):
                 result_dict[keys[n]] = values[n]
     return result_dict
 
+def LoadTriggerDictionarySelf(in_file_path):
+    from ROOT import TFile
+    in_file = TFile(in_file_path)
+    tree = in_file.Get('summary')
+    tree.GetEntry(0)
+    trigger_dict = {}
+    for entry_id in range(len(tree.trigger_pattern)):
+        keys = np.array([tree.trigger_pattern[entry_id]])
+        values = np.array([tree.trigger_index[entry_id]])
+        for n in range(len(keys)):
+            if keys[n] in trigger_dict:
+                if trigger_dict[keys[n]] != values[n]:
+                    raise RuntimeError("Inconsistent trigger information in the input ROOT files.")
+            else:
+                trigger_dict[keys[n]] = values[n]
+    filter_dict = {}
+    for entry_id in range(len(tree.filter_name)):
+        keys = np.array([tree.filter_name[entry_id]])
+        values = np.array([tree.filter_hash[entry_id]])
+        for n in range(len(keys)):
+            if keys[n] in filter_dict:
+                if filter_dict[keys[n]] != values[n]:
+                    raise RuntimeError("Inconsistent filter information in the input ROOT files.")
+            else:
+                filter_dict[keys[n]] = values[n]
+    return trigger_dict, filter_dict
+    
+
 def LoadTriggerDictionary(files):
-    import ROOT
-    df_support = ROOT.RDataFrame('summary', files)
+    from ROOT import RDataFrame
+    print files
+    print ROOT.RDataFrame
+    df_support = ROOT.RDataFrame("summary", "/storage_mnt/storage/user/lwezenbe/private/CMSSW_10_2_20/src/TauTriggerTools/eventTuple.root")
     summary = df_support.AsNumpy()
     trigger_dict = _CreateDictionary(summary, 'trigger_pattern', 'trigger_index', 'trigger')
     filter_dict = _CreateDictionary(summary, 'filter_name', 'filter_hash', 'filter')

@@ -81,6 +81,7 @@ public:
         file.SetCompressionAlgorithm(ROOT::kLZ4);
         file.SetCompressionLevel(4);
         return std::make_unique<TupleProducerData>(file);
+
     }
 
     static void globalEndJob(TupleProducerData* data)
@@ -94,6 +95,17 @@ private:
     static constexpr float default_value = ::tau_trigger::DefaultFillValue<float>();
     static constexpr int default_int_value = ::tau_trigger::DefaultFillValue<int>();
     static constexpr double deltaR2Thr = 0.5*0.5;
+
+    std::vector<UInt_t> hltObj_types;
+    std::vector<Float_t> hltObj_pt;
+    std::vector<Float_t> hltObj_eta;
+    std::vector<Float_t> hltObj_phi;
+    std::vector<Float_t> hltObj_mass;
+    std::vector<Long64_t> hltObj_hasPathName;
+    std::vector<Long64_t> hltObj_isBestMatch;
+    std::vector<UInt_t> hltObj_miniAODIndex;
+    std::vector<UInt_t> filter_hltObj;
+    std::vector<UInt_t> filter_hash;
 
     template<typename T>
     edm::EDGetTokenT<T> consumeIT(const edm::ParameterSet& cfg, const std::string& name, bool always = true)
@@ -125,6 +137,7 @@ private:
 
     void fillTuple(edm::Event& event, Cutter& cut)
     {
+
         EventTuple& eventTuple = *data.eventTuple;
         cut(true, "total");
         eventTuple().run  = event.id().run();
@@ -214,9 +227,22 @@ private:
         edm::Handle<pat::JetCollection> jets;
         event.getByToken(jets_token, jets);
 
-        const auto& selected_taus = CollectTaus(muon_ref_p4, *taus, genLeptons, deltaR2Thr);
+        const auto& selected_taus = CollectTauPairs(muon_ref_p4, *taus, genLeptons, deltaR2Thr);
         cut(!selected_taus.empty(), "has_tau");
-        bool has_good_tau = false;
+
+        // std::vector<TauEntry> tau_pair;
+        // int most_isolated_index = 0;
+        // int index = 0;
+        // for(const auto& tau_entry : selected_taus) {
+        //     if((tau_entry.selection >> 3) & 1){
+        //         tau_pair.push_back(tau_entry);
+        //         if((tau_entry.best_tau_in_pair >> 3) & 1) most_isolated_index = index;
+        //         index++;
+        //     }
+        // }
+
+        bool has_good_tau_pair = false;
+        int ntaus = 0;
         for(const auto& tau_entry : selected_taus) {
             const pat::Tau* tau = tau_entry.reco_tau;
             const auto& gen_tau = tau_entry.gen_tau;
@@ -226,90 +252,113 @@ private:
                 throw exception("Inconsistent tau entry");
             if(btagThreshold > 0  && !PassBtagVeto(muon_ref_p4, tau_ref_p4, *jets, btagThreshold, deltaR2Thr)) continue;
 
-            eventTuple().tau_sel = tau_entry.selection;
-            eventTuple().tau_pt = tau ? static_cast<float>(tau->polarP4().pt()) : default_value;
-            eventTuple().tau_eta = tau ? static_cast<float>(tau->polarP4().eta()) : default_value;
-            eventTuple().tau_phi = tau ? static_cast<float>(tau->polarP4().phi()) : default_value;
-            eventTuple().tau_mass = tau ? static_cast<float>(tau->polarP4().mass()) : default_value;
-            eventTuple().tau_charge = tau ? tau->charge() : default_int_value;
+            eventTuple().tau_sel.push_back(tau_entry.selection);
+            eventTuple().tau_pt.push_back(tau ? static_cast<float>(tau->polarP4().pt()) : default_value);
+            eventTuple().tau_eta.push_back(tau ? static_cast<float>(tau->polarP4().eta()) : default_value);
+            eventTuple().tau_phi.push_back(tau ? static_cast<float>(tau->polarP4().phi()) : default_value);
+            // eventTuple().tau_energy.push_back(tau ? static_cast<float>(tau->polarP4().energy()) : default_value);
+            eventTuple().tau_mass.push_back(tau ? static_cast<float>(tau->polarP4().mass()) : default_value);
+            eventTuple().tau_charge.push_back(tau ? tau->charge() : default_int_value);
 
-            eventTuple().tau_gen_match = static_cast<int>(gen_tau.match);
-            eventTuple().tau_gen_charge = has_gen_tau ? gen_tau.gen_particle_firstCopy->charge() : default_int_value;
-            eventTuple().tau_gen_vis_pt = has_gen_tau ? static_cast<float>(gen_tau.visible_p4.pt()) : default_value;
-            eventTuple().tau_gen_vis_eta = has_gen_tau ? static_cast<float>(gen_tau.visible_p4.eta()) : default_value;
-            eventTuple().tau_gen_vis_phi = has_gen_tau ? static_cast<float>(gen_tau.visible_p4.phi()) : default_value;
-            eventTuple().tau_gen_vis_mass = has_gen_tau ? static_cast<float>(gen_tau.visible_p4.mass()) : default_value;
-            eventTuple().tau_gen_rad_pt = has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.pt()) : default_value;
-            eventTuple().tau_gen_rad_eta = has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.eta())
-                                                       : default_value;
-            eventTuple().tau_gen_rad_phi = has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.phi())
-                                                       : default_value;
-            eventTuple().tau_gen_rad_energy = has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.energy())
-                                                          : default_value;
-            eventTuple().tau_gen_n_charged_hadrons = has_gen_tau ? static_cast<int>(gen_tau.n_charged_hadrons)
-                                                                 : default_int_value;
-            eventTuple().tau_gen_n_neutral_hadrons = has_gen_tau ? static_cast<int>(gen_tau.n_neutral_hadrons)
-                                                                 : default_int_value;
-            eventTuple().tau_gen_n_gammas = has_gen_tau ? static_cast<int>(gen_tau.n_gammas) : default_int_value;
-            eventTuple().tau_gen_n_gammas_rad = has_gen_tau ? static_cast<int>(gen_tau.n_gammas_rad)
-                                                            : default_int_value;
+            eventTuple().tau_gen_match.push_back(static_cast<int>(gen_tau.match));
+            eventTuple().tau_gen_charge.push_back(has_gen_tau ? gen_tau.gen_particle_firstCopy->charge() : default_int_value);
+            eventTuple().tau_gen_vis_pt.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_p4.pt()) : default_value);
+            eventTuple().tau_gen_vis_eta.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_p4.eta()) : default_value);
+            eventTuple().tau_gen_vis_phi.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_p4.phi()) : default_value);
+            eventTuple().tau_gen_vis_mass.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_p4.mass()) : default_value);
+            eventTuple().tau_gen_rad_pt.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.pt()) : default_value);
+            eventTuple().tau_gen_rad_eta.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.eta())
+                                                       : default_value);
+            eventTuple().tau_gen_rad_phi.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.phi())
+                                                       : default_value);
+            eventTuple().tau_gen_rad_energy.push_back(has_gen_tau ? static_cast<float>(gen_tau.visible_rad_p4.energy())
+                                                          : default_value);
+            eventTuple().tau_gen_n_charged_hadrons.push_back(has_gen_tau ? static_cast<int>(gen_tau.n_charged_hadrons)
+                                                                 : default_int_value);
+            eventTuple().tau_gen_n_neutral_hadrons.push_back(has_gen_tau ? static_cast<int>(gen_tau.n_neutral_hadrons)
+                                                                 : default_int_value);
+            eventTuple().tau_gen_n_gammas.push_back(has_gen_tau ? static_cast<int>(gen_tau.n_gammas) : default_int_value);
+            eventTuple().tau_gen_n_gammas_rad.push_back(has_gen_tau ? static_cast<int>(gen_tau.n_gammas_rad)
+                                                            : default_int_value);
 
-            eventTuple().tau_decayMode = tau ? tau->decayMode() : default_int_value;
-            eventTuple().tau_oldDecayModeFinding = tau ? tau->tauID("decayModeFinding") > 0.5f : default_int_value;
+            eventTuple().tau_decayMode.push_back(tau ? tau->decayMode() : default_int_value);
+            eventTuple().tau_oldDecayModeFinding.push_back(tau ? tau->tauID("decayModeFinding") > 0.5f : default_int_value);
 
             for(const auto& tau_id_entry : tau_id::GetTauIdDescriptors()) {
                 const auto& desc = tau_id_entry.second;
                 desc.FillTuple(eventTuple, tau, default_value);
             }
 
-            eventTuple().tau_dxy = tau ? tau->dxy() : default_value;
-            eventTuple().tau_dxy_error = tau ? tau->dxy_error() : default_value;
-            eventTuple().tau_ip3d = tau ? tau->ip3d() : default_value;
-            eventTuple().tau_ip3d_error = tau ? tau->ip3d_error() : default_value;
+            eventTuple().tau_dxy.push_back(tau ? tau->dxy() : default_value);
+            eventTuple().tau_dxy_error.push_back(tau ? tau->dxy_error() : default_value);
+            eventTuple().tau_ip3d.push_back(tau ? tau->ip3d() : default_value);
+            eventTuple().tau_ip3d_error.push_back(tau ? tau->ip3d_error() : default_value);
 
             const pat::PackedCandidate* leadChargedHadrCand = tau
                     ? dynamic_cast<const pat::PackedCandidate*>(tau->leadChargedHadrCand().get())
                     : nullptr;
-            eventTuple().tau_dz = leadChargedHadrCand ? leadChargedHadrCand->dz() : default_value;
-            eventTuple().tau_dz_error = leadChargedHadrCand && leadChargedHadrCand->hasTrackDetails()
-                    ? leadChargedHadrCand->dzError() : default_value;
+            eventTuple().tau_dz.push_back(leadChargedHadrCand ? leadChargedHadrCand->dz() : default_value);
+            eventTuple().tau_dz_error.push_back(leadChargedHadrCand && leadChargedHadrCand->hasTrackDetails()
+                    ? leadChargedHadrCand->dzError() : default_value);
 
             eventTuple().vis_mass = static_cast<float>((muon_ref_p4 + tau_ref_p4).mass());
-
+            hltObj_types.clear();
+            hltObj_pt.clear();
+            hltObj_eta.clear();
+            hltObj_phi.clear();
+            hltObj_mass.clear();
+            hltObj_hasPathName.clear();
+            hltObj_isBestMatch.clear();
+            hltObj_miniAODIndex.clear();
+            filter_hltObj.clear();
+            filter_hash.clear();
             const auto tauTriggerMatch = triggerDescriptors.matchTriggerObjects(*triggerResults, *triggerObjects,
                     tau_ref_p4, triggerNames.triggerNames(), deltaR2Thr, true, true);
-            eventTuple().hlt_accept = tauTriggerMatch.accept.to_ullong();
-            eventTuple().hlt_acceptAndMatch = tauTriggerMatch.acceptAndMatch.to_ullong();
+            eventTuple().hlt_accept.push_back(tauTriggerMatch.accept.to_ullong());
+            eventTuple().hlt_acceptAndMatch.push_back(tauTriggerMatch.acceptAndMatch.to_ullong());
             for(const auto& match_entry : tauTriggerMatch.matchResults) {
                 const auto& hlt_obj = triggerObjects->at(match_entry.second.hltObjIndex);
-                eventTuple().hltObj_types.push_back(match_entry.second.objType);
-                eventTuple().hltObj_pt.push_back(static_cast<float>(hlt_obj.polarP4().pt()));
-                eventTuple().hltObj_eta.push_back(static_cast<float>(hlt_obj.polarP4().eta()));
-                eventTuple().hltObj_phi.push_back(static_cast<float>(hlt_obj.polarP4().phi()));
-                eventTuple().hltObj_mass.push_back(static_cast<float>(hlt_obj.polarP4().mass()));
-                eventTuple().hltObj_hasPathName.push_back(match_entry.second.hasPathName.to_ullong());
-                eventTuple().hltObj_isBestMatch.push_back(match_entry.second.isBestMatch.to_ullong());
-                eventTuple().hltObj_miniAODIndex.push_back(match_entry.second.hltObjIndex);
-                const size_t hltObj_index = eventTuple().hltObj_pt.size() - 1;
+                hltObj_types.push_back(match_entry.second.objType);
+                hltObj_pt.push_back(static_cast<float>(hlt_obj.polarP4().pt()));
+                hltObj_eta.push_back(static_cast<float>(hlt_obj.polarP4().eta()));
+                hltObj_phi.push_back(static_cast<float>(hlt_obj.polarP4().phi()));
+                hltObj_mass.push_back(static_cast<float>(hlt_obj.polarP4().mass()));
+                hltObj_hasPathName.push_back(match_entry.second.hasPathName.to_ullong());
+                hltObj_isBestMatch.push_back(match_entry.second.isBestMatch.to_ullong());
+                hltObj_miniAODIndex.push_back(match_entry.second.hltObjIndex);
+                const size_t hltObj_index = hltObj_pt.size() - 1;
                 for(const std::string& filter : match_entry.second.filters) {
-                    eventTuple().filter_hltObj.push_back(hltObj_index);
+                    filter_hltObj.push_back(hltObj_index);
                     const uint32_t hash = SummaryProducerData::GetData().getFilterHash(filter);
-                    eventTuple().filter_hash.push_back(hash);
+                    filter_hash.push_back(hash);
                 }
             }
 
-            auto l1Tau = MatchL1Taus(tau_ref_p4, *l1Taus, deltaR2Thr, 0);
-            eventTuple().l1Tau_pt = l1Tau ? static_cast<float>(l1Tau->polarP4().pt()) : default_value;
-            eventTuple().l1Tau_eta = l1Tau ? static_cast<float>(l1Tau->polarP4().eta()) : default_value;
-            eventTuple().l1Tau_phi = l1Tau ? static_cast<float>(l1Tau->polarP4().phi()) : default_value;
-            eventTuple().l1Tau_mass = l1Tau ? static_cast<float>(l1Tau->polarP4().mass()) : default_value;
-            eventTuple().l1Tau_hwIso = l1Tau ? l1Tau->hwIso() : default_int_value;
-            eventTuple().l1Tau_hwQual = l1Tau ? l1Tau->hwQual() : default_int_value;
+            eventTuple().hltObj_types.push_back(hltObj_types);
+            eventTuple().hltObj_pt.push_back(hltObj_pt);
+            eventTuple().hltObj_eta.push_back(hltObj_eta);
+            eventTuple().hltObj_phi.push_back(hltObj_phi);
+            eventTuple().hltObj_mass.push_back(hltObj_mass);
+            eventTuple().hltObj_hasPathName.push_back(hltObj_hasPathName);
+            eventTuple().hltObj_isBestMatch.push_back(hltObj_isBestMatch);
+            eventTuple().hltObj_miniAODIndex.push_back(hltObj_miniAODIndex);
+            eventTuple().filter_hltObj.push_back(filter_hltObj);
+            eventTuple().filter_hash.push_back(filter_hash);
 
-            has_good_tau = true;
-            eventTuple.Fill();
+            auto l1Tau = MatchL1Taus(tau_ref_p4, *l1Taus, deltaR2Thr, 0);
+            eventTuple().l1Tau_pt.push_back(l1Tau ? static_cast<float>(l1Tau->polarP4().pt()) : default_value);
+            eventTuple().l1Tau_eta.push_back(l1Tau ? static_cast<float>(l1Tau->polarP4().eta()) : default_value);
+            eventTuple().l1Tau_phi.push_back(l1Tau ? static_cast<float>(l1Tau->polarP4().phi()) : default_value);
+            eventTuple().l1Tau_mass.push_back(l1Tau ? static_cast<float>(l1Tau->polarP4().mass()) : default_value);
+            eventTuple().l1Tau_hwIso.push_back(l1Tau ? l1Tau->hwIso() : default_int_value);
+            eventTuple().l1Tau_hwQual.push_back(l1Tau ? l1Tau->hwQual() : default_int_value);
+
+            ntaus++;
+            
         }
-        cut(has_good_tau, "btag_veto");
+        if(ntaus >= 2) has_good_tau_pair = true;
+        eventTuple.Fill();
+        cut(has_good_tau_pair, "btag_veto");
     }
 
 private:

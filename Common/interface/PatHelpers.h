@@ -27,10 +27,18 @@ struct TauEntry {
     const pat::Tau* reco_tau{nullptr};
     gen_truth::LeptonMatchResult gen_tau;
     unsigned selection{0};
+    unsigned best_tau_in_pair{0};
 };
 
 std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
+
+std::vector<TauEntry> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
+
+bool IsGoodBaselineTau(const pat::Tau& tau, const LorentzVectorM& muon_p4, double deltaR2Thr);
+
+bool IsBetterTauPair(std::vector<const pat::Tau*>& tau_pair_1, const std::vector<const pat::Tau*>& tau_pair_2, const std::string IdName);
 
 bool PassBtagVeto(const LorentzVectorM& muon_p4, const LorentzVectorM& tau_p4, const pat::JetCollection& jets,
                   double btagThreshold, double deltaR2Thr);
