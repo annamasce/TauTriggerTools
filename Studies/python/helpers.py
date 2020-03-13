@@ -47,7 +47,12 @@ def progress(i, n, prefix="", size=60):
 def makeDirIfNeeded(path):
   try:
     os.makedirs(os.path.dirname(path))
-    print 'made dir'
   except OSError:
-    print 'did not make dir'
     pass
+
+#
+#Sort one list based on another list
+#
+def sortByOtherList(to_sort, base):
+    orderedList = [x for _, x in sorted(zip(base, to_sort))]
+    return orderedList

@@ -1,5 +1,5 @@
 import ROOT, glob, os
-from helpers_old import isValidRootFile, getObjFromFile
+from TauTriggerTools.Studies.helpers import isValidRootFile, getObjFromFile
 
 class Sample:
 
@@ -16,7 +16,7 @@ class Sample:
         self.isSkimmed          = not 'pnfs' in self.path
  
     def initTree(self, branches = None, needhCount=True):
-        self.Chain              = ROOT.TChain('tOut')
+        self.Chain              = ROOT.TChain('events')
         if self.singleFile:
             listOfFiles         = [self.path]
         else:

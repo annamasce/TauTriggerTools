@@ -66,14 +66,14 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     /* HLT results and objects */ \
     VAR(std::vector<ULong64_t>, hlt_accept) /* HLT accept bits */ \
     VAR(std::vector<ULong64_t>, hlt_acceptAndMatch) /* HLT accept & match bits */ \
-    VAR(std::vector<std::vector<UInt_t>>, hltObj_types) /* types of the HLT object */ \
-    VAR4(std::vector<std::vector<Float_t>>, hltObj_pt, hltObj_eta, hltObj_phi, hltObj_mass) /* 4-momentum of the HLT object */ \
-    VAR(std::vector<std::vector<Long64_t>>, hltObj_hasPathName) /* whatever the HLT object has a path name */ \
-    VAR(std::vector<std::vector<Long64_t>>, hltObj_isBestMatch) /* whatever the HLT object the best match for a path name */ \
-    VAR(std::vector<std::vector<UInt_t>>, hltObj_miniAODIndex) /* index of the HLT object record in the MiniAOD */ \
+    VAR(std::vector<UInt_t>, hltObj_types) /* types of the HLT object */ \
+    VAR4(std::vector<Float_t>, hltObj_pt, hltObj_eta, hltObj_phi, hltObj_mass) /* 4-momentum of the HLT object */ \
+    VAR(std::vector<Long64_t>, hltObj_hasPathName) /* whatever the HLT object has a path name */ \
+    VAR(std::vector<Long64_t>, hltObj_isBestMatch) /* whatever the HLT object the best match for a path name */ \
+    VAR(std::vector<UInt_t>, hltObj_miniAODIndex) /* index of the HLT object record in the MiniAOD */ \
     /* HLT filters */ \
-    VAR(std::vector<std::vector<UInt_t>>, filter_hltObj) /* index of the HLT object */ \
-    VAR(std::vector<std::vector<UInt_t>>, filter_hash) /* hash of the name of the filter */ \
+    VAR(std::vector<UInt_t>, filter_hltObj) /* index of the HLT object */ \
+    VAR(std::vector<UInt_t>, filter_hash) /* hash of the name of the filter */ \
     /* Matched L1 tau */ \
     VAR4(std::vector<Float_t>, l1Tau_pt, l1Tau_eta, l1Tau_phi, l1Tau_mass) /* 4-momentum of the L1 tau */ \
     VAR(std::vector<Int_t>, l1Tau_hwIso) /* integer "hardware" isolation value of the L1 tau */ \

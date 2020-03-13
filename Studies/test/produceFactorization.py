@@ -28,7 +28,7 @@ args = argParser.parse_args()
 #Load in samples
 import TauTriggerTools.Studies.Sample as Sample
 sampleList = Sample.createSampleList(os.path.expandvars('$CMSSW_BASE/src/TauTriggerTools/Studies/data/inputFiles_Factorization_2018.conf'))
-sample = Sample.getSampleFromList(sampleList, 'noTagAndProbe')
+sample = Sample.getSampleFromList(sampleList, 'noTagAndProbe_'+args.selection)
 
 in_file = TFile.Open(sample.path)
 tree = sample.initTree()
@@ -52,7 +52,7 @@ if args.ptThresholdLeading:
     thresholdName = args.ptThresholdLeading +'-'+args.ptThreshold
 else:
     thresholdName = args.ptThreshold
-outputname = os.path.expandvars("$CMSSW_BASE/src/TauTriggerTools/Studies/data/Factorization/"+args.ptRegion+"/"+thresholdName+"/tauTriggerFactorization2018_"+str(args.subJob)+".root")
+outputname = os.path.expandvars("$CMSSW_BASE/src/TauTriggerTools/Studies/data/Factorization/"+args.selection+"/"+args.ptRegion+"/"+thresholdName+"/tauTriggerFactorization2018_"+str(args.subJob)+".root")
 makeDirIfNeeded(outputname)
 #
 #       Set variable range ranges
@@ -122,18 +122,21 @@ def getYval(graph, xval):
             else:                                       return np.array(graph.GetY())[i]
     else: return 0.
 
-
+test = 0
+test1 = 0
+test2 = 0
 for iEv in eventRange:
     tree.GetEntry(iEv)
     progress(iEv - eventRange[0], len(eventRange))       
-    tauPt = [tree.tau1_pt, tree.tau2_pt]
-    tauEta = [tree.tau1_eta, tree.tau2_eta]
-    tauPhi = [tree.tau1_phi, tree.tau2_phi]
-    tauMass = [tree.tau1_mass, tree.tau2_mass]
-    tauDM = [tree.tau1_decayMode, tree.tau2_decayMode]
+    test += 1
+    tauPt = tree.tau_pt
+    tauEta = tree.tau_eta
+    tauPhi = tree.tau_phi
+    tauMass = tree.tau_mass
+    tauDM = tree.tau_decayMode
 
-    if args.selection == 'DeepTau': tauSel = [tree.tau1_byDeepTau2017v2p1VSjet, tree.tau2_byDeepTau2017v2p1VSjet]
-    else: tauSel = [tree.tau1_byIsolationMVArun2017v2DBoldDMwLT2017, tree.tau2_byIsolationMVArun2017v2DBoldDMwLT2017]
+    if args.selection == 'DeepTau': tauSel = tree.byDeepTau2017v2p1VSjet
+    else: tauSel = tree.byIsolationMVArun2017v2DBoldDMwLT2017
  
     if 11 in tauDM: continue
 
@@ -157,9 +160,10 @@ for iEv in eventRange:
     pt_values = sorted([p1.Pt(), p2.Pt()], reverse=True)
 
     leadingptcut = args.ptThresholdLeading if args.ptThresholdLeading else args.ptThreshold
+    print pt_values
     if args.ptRegion == 'high' and (pt_values[0] < float(leadingptcut) or pt_values[1] < float(args.ptThreshold)): continue
 
-    passed_ditau_trigger = tree.passedTrigger
+    passed_ditau_trigger = tree.pass_ditau
 
     Nevts =Nevts + 1
     
@@ -170,11 +174,11 @@ for iEv in eventRange:
                     'DeepTau':{"vvloose":"VVLoose", "vloose":"VLoose", "loose":"Loose", "medium":"Medium", "tight":"Tight", "vtight":"VTight", "vvtight":"VVTight"}}
     # WPoints = {"vvlooseTauMVA":vlooseWP, "vlooseTauMVA":vlooseWP, "looseTauMVA":looseWP, "mediumTauMVA":mediumWP, "tightTauMVA":tightWP, "vtightTauMVA":vtightWP, "vvtightTauMVA":vtightWP}
 
+    test1 += 1
     # Filling the histograms
     for WP in WPs:
-        print WP, int(tauSel[1]), (1 << WPoints[WP])
         if (int(tauSel[0]) & (1 << WPoints[WP])) == 0 or (int(tauSel[1]) & (1 << WPoints[WP])) == 0: continue
-
+	if WP == 'vloose': test2 += 1
         if args.selection == 'DeepTau':
             eff_curve_leg1 = eff_file.Get('mc_ditau_'+WPointNames[args.selection][WP]+"_"+DMmap[tauDM[highestPtIndex]]+'_fitted')
             eff_curve_leg2 = eff_file.Get('mc_ditau_'+WPointNames[args.selection][WP]+"_"+DMmap[tauDM[abs(highestPtIndex-1)]]+'_fitted')
@@ -208,6 +212,7 @@ for iEv in eventRange:
             ditauTriggeredHists_1D_subleading.fillHist(WP, (DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), pt_values[1],args.ptRegion, weight)
             ditauTriggeredHists_2D.fillHist(WP, (DMmap[tauDM[highestPtIndex]], DMmap[tauDM[abs(highestPtIndex-1)]]), pt_values, args.ptRegion,weight)
 
+print test, test1, test2
 
 if not args.isTest: 
     out_file = TFile( outputname, 'recreate')

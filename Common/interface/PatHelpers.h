@@ -33,7 +33,7 @@ struct TauEntry {
 std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
 
-std::vector<TauEntry> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+std::vector<std::vector<TauEntry>> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
 
 bool IsGoodBaselineTau(const pat::Tau& tau, const LorentzVectorM& muon_p4, double deltaR2Thr);

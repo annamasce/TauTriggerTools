@@ -1,9 +1,9 @@
 import ROOT
 from ROOT import TLine, THStack, TColor, TCanvas, TLegend, gROOT, gStyle, TH1, TMultiGraph, TGraphErrors, TGraph, TLatex, TPad, TMath
-import CMS_lumi as cl
+#import CMS_lumi as cl
 import tdrstyle as tdr
 import numpy as np
-from helpers_old import makeDirIfNeeded, isTimeStampFormat, sortByOtherList
+from TauTriggerTools.Studies.helpers import makeDirIfNeeded, sortByOtherList
 import os
 
 def GeneralSettings(paintformat = "4.2f"):
@@ -183,31 +183,11 @@ def makeList(item):
     return item
 
 def savePlots(Canv, destination):
-    makeDirIfNeeded(destination.rsplit('/', 1)[0])
-    destination_components = destination.split('/')
-    cleaned_components = [x for x in destination_components if not isTimeStampFormat(x)]
-    try:
-        index_for_php = cleaned_components.index('Results')
-    except:
-        index_for_php = None
-
-    if index_for_php:
-        php_destination = '/user/lwezenbe/public_html/'
-        php_destination += '/'.join(cleaned_components[index_for_php+1:])
-        makeDirIfNeeded(php_destination.rsplit('/', 1)[0])    
-        os.system('cp -rf /user/lwezenbe/private/PhD/index.php '+ php_destination.rsplit('/', 1)[0]+'/index.php')    
 
     Canv.SaveAs(destination + ".pdf")
     Canv.SaveAs(destination + ".png")
     Canv.SaveAs(destination + ".root")
 
-    #Clean out the php directory you want to write to if it is already filled, otherwise things go wrong with updating the file on the website
-    #os.system("rm "+php_destination.rsplit('/')[0]+"/*")
-
-    if index_for_php:
-        Canv.SaveAs(php_destination + ".pdf")
-        Canv.SaveAs(php_destination + ".png")
-        Canv.SaveAs(php_destination + ".root")
 
 def plotClosure(observed, predicted, xtitle, ytitle, DataName, destination, yLog = False, additionalInfo = None, denominator_shape = None):
     GeneralSettings()

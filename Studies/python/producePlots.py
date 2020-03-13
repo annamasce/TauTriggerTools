@@ -1,5 +1,6 @@
 from TauTriggerTools.Studies.plottingTools import *
 import ROOT
+from TauTriggerTools.Studies.helpers import *
 
 import argparse
 
@@ -8,10 +9,11 @@ argParser.add_argument('--ptRegion',              action='store',       default 
 argParser.add_argument('--WP',                    action='store',       default = 'tight',       choices=['vvvloose', 'vvloose', 'vloose', 'loose', 'medium', 'tight', 'vtight', 'vvtight'])
 argParser.add_argument('--var',                   action='store',       default = 'leadingpt') 
 argParser.add_argument('--ptThreshold',           action='store',       default = '40') 
+argParser.add_argument('--selection',             action='store',       required=True, choices=['DeepTau', 'MVA']) 
 
 args = argParser.parse_args()
 
-in_file = ROOT.TFile.Open(os.path.expandvars("$CMSSW_BASE/src/TauTriggerTools/Studies/data/Factorization/"+args.ptRegion+"/"+args.ptThreshold+"/tauTriggerFactorization2018_0.root"))
+in_file = ROOT.TFile.Open(os.path.expandvars("$CMSSW_BASE/src/TauTriggerTools/Studies/data/Factorization/"+args.selection+"/"+args.ptRegion+"/"+args.ptThreshold+"/tauTriggerFactorization2018_0.root"))
 WP = args.WP
 tauDMs = ['dm0', 'dm1', 'dm10']
 
@@ -67,7 +69,8 @@ for h in histNames:
     axis_max = None
     if args.ptRegion == 'high': axis_max = 115.
 
-    destination = os.path.expandvars("$CMSSW_BASE/src/TauTriggerTools/Studies/data/Factorization/Results/Factorization/HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v/test/"+args.ptRegion+"/"+args.ptThreshold+"/"+args.var+'/'+WP+'_'+h)
+    destination = os.path.expandvars("$CMSSW_BASE/src/TauTriggerTools/Studies/data/Factorization/Results/Factorization/HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v/"+args.selection+"/"+args.ptRegion+"/"+args.ptThreshold+"/"+args.var+'/'+WP+'_'+h)
+    makeDirIfNeeded(destination)
     if args.var == '2D': 
         draw2DHist(triggeredHist, "p_{T}^{#tau_{1}}(leading) [GeV]", "p_{T}^{#tau_{2}}(subleading) [GeV]", destination+"_2DtriggeredEff", option="EtextColz", x_log=False, y_log=False, extraText=(triggeredExtraInfo), axis_max=axis_max)
         draw2DHist(weightedHist, "p_{T}^{#tau_{1}}(leading) [GeV]", "p_{T}^{#tau_{2}}(subleading) [GeV]", destination+"_2DweightedEff", option="EtextColz", x_log=False, y_log=False, extraText=(WeightedExtraInfo), axis_max=axis_max)

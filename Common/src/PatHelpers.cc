@@ -115,7 +115,7 @@ bool IsBetterTauPair(std::vector<const pat::Tau*>& tau_pair_1, const std::vector
 
 }
 
-std::vector<TauEntry> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+std::vector<std::vector<TauEntry>> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr)
 {
 
@@ -178,7 +178,7 @@ std::vector<TauEntry> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::
             }
         }
     }
-    
+
     std::map<const pat::Tau*, TauEntry> selected_taus;
     for(const auto& entry : best_tau_pair){
         const pat::Tau* reco_tau1 = entry.second[0];
@@ -195,11 +195,36 @@ std::vector<TauEntry> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::
             selected_taus[reco_tau2] = TauEntry{reco_tau2, gen_tau, 0};
         }
         selected_taus[reco_tau2].selection |= static_cast<unsigned>(entry.first);
-
     }
 
-    std::vector<TauEntry> result;
-    for(const auto& entry : selected_taus){
+    std::map<std::vector<const pat::Tau*>, std::vector<TauEntry>> selected_tau_pairs;
+    
+    for(const auto& entry : best_tau_pair){
+
+        if(selected_tau_pairs.empty()){
+            std::vector<TauEntry> pair;
+            pair.push_back(selected_taus[entry.second[0]]);
+            pair.push_back(selected_taus[entry.second[1]]);
+            selected_tau_pairs[entry.second] = pair; 
+        } else {
+            bool already_contained = false;
+            // for(selected_entry = selected_tau_pairs.begin(); selected_entry != selected_tau_pairs.end(); selected_entry++){
+            for(auto const& selected_entry : selected_tau_pairs){
+                if(std::count(selected_entry.first.begin(), selected_entry.first.end(), entry.second[0]) and std::count(selected_entry.first.begin(), selected_entry.first.end(), entry.second[1])){
+                    already_contained = true;
+                }
+            }
+            if(!already_contained){
+                std::vector<TauEntry> pair;
+                pair.push_back(selected_taus[entry.second[0]]);
+                pair.push_back(selected_taus[entry.second[1]]);
+                selected_tau_pairs[entry.second] = pair; 
+            }
+        }
+    }    
+
+    std::vector<std::vector<TauEntry>> result;
+    for(const auto& entry : selected_tau_pairs){
         result.push_back(entry.second);
     }
     return result;
