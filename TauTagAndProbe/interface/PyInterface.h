@@ -3,6 +3,10 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 
 #pragma once
 
+#include <vector>
+#include <algorithm>
+
+
 enum class LegType { e = 1, mu = 2, tau = 4, jet = 8 };
 
 class TriggerMatchProvider {
@@ -56,6 +60,55 @@ public:
                 }
             }
         }
+        return false;
+    }
+
+    bool PassDitau(int channel_id, UInt_t run, ROOT::VecOps::RVec<float>& tau_eta, ROOT::VecOps::RVec<float>& tau_phi, ROOT::VecOps::RVec<ULong64_t>& hlt_accept, float deltaRThr,
+              const ROOT::VecOps::RVec<UInt_t>& hltObj_types, const ROOT::VecOps::RVec<float>& hltObj_pt,
+              const ROOT::VecOps::RVec<float>& hltObj_eta, const ROOT::VecOps::RVec<float>& hltObj_phi,
+              const ROOT::VecOps::RVec<ULong64_t>& hltObj_hasPathName, const ROOT::VecOps::RVec<UInt_t>& filter_hltObj,
+              const ROOT::VecOps::RVec<UInt_t>& filter_hash, ROOT::VecOps::RVec<float>& l1Tau_pt, ROOT::VecOps::RVec<int>& l1Tau_hwIso) const
+    {
+        std::vector<size_t> used_indices;
+        std::vector<bool> passedFilters(2, false);
+
+        for(int tau_index = 0; tau_index < 2; tau_index++){
+            const auto desc_iter = channel_matches.find(channel_id);
+            if(desc_iter != channel_matches.end()) {
+                const float deltaRThr2 = std::pow(deltaRThr, 2);
+                for(const MatchDescriptor& match_desc : desc_iter->second) {
+                    if((hlt_accept[tau_index] & match_desc.match_mask) == 0) continue;
+                    if(match_desc.min_run >= 0 && run < match_desc.min_run) continue;
+                    if(match_desc.max_run >= 0 && run >= match_desc.max_run) continue;
+                    if(match_desc.l1Tau_pt >= 0 && l1Tau_pt[tau_index] <= match_desc.l1Tau_pt) continue;
+                    if(match_desc.l1Tau_hwIso >= 0 && l1Tau_hwIso[tau_index] <= match_desc.l1Tau_hwIso) continue;
+
+                    bool skip_object = false;
+                    for(size_t n = 0; n < hltObj_pt.size(); ++n) {
+                        // if(std::find(used_indices.begin(), used_indices.end()) != used_indices.end()) continue;
+                        // if(used_indices.count(n)) continue;
+
+                        // Temporarily check if already used like this, above lines wont work
+                        for(const auto& used_index : used_indices){
+                            if(used_index == n) skip_object=true;
+                        }
+                        if(skip_object) continue;
+                        if((hltObj_types.at(n) & static_cast<UInt_t>(LegType::tau)) == 0) continue;
+                        if((hltObj_hasPathName.at(n) & match_desc.match_mask) == 0) continue;
+                        if(match_desc.hltObj_pt >= 0 && hltObj_pt.at(n) <= match_desc.hltObj_pt) continue;
+                        const float deta = tau_eta[tau_index] - hltObj_eta.at(n);
+                        const float dphi = ROOT::Math::VectorUtil::Phi_mpi_pi(tau_phi[tau_index] - hltObj_phi.at(n));
+                        const float deltaR2 = std::pow(deta, 2) + std::pow(dphi, 2);
+                        if(deltaR2 >= deltaRThr2) continue;
+                        if(PassFilters(match_desc.filter_hashes, n, filter_hltObj, filter_hash)){
+                            passedFilters[tau_index] = true;
+                            used_indices.push_back(n);
+                        }
+                    }
+                }
+            }
+        }
+        if(passedFilters[0] == true and passedFilters[1] == true) return true;
         return false;
     }
 
