@@ -82,8 +82,8 @@ df = df.Filter('''
 # if selection_id == TauSelection.DeepTau:
 #     df = df.Filter('(byDeepTau2017v2p1VSmu[0] & (1 << {})) != 0'.format(DiscriminatorWP.Tight))
 #     df = df.Filter('(byDeepTau2017v2p1VSmu[1] & (1 << {})) != 0'.format(DiscriminatorWP.Tight))
-# if args.type == 'mc':
-    # df = df.Filter('tau_charge[0] + tau_charge[1] + muon_charge != 0 && tau_gen_match[0] == 5 && tau_gen_match[1] == 5')
+ if args.type == 'mc':
+     df = df.Filter('tau_charge[0] + tau_charge[1] + muon_charge != 0 && tau_gen_match[0] == 5 && tau_gen_match[1] == 5')
     # df = df.Define('weight', "PileUpWeightProvider::GetDefault().GetWeight(npu) * genEventWeight")
 # else:
 #     df = df.Define('weight', "muon_charge != tau_charge ? 1. : -1.")
