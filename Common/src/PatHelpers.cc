@@ -4,6 +4,8 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 #include "TauTriggerTools/Common/interface/PatHelpers.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "TauTriggerTools/Common/interface/AnalysisTypes.h"
+#include "TauTriggerTools/Common/interface/CutTools.h"
+
 
 namespace tau_trigger {
 
@@ -116,16 +118,20 @@ bool IsBetterTauPair(std::vector<const pat::Tau*>& tau_pair_1, const std::vector
 }
 
 std::vector<std::vector<TauEntry>> CollectTauPairs(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
-                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr)
+                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr, cuts::Cutter<>& cut)
 {
 
     static const std::string mvaIdName = "byIsolationMVArun2017v2DBoldDMwLTraw2017";
     static const std::string deepIdName = "byDeepTau2017v2p1VSjetraw";
     std::map<TauSelection, std::vector<const pat::Tau*>> best_tau_pair;
     int tau1_index = 0;
+    bool has_any_pair = taus.size() > 1;
+    bool has_pair = false;
+    bool has_any_tau = false;
     for(const auto& tau1 : taus) {
         tau1_index++;
         if(!IsGoodBaselineTau(tau1, muon_p4, deltaR2Thr)) continue;
+        has_any_tau = true;
         const bool pass_mva_sel_tau1 = tau1.tauID("againstMuonLoose3") > 0.5f;
         const bool pass_deep_sel_tau1 = tau1.isTauIDAvailable("byDeepTau2017v2p1VSjetraw")
             && tau1.tauID("byVVVLooseDeepTau2017v2p1VSe") > 0.5f
@@ -154,6 +160,7 @@ std::vector<std::vector<TauEntry>> CollectTauPairs(const LorentzVectorM& muon_p4
                     tau_pair.push_back(&tau1);
                 }
                 if(!best_tau_pair.count(TauSelection::DeepTau)){
+                    has_pair = true;
                     best_tau_pair[TauSelection::DeepTau] = tau_pair;
                 } else if(IsBetterTauPair(best_tau_pair[TauSelection::DeepTau], tau_pair, deepIdName)) {
                     best_tau_pair[TauSelection::DeepTau] = tau_pair;
@@ -171,6 +178,7 @@ std::vector<std::vector<TauEntry>> CollectTauPairs(const LorentzVectorM& muon_p4
                     tau_pair.push_back(&tau1);
                 }
                 if(!best_tau_pair.count(TauSelection::MVA)){
+                    has_pair = true;
                     best_tau_pair[TauSelection::MVA] = tau_pair;
                 } else if(IsBetterTauPair(best_tau_pair[TauSelection::MVA], tau_pair, mvaIdName)) {
                     best_tau_pair[TauSelection::MVA] = tau_pair;
@@ -178,6 +186,10 @@ std::vector<std::vector<TauEntry>> CollectTauPairs(const LorentzVectorM& muon_p4
             }
         }
     }
+
+    cut(has_any_tau ,"has_any_tau");
+    cut(has_any_pair ,"has_any_tau_pair");
+    cut(has_pair, "has_selected_tau_pair");
 
     std::map<const pat::Tau*, TauEntry> selected_taus;
     for(const auto& entry : best_tau_pair){

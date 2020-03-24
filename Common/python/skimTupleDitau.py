@@ -33,14 +33,14 @@ if args.type not in ['data', 'mc']:
 
 input_vec = ListToStdVector(args.input)
 
-# if args.type == 'mc':
-#     if args.pu is None:
-#         raise RuntimeError("Pileup file should be provided for mc.")
-#     data_pu_file = ROOT.TFile(args.pu, 'READ')
-#     data_pu = data_pu_file.Get('pileup')
-#     df_all = ROOT.RDataFrame('all_events', input_vec)
-#     mc_pu = df_all.Histo1D(ROOT.RDF.TH1DModel(data_pu), 'npu')
-#     ROOT.PileUpWeightProvider.Initialize(data_pu, mc_pu.GetPtr())
+if args.type == 'mc':
+    if args.pu is None:
+        raise RuntimeError("Pileup file should be provided for mc.")
+    data_pu_file = ROOT.TFile(args.pu, 'READ')
+    data_pu = data_pu_file.Get('pileup')
+    df_all = ROOT.RDataFrame('all_events', input_vec)
+    mc_pu = df_all.Histo1D(ROOT.RDF.TH1DModel(data_pu), 'npu')
+    ROOT.PileUpWeightProvider.Initialize(data_pu, mc_pu.GetPtr())
 
 trig_descriptors, channel_triggers = TriggerConfig.Load(args.config)
 trigger_dict, filter_dict = TriggerConfig.LoadTriggerDictionary(input_vec)
@@ -75,18 +75,25 @@ for channel_name, channel_trig_descs in channel_triggers.items():
 selection_id = ParseEnum(TauSelection, args.selection)
 df = ROOT.RDataFrame('events', input_vec)
 df = df.Filter('''
-               (tau_sel[0] & {}) != 0 && (tau_sel[1] & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30
+               (tau_sel[0] & {}) != 0 && (tau_sel[1] & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt > 30
                && tau_pt[0] > 20 && abs(tau_eta[0]) < 2.1 && tau_decayMode[0] != 5 && tau_decayMode[0] != 6
                && tau_pt[1] > 20 && abs(tau_eta[1]) < 2.1 && tau_decayMode[1] != 5 && tau_decayMode[1] != 6
+               && TriggerMatchProvider::GetDefault().PassDitauMassCut(tau_eta, tau_phi, tau_pt, tau_mass)
                '''.format(selection_id, selection_id))
+# df = df.Filter('''
+#                (tau_sel[0] & {}) != 0 && (tau_sel[1] & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt > 30
+#                && tau_pt[0] > 20 && abs(tau_eta[0]) < 2.1 && tau_decayMode[0] != 5 && tau_decayMode[0] != 6
+#                && tau_pt[1] > 20 && abs(tau_eta[1]) < 2.1 && tau_decayMode[1] != 5 && tau_decayMode[1] != 6
+#                && TriggerMatchProvider::GetDefault().PassDitauMassCut(tau_eta, tau_phi, tau_pt, tau_mass)
+#                '''.format(selection_id, selection_id))
 # if selection_id == TauSelection.DeepTau:
 #     df = df.Filter('(byDeepTau2017v2p1VSmu[0] & (1 << {})) != 0'.format(DiscriminatorWP.Tight))
 #     df = df.Filter('(byDeepTau2017v2p1VSmu[1] & (1 << {})) != 0'.format(DiscriminatorWP.Tight))
- if args.type == 'mc':
-     df = df.Filter('tau_charge[0] + tau_charge[1] + muon_charge != 0 && tau_gen_match[0] == 5 && tau_gen_match[1] == 5')
+if args.type == 'mc':
+   df = df.Filter('tau_charge[0] + tau_charge[1] + muon_charge != 0 && tau_gen_match[0] == 5 && tau_gen_match[1] == 5')
     # df = df.Define('weight', "PileUpWeightProvider::GetDefault().GetWeight(npu) * genEventWeight")
-# else:
-#     df = df.Define('weight', "muon_charge != tau_charge ? 1. : -1.")
+else:
+    df = df.Define('weight', "muon_charge != tau_charge ? 1. : -1.")
 
 skimmed_branches = [
     'tau_pt', 'tau_eta', 'tau_phi', 'tau_charge', 'tau_decayMode', 'tau_mass',

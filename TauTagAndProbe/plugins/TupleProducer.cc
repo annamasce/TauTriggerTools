@@ -30,6 +30,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 #include "TauTriggerTools/Common/interface/TriggerDescriptor.h"
 #include "TauTriggerTools/TauTagAndProbe/interface/SummaryTuple.h"
 
+
 namespace tau_trigger {
 
 struct TupleProducerData {
@@ -144,6 +145,8 @@ private:
         eventTuple().lumi = event.id().luminosityBlock();
         eventTuple().evt  = event.id().event();
 
+        std::cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << std::endl;
+
         edm::Handle<std::vector<reco::Vertex>> vertices;
         event.getByToken(vertices_token, vertices);
         eventTuple().npv = static_cast<int>(vertices->size());
@@ -227,19 +230,8 @@ private:
         edm::Handle<pat::JetCollection> jets;
         event.getByToken(jets_token, jets);
 
-        const auto& selected_tau_pairs = CollectTauPairs(muon_ref_p4, *taus, genLeptons, deltaR2Thr);
+        const auto& selected_tau_pairs = CollectTauPairs(muon_ref_p4, *taus, genLeptons, deltaR2Thr, cut);
         cut(!selected_tau_pairs.empty(), "has_tau");
-
-        // std::vector<TauEntry> tau_pair;
-        // int most_isolated_index = 0;
-        // int index = 0;
-        // for(const auto& tau_entry : selected_taus) {
-        //     if((tau_entry.selection >> 3) & 1){
-        //         tau_pair.push_back(tau_entry);
-        //         if((tau_entry.best_tau_in_pair >> 3) & 1) most_isolated_index = index;
-        //         index++;
-        //     }
-        // }
 
         bool has_good_tau_pair = false;
         for(const auto& tau_pair_entry : selected_tau_pairs) {
@@ -352,8 +344,10 @@ private:
                     eventTuple().filter_hash.push_back(hash);
                 }
             }
-            if(!bveto) eventTuple.Fill();
-            // eventTuple.Fill();
+            if(!bveto){
+                has_good_tau_pair = true;
+                eventTuple.Fill();
+            }
         }
         cut(has_good_tau_pair, "btag_veto");
     }
