@@ -1,0 +1,1 @@
+/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/F221E357-32D3-4F43-8731-B84072D48F64.root

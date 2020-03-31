@@ -1,8 +1,11 @@
 {
-    "HLT_IsoMu27_v": {
-        "filters": [ [ "hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07" ] ],
-        "leg_types": [ "mu" ],
-        "is_tag": 1
+    "HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v": {
+        "filters": [
+            [ "hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded" ],
+            [ "hltHpsSelectedPFTau27MediumChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded" ]
+        ],
+        "leg_types": [ "mu", "tau" ],
+        "is_tag":1
     },
     "HLT_IsoMu27_LooseChargedIsoPFTau20_Trk1_eta2p1_SingleL1_v": {
         "filters": [
@@ -127,13 +130,6 @@
         "target_channels": [ "etau", "mutau" ],
         "min_run": 317509,
         "sample_types": [ "data", "mc" ]
-    },
-    "HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v": {
-        "filters": [
-            [ "hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07", "hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded" ],
-            [ "hltHpsSelectedPFTau27MediumChargedIsolationAgainstMuonL1HLTMatched", "hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded" ]
-        ],
-        "leg_types": [ "mu", "tau" ]
     },
     "HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v": {
         "filters": [

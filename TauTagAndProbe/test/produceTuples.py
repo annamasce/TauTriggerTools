@@ -5,7 +5,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 from TauTriggerTools.Common.ProduceHelpers import *
 
 options = VarParsing('analysis')
-options.register('inputFileList', '', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+options.register('inputFileList', 'input.txt', VarParsing.multiplicity.singleton, VarParsing.varType.string,
                  "Text file with a list of the input root files to process.")
 options.register('fileNamePrefix', '', VarParsing.multiplicity.singleton, VarParsing.varType.string,
                  "Prefix to add to input file names. Use file: for the files in the local file system.")
@@ -52,6 +52,7 @@ elif len(options.inputFiles) > 0:
     addFilesToList(process.source.fileNames, options.inputFiles, options.fileNamePrefix)
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5000) )
 if options.maxEvents > 0:
     process.maxEvents.input = cms.untracked.int32(options.maxEvents)
 if options.skipEvents > 0:
@@ -142,6 +143,7 @@ else:
 from TauTriggerTools.Common import TriggerConfig
 trigFile = '{}/src/TauTriggerTools/TauTagAndProbe/data/{}/triggers.json'.format(os.environ['CMSSW_BASE'], year)
 hltPaths, tagHltPaths = TriggerConfig.LoadAsVPSet(trigFile)
+print tagHltPaths
 
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 

@@ -60,13 +60,21 @@ public:
     size_t size() const { return descs.size(); }
     const std::set<size_t>& getTagDescriptorsIndices() const { return tag_desc_indices; }
 
+    bool hasFilters(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor);
+
+
     FullTriggerResults matchTriggerObjects(const edm::TriggerResults& triggerResults,
                                            const pat::TriggerObjectStandAloneCollection& triggerObjects,
                                            const analysis::LorentzVectorM& ref_p4,
                                            const std::vector<std::string>& triggerNames, double deltaR2Thr,
-                                           bool include_tag_paths, bool include_nontag_paths);
+                                           bool include_tag_paths, bool include_nontag_paths, std::vector<unsigned int> obj_ind_to_veto);
+    FullTriggerResults matchTriggerObjectsForTag(const edm::TriggerResults& triggerResults,
+                                           const pat::TriggerObjectStandAloneCollection& triggerObjects,
+                                           const analysis::LorentzVectorM& ref_p4,
+                                           const std::vector<std::string>& triggerNames, double deltaR2Thr, std::string legtype);
 
     void updateGlobalIndices(const std::vector<std::string>& triggerNames);
+
 
 private:
     std::vector<TriggerDescriptor> descs;

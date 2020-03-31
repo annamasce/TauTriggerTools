@@ -15,7 +15,26 @@ double MuonIsolation(const pat::Muon& muon)
     return pfIso / muon.polarP4().pt();
 }
 
-std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+std::vector<pat::Tau> SignalTauCandidates(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr)
+{
+    std::vector<pat::Tau> signalTauCandidates;
+    for(const auto& tau : taus) {
+        if(tau.polarP4().pt() > 24 && std::abs(tau.polarP4().eta()) < 2.1 && tau.tauID("againstMuonLoose3") > 0.5f
+                        && tau.tauID("byTightIsolationMVArun2017v2DBoldDMwLT2017") > 0.5f && tau.tauID("decayModeFinding") > 0.5f
+                        && reco::deltaR2(muon_p4, tau.polarP4()) > deltaR2Thr)
+            signalTauCandidates.push_back(tau);
+    }
+    static const auto tauComparitor = [](const pat::Tau& a, const pat::Tau& b) {
+        const double iso_a = a.tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017"), iso_b = b.tauID("byIsolationMVArun2017v2DBoldDMwLTraw2017");
+        if(iso_a != iso_b) return iso_a < iso_b;
+        return a.polarP4().pt() > b.polarP4().pt();
+    };
+    std::sort(signalTauCandidates.begin(), signalTauCandidates.end(), tauComparitor);
+    return signalTauCandidates;
+}
+
+std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus, const LorentzVectorM& signal_tau_p4,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr)
 {
     static const std::string mvaIdName = "byIsolationMVArun2017v2DBoldDMwLTraw2017";
@@ -25,7 +44,8 @@ std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauC
         auto leadChargedHadrCand = dynamic_cast<const pat::PackedCandidate*>(tau.leadChargedHadrCand().get());
         if(tau.polarP4().pt() > 18 && std::abs(tau.polarP4().eta()) < 2.3
                 && leadChargedHadrCand && std::abs(leadChargedHadrCand->dz()) < 0.2
-                && reco::deltaR2(muon_p4, tau.polarP4()) > deltaR2Thr) {
+                && reco::deltaR2(muon_p4, tau.polarP4()) > deltaR2Thr
+                && reco::deltaR2(signal_tau_p4, tau.polarP4()) > deltaR2Thr) {
             const bool pass_mva_sel = tau.tauID("againstMuonLoose3") > 0.5f;
             const bool pass_deep_sel = tau.isTauIDAvailable("byDeepTau2017v2p1VSjetraw")
                 && tau.tauID("byVVVLooseDeepTau2017v2p1VSe") > 0.5f

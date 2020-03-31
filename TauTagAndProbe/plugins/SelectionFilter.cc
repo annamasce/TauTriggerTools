@@ -82,7 +82,7 @@ private:
         std::vector<pat::MuonRef> signalMuonCandidates;
         for(size_t n = 0; n < muons->size(); ++n) {
             const pat::Muon& muon = muons->at(n);
-            if(muon.polarP4().pt() > 24 && std::abs(muon.polarP4().eta()) < 2.1 && muon.isMediumMuon())
+            if(muon.polarP4().pt() > 20 && std::abs(muon.polarP4().eta()) < 2.1 && muon.isMediumMuon())
                 signalMuonCandidates.emplace_back(muons, n);
         }
         cut(!signalMuonCandidates.empty(), "signal_muon");

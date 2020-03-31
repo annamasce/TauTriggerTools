@@ -72,7 +72,7 @@ TriggerDescriptorCollection::TriggerDescriptorCollection(const edm::VParameterSe
 FullTriggerResults TriggerDescriptorCollection::matchTriggerObjects(
         const edm::TriggerResults& triggerResults, const pat::TriggerObjectStandAloneCollection& triggerObjects,
         const analysis::LorentzVectorM& ref_p4, const std::vector<std::string>& triggerNames, double deltaR2Thr,
-        bool include_tag_paths, bool include_nontag_paths)
+        bool include_tag_paths, bool include_nontag_paths, std::vector<unsigned int> obj_ind_to_veto)
 {
     FullTriggerResults results;
 
@@ -94,6 +94,7 @@ FullTriggerResults TriggerDescriptorCollection::matchTriggerObjects(
         boost::optional<size_t> best_matched_obj_index;
         double dR2_bestMatch = deltaR2Thr;
         for(size_t obj_index = 0; obj_index < triggerObjects.size(); ++obj_index) {
+            if(std::count(obj_ind_to_veto.begin(), obj_ind_to_veto.end(), obj_index)) continue;
             const auto& hlt_obj = triggerObjects.at(obj_index);
             const double deltaR2 = ROOT::Math::VectorUtil::DeltaR2(ref_p4, hlt_obj.polarP4());
             if(deltaR2 >= deltaR2Thr) continue;
@@ -120,6 +121,62 @@ FullTriggerResults TriggerDescriptorCollection::matchTriggerObjects(
     return results;
 }
 
+FullTriggerResults TriggerDescriptorCollection::matchTriggerObjectsForTag(
+        const edm::TriggerResults& triggerResults, const pat::TriggerObjectStandAloneCollection& triggerObjects,
+        const analysis::LorentzVectorM& ref_p4, const std::vector<std::string>& triggerNames, double deltaR2Thr, std::string legtype)
+{
+    FullTriggerResults results;
+
+    std::vector<unsigned> obj_types;
+    for(const auto& hlt_obj : triggerObjects) {
+        const unsigned obj_type = GetTriggerObjectTypes(hlt_obj);
+        obj_types.push_back(obj_type);
+    }
+
+    for(size_t desc_index = 0; desc_index < descs.size(); ++desc_index) {
+        const auto& trig_desc = descs.at(desc_index);
+        if(!trig_desc.is_tag) continue;
+        if(trig_desc.global_index < 0) continue;
+        const bool accept = triggerResults.accept(trig_desc.global_index);
+        results.accept.set(desc_index, accept);
+        const std::string& path_name = triggerNames.at(trig_desc.global_index);
+        TriggerObjectMatchResult best_match;
+        boost::optional<size_t> best_matched_obj_index;
+        double dR2_bestMatch = deltaR2Thr;
+        for(size_t obj_index = 0; obj_index < triggerObjects.size(); ++obj_index) {
+            const auto& hlt_obj = triggerObjects.at(obj_index);
+            const double deltaR2 = ROOT::Math::VectorUtil::DeltaR2(ref_p4, hlt_obj.polarP4());
+            if(deltaR2 >= deltaR2Thr) continue;
+            if(!hlt_obj.hasPathName(path_name, true, false)) continue;
+            bool passed_filters = false;
+            for(size_t leg_index = 0; leg_index < trig_desc.legs.size(); ++leg_index) {
+                const auto& trig_leg = trig_desc.legs.at(leg_index);
+                if(trig_leg.type != analysis::Parse<analysis::LegType>(legtype)) continue;
+                if(hasFilters(hlt_obj.filterLabels(), trig_leg.filters)) passed_filters = true;
+            }
+            if((obj_types.at(obj_index) & trig_desc.type_mask) != 0 && passed_filters) {
+                if(deltaR2 < dR2_bestMatch) {
+                    best_matched_obj_index = obj_index;
+                    dR2_bestMatch = deltaR2;
+                }
+                results.acceptAndMatch.set(desc_index);
+            }
+            auto& match_result = results.matchResults[obj_index];
+            match_result.hltObjIndex = obj_index;
+            match_result.objType = obj_types.at(obj_index);
+            match_result.hasPathName.set(desc_index);
+            match_result.descIndices.insert(desc_index);
+            match_result.filters = hlt_obj.filterLabels();
+        }
+
+        if(best_matched_obj_index)
+            results.matchResults[*best_matched_obj_index].isBestMatch.set(desc_index);
+    }
+
+    return results;
+}
+
+
 void TriggerDescriptorCollection::updateGlobalIndices(const std::vector<std::string>& triggerNames)
 {
     std::map<size_t, size_t> globalToPos, posToGlobal;
@@ -142,6 +199,24 @@ void TriggerDescriptorCollection::updateGlobalIndices(const std::vector<std::str
             }
         }
     }
+}
+
+bool TriggerDescriptorCollection::hasFilters(const std::vector<std::string>& eventLabels, const std::vector<std::string>& filtersToLookFor){
+    for (const std::string& filter : filtersToLookFor)
+        {
+        //Looking for matching filters
+        bool found = false;
+        for (const std::string& label : eventLabels)
+            {
+        if (label == filter)
+                {
+            found = true;
+                }
+            }
+        if(!found) return false;
+        }
+
+    return true;
 }
 
 } // namespace tau_trigger

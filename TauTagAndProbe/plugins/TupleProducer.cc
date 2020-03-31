@@ -174,6 +174,31 @@ private:
         }
         cut(has_muon, "has_muon");
 
+        edm::Handle<pat::TauCollection> taus;
+        event.getByToken(taus_token, taus);
+
+        edm::Handle<pat::JetCollection> jets;
+        event.getByToken(jets_token, jets);
+
+        std::vector<pat::Tau> signal_tau_candidates = SignalTauCandidates(muon_ref_p4, *taus, genLeptons, deltaR2Thr);
+        const pat::Tau* signal_tau = !signal_tau_candidates.empty() ? &signal_tau_candidates.at(0) : nullptr;
+        gen_truth::LeptonMatchResult gen_signal_tau;
+        LorentzVectorM signal_tau_ref_p4;
+        bool has_signal_tau = false;
+        bool has_gen_signal_tau = gen_signal_tau.match != GenLeptonMatch::NoMatch;
+        if(signal_tau) {
+            gen_signal_tau = gen_truth::LeptonGenMatch(signal_tau->polarP4(), genLeptons);
+            signal_tau_ref_p4 = signal_tau->polarP4();
+            has_signal_tau = true;
+        } else {
+            gen_signal_tau = SelectGenLeg(genLeptons, true);
+            if(gen_signal_tau.match != GenLeptonMatch::NoMatch) {
+                signal_tau_ref_p4 = gen_signal_tau.visible_p4;
+                has_signal_tau = true;
+            }
+        }
+        cut(has_signal_tau, "has_signal_tau");
+
         edm::Handle<edm::TriggerResults> triggerResults;
         event.getByToken(triggerResults_token, triggerResults);
         const edm::TriggerNames& triggerNames = event.triggerNames(*triggerResults);
@@ -182,9 +207,20 @@ private:
         edm::Handle<l1t::TauBxCollection> l1Taus;
         event.getByToken(l1Taus_token, l1Taus);
 
-        const auto muonTriggerMatch = triggerDescriptors.matchTriggerObjects(*triggerResults, *triggerObjects,
-                muon_ref_p4, triggerNames.triggerNames(), deltaR2Thr, true, false);
-        cut(!muonTriggerMatch.matchResults.empty(), "tag_trig_match");
+
+        const auto muonTriggerMatch = triggerDescriptors.matchTriggerObjectsForTag(*triggerResults, *triggerObjects,
+                muon_ref_p4, triggerNames.triggerNames(), deltaR2Thr, "mu");
+        cut(!muonTriggerMatch.matchResults.empty(), "muon_tag_trig_match");
+        const auto signalTauTriggerMatch = triggerDescriptors.matchTriggerObjectsForTag(*triggerResults, *triggerObjects,
+                signal_tau_ref_p4, triggerNames.triggerNames(), deltaR2Thr, "tau");
+        cut(!signalTauTriggerMatch.matchResults.empty(), "tau_tag_trig_match");
+
+        // Temporary dirty fix because size is 1
+        std::vector<unsigned int> hlt_obj_to_veto = {};
+        for(const auto& match_entry : signalTauTriggerMatch.matchResults) {
+            hlt_obj_to_veto.push_back(match_entry.second.hltObjIndex);
+        }
+        // const auto& sigtau_hlt_obj = triggerObjects->at(sigtau_obj_index);
 
         edm::Handle<pat::METCollection> metCollection;
         event.getByToken(met_token, metCollection);
@@ -208,13 +244,50 @@ private:
         eventTuple().muon_gen_vis_phi = has_gen_muon ? static_cast<float>(gen_muon.visible_p4.phi()) : default_value;
         eventTuple().muon_gen_vis_mass = has_gen_muon ? static_cast<float>(gen_muon.visible_p4.mass()) : default_value;
 
-        edm::Handle<pat::TauCollection> taus;
-        event.getByToken(taus_token, taus);
+        eventTuple().sigtau_pt = signal_tau ? static_cast<float>(signal_tau->polarP4().pt()) : default_value;
+        eventTuple().sigtau_eta = signal_tau ? static_cast<float>(signal_tau->polarP4().eta()) : default_value;
+        eventTuple().sigtau_phi = signal_tau ? static_cast<float>(signal_tau->polarP4().phi()) : default_value;
+        eventTuple().sigtau_mass = signal_tau ? static_cast<float>(signal_tau->polarP4().mass()) : default_value;
+        eventTuple().sigtau_charge = signal_tau ? signal_tau->charge() : default_int_value;
 
-        edm::Handle<pat::JetCollection> jets;
-        event.getByToken(jets_token, jets);
+        eventTuple().sigtau_gen_match = static_cast<int>(gen_signal_tau.match);
+        eventTuple().sigtau_gen_charge = has_gen_signal_tau ? gen_signal_tau.gen_particle_firstCopy->charge() : default_int_value;
+        eventTuple().sigtau_gen_vis_pt = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_p4.pt()) : default_value;
+        eventTuple().sigtau_gen_vis_eta = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_p4.eta()) : default_value;
+        eventTuple().sigtau_gen_vis_phi = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_p4.phi()) : default_value;
+        eventTuple().sigtau_gen_vis_mass = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_p4.mass()) : default_value;
+        eventTuple().sigtau_gen_rad_pt = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_rad_p4.pt()) : default_value;
+        eventTuple().sigtau_gen_rad_eta = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_rad_p4.eta())
+                                                    : default_value;
+        eventTuple().sigtau_gen_rad_phi = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_rad_p4.phi())
+                                                    : default_value;
+        eventTuple().sigtau_gen_rad_energy = has_gen_signal_tau ? static_cast<float>(gen_signal_tau.visible_rad_p4.energy())
+                                                        : default_value;
+        eventTuple().sigtau_gen_n_charged_hadrons = has_gen_signal_tau ? static_cast<int>(gen_signal_tau.n_charged_hadrons)
+                                                                : default_int_value;
+        eventTuple().sigtau_gen_n_neutral_hadrons = has_gen_signal_tau ? static_cast<int>(gen_signal_tau.n_neutral_hadrons)
+                                                                : default_int_value;
+        eventTuple().sigtau_gen_n_gammas = has_gen_signal_tau ? static_cast<int>(gen_signal_tau.n_gammas) : default_int_value;
+        eventTuple().sigtau_gen_n_gammas_rad = has_gen_signal_tau ? static_cast<int>(gen_signal_tau.n_gammas_rad)
+                                                        : default_int_value;
 
-        const auto& selected_taus = CollectTaus(muon_ref_p4, *taus, genLeptons, deltaR2Thr);
+        eventTuple().sigtau_decayMode = signal_tau ? signal_tau->decayMode() : default_int_value;
+        eventTuple().sigtau_oldDecayModeFinding = signal_tau ? signal_tau->tauID("decayModeFinding") > 0.5f : default_int_value;
+
+        eventTuple().sigtau_dxy = signal_tau ? signal_tau->dxy() : default_value;
+        eventTuple().sigtau_dxy_error = signal_tau ? signal_tau->dxy_error() : default_value;
+        eventTuple().sigtau_ip3d = signal_tau ? signal_tau->ip3d() : default_value;
+        eventTuple().sigtau_ip3d_error = signal_tau ? signal_tau->ip3d_error() : default_value;
+
+        const pat::PackedCandidate* leadChargedHadrCand = signal_tau
+                ? dynamic_cast<const pat::PackedCandidate*>(signal_tau->leadChargedHadrCand().get())
+                : nullptr;
+        eventTuple().sigtau_dz = leadChargedHadrCand ? leadChargedHadrCand->dz() : default_value;
+        eventTuple().sigtau_dz_error = leadChargedHadrCand && leadChargedHadrCand->hasTrackDetails()
+                ? leadChargedHadrCand->dzError() : default_value;
+
+
+        const auto& selected_taus = CollectTaus(muon_ref_p4, *taus, signal_tau_ref_p4, genLeptons, deltaR2Thr);
         cut(!selected_taus.empty(), "has_tau");
         bool has_good_tau = false;
         for(const auto& tau_entry : selected_taus) {
@@ -277,7 +350,7 @@ private:
             eventTuple().vis_mass = static_cast<float>((muon_ref_p4 + tau_ref_p4).mass());
 
             const auto tauTriggerMatch = triggerDescriptors.matchTriggerObjects(*triggerResults, *triggerObjects,
-                    tau_ref_p4, triggerNames.triggerNames(), deltaR2Thr, true, true);
+                    tau_ref_p4, triggerNames.triggerNames(), deltaR2Thr, true, true, hlt_obj_to_veto);
             eventTuple().hlt_accept = tauTriggerMatch.accept.to_ullong();
             eventTuple().hlt_acceptAndMatch = tauTriggerMatch.acceptAndMatch.to_ullong();
             for(const auto& match_entry : tauTriggerMatch.matchResults) {

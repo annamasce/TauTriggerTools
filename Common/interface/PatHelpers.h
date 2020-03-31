@@ -29,7 +29,10 @@ struct TauEntry {
     unsigned selection{0};
 };
 
-std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+std::vector<pat::Tau> SignalTauCandidates(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
+
+std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus, const LorentzVectorM& signal_tau_p4,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
 
 bool PassBtagVeto(const LorentzVectorM& muon_p4, const LorentzVectorM& tau_p4, const pat::JetCollection& jets,

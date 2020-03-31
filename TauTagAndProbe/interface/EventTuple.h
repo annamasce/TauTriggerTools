@@ -34,6 +34,31 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR4(Float_t, muon_gen_vis_pt, muon_gen_vis_eta, muon_gen_vis_phi, muon_gen_vis_mass) /* visible 4-momentum of the
                   gen lepton that was matched with the muon */ \
     /* Basic tau variables */ \
+    VAR4(Float_t, sigtau_pt, sigtau_eta, sigtau_phi, sigtau_mass) /* 4-momentum of the sigtau */ \
+    VAR(Int_t, sigtau_charge) /* sigtau charge */ \
+    VAR(Int_t, sigtau_gen_match) /* matching of the sigtau with leptons on the generator level:
+                                 Electron = 1, Muon = 2, sigTauElectron = 3, sigTauMuon = 4, sigTau = 5, NoMatch = 6 */ \
+    VAR(Int_t, sigtau_gen_charge) /* charge of the gen lepton that was matched with the sigtau */ \
+    VAR4(Float_t, sigtau_gen_vis_pt, sigtau_gen_vis_eta, sigtau_gen_vis_phi, sigtau_gen_vis_mass) /* visible 4-momentum of the
+                  gen lepton that was matched with the sigtau */ \
+    VAR4(Float_t, sigtau_gen_rad_pt, sigtau_gen_rad_eta, sigtau_gen_rad_phi, sigtau_gen_rad_energy) /* visible 4-momentum of the
+                  initial state radiation emmited by the gen sigtau */ \
+    VAR4(Int_t, sigtau_gen_n_charged_hadrons, sigtau_gen_n_neutral_hadrons, sigtau_gen_n_gammas, sigtau_gen_n_gammas_rad) /*
+                number of charged and neutral hadrons, gammas and initial state radiation gammas produced by the sigtau
+                decay at the generator level */ \
+    /* sigTau ID variables */ \
+    VAR(Int_t, sigtau_decayMode) /* sigtau decay mode */ \
+    VAR(Int_t, sigtau_oldDecayModeFinding) /* sigtau passed the old decay mode finding requirements */ \
+    /* sigTau transverse impact paramters.
+       See cmssw/RecosigTauTag/RecosigTau/plugins/PFsigTauTransverseImpactParameters.cc for details */ \
+    VAR(Float_t, sigtau_dxy) /* sigtau signed transverse impact parameter wrt to the primary vertex */ \
+    VAR(Float_t, sigtau_dxy_error) /* uncertainty of the transverse impact parameter measurement */ \
+    VAR(Float_t, sigtau_ip3d) /* sigtau signed 3D impact parameter wrt to the primary vertex */ \
+    VAR(Float_t, sigtau_ip3d_error) /* uncertainty of the 3D impact parameter measurement */ \
+    VAR(Float_t, sigtau_dz) /* sigtau dz of the leadChargedHadrCand wrt to the primary vertex */ \
+    VAR(Float_t, sigtau_dz_error) /* uncertainty of the tau dz measurement */ \
+    /* mu-tau variables */ \
+    VAR(Float_t, vis_mass) /* visible mu-tau mass */ \
     VAR(UInt_t, tau_sel) /* how tau was selected */ \
     VAR4(Float_t, tau_pt, tau_eta, tau_phi, tau_mass) /* 4-momentum of the tau */ \
     VAR(Int_t, tau_charge) /* tau charge */ \
@@ -59,8 +84,6 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR(Float_t, tau_ip3d_error) /* uncertainty of the 3D impact parameter measurement */ \
     VAR(Float_t, tau_dz) /* tau dz of the leadChargedHadrCand wrt to the primary vertex */ \
     VAR(Float_t, tau_dz_error) /* uncertainty of the tau dz measurement */ \
-    /* mu-tau variables */ \
-    VAR(Float_t, vis_mass) /* visible mu-tau mass */ \
     /* HLT results and objects */ \
     VAR(ULong64_t, hlt_accept) /* HLT accept bits */ \
     VAR(ULong64_t, hlt_acceptAndMatch) /* HLT accept & match bits */ \
