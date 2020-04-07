@@ -75,19 +75,20 @@ for channel_name, channel_trig_descs in channel_triggers.items():
 selection_id = ParseEnum(TauSelection, args.selection)
 df = ROOT.RDataFrame('events', input_vec)
 df = df.Filter('''
-               (tau_sel & {}) != 0 && muon_pt > 27 && muon_iso < 0.1 && muon_mt < 30
+               (tau_sel & {}) != 0 && muon_pt > 20 && muon_iso < 0.1 && muon_mt < 30
+               && sigtau_pt > 27 && abs(sigtau_eta) < 2.1 && sigtau_decayMode != 5 && sigtau_decayMode != 6
                && tau_pt > 20 && abs(tau_eta) < 2.1 && tau_decayMode != 5 && tau_decayMode != 6
-               && vis_mass > 40 && vis_mass < 80
                '''.format(selection_id))
 if selection_id == TauSelection.DeepTau:
     df = df.Filter('(byDeepTau2017v2p1VSmu & (1 << {})) != 0'.format(DiscriminatorWP.Tight))
 if args.type == 'mc':
-    df = df.Filter('tau_charge + muon_charge == 0 && tau_gen_match == 5')
+    df = df.Filter('sigtau_charge + muon_charge == 0 && sigtau_gen_match == 5')
     df = df.Define('weight', "PileUpWeightProvider::GetDefault().GetWeight(npu) * genEventWeight")
 else:
-    df = df.Define('weight', "muon_charge != tau_charge ? 1. : -1.")
+    df = df.Define('weight', "muon_charge != sigtau_charge ? 1. : -1.")
 
 skimmed_branches = [
+    'sigtau_pt', 'sigtau_eta', 'sigtau_phi', 'sigtau_mass', 'sigtau_charge', 'sigtau_decayMode',
     'tau_pt', 'tau_eta', 'tau_phi', 'tau_mass', 'tau_charge', 'tau_decayMode', 'weight',
     'byIsolationMVArun2017v2DBoldDMwLT2017', 'byDeepTau2017v2p1VSjet'
 ]
