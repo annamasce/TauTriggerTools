@@ -20,7 +20,7 @@ std::vector<pat::Tau> SignalTauCandidates(const LorentzVectorM& muon_p4, const p
 {
     std::vector<pat::Tau> signalTauCandidates;
     for(const auto& tau : taus) {
-        if(tau.polarP4().pt() > 24 && std::abs(tau.polarP4().eta()) < 2.1 && tau.tauID("againstMuonLoose3") > 0.5f
+        if(tau.polarP4().pt() > 27 && std::abs(tau.polarP4().eta()) < 2.1 && tau.tauID("againstMuonLoose3") > 0.5f
                         && tau.tauID("byTightIsolationMVArun2017v2DBoldDMwLT2017") > 0.5f && tau.tauID("decayModeFinding") > 0.5f
                         && reco::deltaR2(muon_p4, tau.polarP4()) > deltaR2Thr)
             signalTauCandidates.push_back(tau);
@@ -62,37 +62,37 @@ std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauC
         }
     }
     std::map<const pat::Tau*, TauEntry> selected_taus;
-    const gen_truth::LeptonMatchResult selected_gen_tau = SelectGenLeg(genLeptons, true);
-    const bool has_selected_gen_tau = selected_gen_tau.match != GenLeptonMatch::NoMatch;
-    bool selected_gen_tau_stored = false;
+    // const gen_truth::LeptonMatchResult selected_gen_tau = SelectGenLeg(genLeptons, true);
+    // const bool has_selected_gen_tau = selected_gen_tau.match != GenLeptonMatch::NoMatch;
+    // bool selected_gen_tau_stored = false;
     for(const auto& entry : best_tau) {
         const pat::Tau* reco_tau = entry.second;
         if(!selected_taus.count(reco_tau)) {
             const auto gen_tau = gen_truth::LeptonGenMatch(reco_tau->polarP4(), genLeptons);
-            const bool has_gen_tau = gen_tau.match != GenLeptonMatch::NoMatch;
+    //         const bool has_gen_tau = gen_tau.match != GenLeptonMatch::NoMatch;
             selected_taus[reco_tau] = TauEntry{reco_tau, gen_tau, 0};
-            if(has_selected_gen_tau && has_gen_tau
-                    && selected_gen_tau.gen_particle_firstCopy == gen_tau.gen_particle_firstCopy) {
-                selected_gen_tau_stored = true;
-                selected_taus[reco_tau].selection |= static_cast<unsigned>(TauSelection::gen);
-            }
+    //         if(has_selected_gen_tau && has_gen_tau
+    //                 && selected_gen_tau.gen_particle_firstCopy == gen_tau.gen_particle_firstCopy) {
+    //             selected_gen_tau_stored = true;
+    //             selected_taus[reco_tau].selection |= static_cast<unsigned>(TauSelection::gen);
+    //         }
         }
         selected_taus[reco_tau].selection |= static_cast<unsigned>(entry.first);
     }
-    if(has_selected_gen_tau && !selected_gen_tau_stored) {
-        const pat::Tau* reco_tau = nullptr;
-        for(const auto& tau : taus) {
-            const auto gen_tau = gen_truth::LeptonGenMatch(tau.polarP4(), genLeptons);
-            if(gen_tau.match != GenLeptonMatch::NoMatch
-                    && gen_tau.gen_particle_firstCopy == selected_gen_tau.gen_particle_firstCopy) {
-                reco_tau = &tau;
-                break;
-            }
-        }
-        if(selected_taus.count(reco_tau))
-            throw exception("Inconsistency in CollectTaus algorithm.");
-        selected_taus[reco_tau] = TauEntry{reco_tau, selected_gen_tau, static_cast<unsigned>(TauSelection::gen)};
-    }
+    // if(has_selected_gen_tau && !selected_gen_tau_stored) {
+    //     const pat::Tau* reco_tau = nullptr;
+    //     for(const auto& tau : taus) {
+    //         const auto gen_tau = gen_truth::LeptonGenMatch(tau.polarP4(), genLeptons);
+    //         if(gen_tau.match != GenLeptonMatch::NoMatch
+    //                 && gen_tau.gen_particle_firstCopy == selected_gen_tau.gen_particle_firstCopy) {
+    //             reco_tau = &tau;
+    //             break;
+    //         }
+    //     }
+    //     if(selected_taus.count(reco_tau))
+    //         throw exception("Inconsistency in CollectTaus algorithm.");
+    //     selected_taus[reco_tau] = TauEntry{reco_tau, selected_gen_tau, static_cast<unsigned>(TauSelection::gen)};
+    // }
 
     std::vector<TauEntry> result;
     for(const auto& entry : selected_taus)

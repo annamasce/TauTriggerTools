@@ -15,6 +15,7 @@ parser.add_argument('--input-dy-mc', required=True, type=str, help="skimmed DY M
 parser.add_argument('--output', required=True, type=str, help="output file prefix")
 parser.add_argument('--channels', required=False, type=str, default='etau,mutau,ditau', help="channels to process")
 parser.add_argument('--decay-modes', required=False, type=str, default='all,0,1,10,11', help="decay modes to process")
+parser.add_argument('--store2D', action = 'store_true', help="Also include tag-tau pt in bins")
 parser.add_argument('--working-points', required=False, type=str,
                     default='VVVLoose,VVLoose,VLoose,Loose,Medium,Tight,VTight,VVTight',
                     help="working points to process")
@@ -22,9 +23,9 @@ args = parser.parse_args()
 
 path_prefix = '' if 'TauTriggerTools' in os.getcwd() else 'TauTriggerTools/'
 sys.path.insert(0, path_prefix + 'Common/python')
-from AnalysisTypes import *
-from AnalysisTools import *
-import RootPlotting
+from TauTriggerTools.Common.AnalysisTypes import *
+from TauTriggerTools.Common.AnalysisTools import *
+import TauTriggerTools.Common.RootPlotting as RootPlotting
 ROOT.ROOT.EnableImplicitMT(4)
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2()
@@ -66,7 +67,7 @@ class TurnOnData:
         self.hist_passed = None
         self.eff = None
 
-def CreateHistograms(input_file, channels, decay_modes, discr_name, working_points, hist_models, label, var,
+def Create1DHistograms(input_file, channels, decay_modes, discr_name, working_points, hist_models, label, var,
                      output_file):
     df = ROOT.RDataFrame('events', input_file)
     turnOn_data = {}
@@ -124,26 +125,97 @@ def CreateHistograms(input_file, channels, decay_modes, discr_name, working_poin
 
     return turnOn_data
 
+def Create2DHistograms(input_file, channels, decay_modes, discr_name, working_points, hist_models, label, var, var2,
+                     output_file):
+    df = ROOT.RDataFrame('events', input_file)
+    turnOn_data = {}
+    dm_labels = {}
+
+    for dm in decay_modes:
+        if dm == 'all':
+            dm_labels[dm] = ''
+            df_dm = df
+        else:
+            dm_labels[dm] = '_dm{}'.format(dm)
+            df_dm = df.Filter('tau_decayMode == {}'.format(dm))
+        turnOn_data[dm] = {}
+        for wp in working_points:
+            wp_bit = ParseEnum(DiscriminatorWP, wp)
+            df_wp = df_dm.Filter('({} & (1 << {})) != 0'.format(discr_name, wp_bit))
+            turnOn_data[dm][wp] = {}
+            for channel in channels:
+                turnOn_data[dm][wp][channel] = {}
+                df_ch = df_wp.Filter('pass_{} > 0.5'.format(channel))
+                for model_name, hist_model in hist_models.items():
+                    turn_on = TurnOnData()
+                    turn_on.hist_total = df_wp.Histo2D(hist_model, var1, var2, 'weight')
+                    turn_on.hist_passed = df_ch.Histo2D(hist_model, var1, var2, 'weight')
+                    turnOn_data[dm][wp][channel][model_name] = turn_on
+
+    for dm in decay_modes:
+        for wp in working_points:
+            for channel in channels:
+                for model_name, hist_model in hist_models.items():
+                    turn_on = turnOn_data[dm][wp][channel][model_name]
+                    name_pattern = '{}_{}_{}{}_{}_{{}}'.format(label, channel, wp, dm_labels[dm], model_name)
+                    turn_on.name_pattern = name_pattern
+                    if 'fit' in model_name:
+                        passed, total, eff = AutoRebinAndEfficiency(turn_on.hist_passed.GetPtr(),
+                                                                    turn_on.hist_total.GetPtr(), bin_scan_pairs)
+                    else:
+                        passed, total = turn_on.hist_passed.GetPtr(), turn_on.hist_total.GetPtr()
+                        FixEfficiencyBins(passed, total)
+                        turn_on.eff = ROOT.TEfficiency(passed, total)
+                        eff = turn_on.eff
+                    output_file.WriteTObject(total, name_pattern.format('total'), 'Overwrite')
+                    output_file.WriteTObject(passed, name_pattern.format('passed'), 'Overwrite')
+                    output_file.WriteTObject(eff, name_pattern.format('eff'), 'Overwrite')
+                    # print(name_pattern)
+                    # print('hist_total {}'.format(turn_on.hist_total.GetPtr().GetNbinsX()))
+                    # for n in range(turn_on.hist_total.GetPtr().GetNbinsX() + 1):
+                    #     print('\t{} {} +/- {} {} +/- {}'.format(turn_on.hist_total.GetPtr().GetBinLowEdge(n+1), turn_on.hist_total.GetPtr().GetBinContent(n+1), turn_on.hist_total.GetPtr().GetBinError(n+1), turn_on.hist_passed.GetPtr().GetBinContent(n+1), turn_on.hist_passed.GetPtr().GetBinError(n+1)))
+                    # print('hist_passed {}'.format(turn_on.hist_passed.GetPtr().GetNbinsX()))
+                    # for n in range(turn_on.hist_passed.GetPtr().GetNbinsX() + 1):
+                    #     print('\t{} {}'.format(turn_on.hist_passed.GetPtr().GetBinLowEdge(n+1), ))
+                    #if 'fit' not in model_name:
+                    #    turn_on.eff = ROOT.TEfficiency(turn_on.hist_passed.GetPtr(), turn_on.hist_total.GetPtr())
+                    #    output_file.WriteTObject(turn_on.eff, name_pattern.format('passed'), 'Overwrite')
+
+    return turnOn_data
+
 output_file = ROOT.TFile(args.output + '.root', 'RECREATE')
 input_files = [ args.input_data, args.input_dy_mc ]
 n_inputs = len(input_files)
 labels = [ 'data', 'mc' ]
-var = 'tau_pt'
+var1 = 'tau_pt'
+var2 = 'tau2_pt'
 title, x_title = '#tau p_{T}', '#tau p_{T} (GeV)'
 decay_modes = args.decay_modes.split(',')
 channels = args.channels.split(',')
 working_points = args.working_points.split(',')
 bins, use_logx = CreateBins(200, False)
 bins_fit, _ = CreateBins(200, True)
-hist_models = {
-    'plot': ROOT.RDF.TH1DModel(var, var, len(bins) - 1, array('d', bins)),
-    'fit': ROOT.RDF.TH1DModel(var, var, len(bins_fit) - 1, array('d', bins_fit))
-}
+if not args.store2D:
+    hist_models = {
+        'plot': ROOT.RDF.TH1DModel(var1, var1, len(bins) - 1, array('d', bins)),
+        'fit': ROOT.RDF.TH1DModel(var1, var1, len(bins_fit) - 1, array('d', bins_fit))
+    }
+else:
+    hist_models = {
+        'plot': ROOT.RDF.TH2DModel(var1, var1, len(bins) - 1, array('d', bins), len(bins) - 1, array('d', bins)),
+        'fit': ROOT.RDF.TH2DModel(var1, var1, len(bins_fit) - 1, array('d', bins_fit), len(bins) - 1, array('d', bins))
+    }
+
 turnOn_data = [None] * n_inputs
 for input_id in range(n_inputs):
-    print("Creating {} histograms...".format(labels[input_id]))
-    turnOn_data[input_id] = CreateHistograms(input_files[input_id], channels, decay_modes, 'byDeepTau2017v2p1VSjet',
-                                             working_points, hist_models, labels[input_id], var, output_file)
+    if not args.store2D:
+        print("Creating {} histograms...".format(labels[input_id]))
+        turnOn_data[input_id] = Create1DHistograms(input_files[input_id], channels, decay_modes, 'byDeepTau2017v2p1VSjet',
+                                                working_points, hist_models, labels[input_id], var, output_file)
+    else:
+        print("Creating {} histograms...".format(labels[input_id]))
+        turnOn_data[input_id] = Create2DHistograms(input_files[input_id], channels, decay_modes, 'byDeepTau2017v2p1VSjet',
+                                                working_points, hist_models, labels[input_id], var, output_file)
 
 colors = [ ROOT.kRed, ROOT.kBlack ]
 canvas = RootPlotting.CreateCanvas()

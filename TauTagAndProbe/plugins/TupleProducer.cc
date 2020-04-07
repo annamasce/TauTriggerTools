@@ -185,7 +185,6 @@ private:
         gen_truth::LeptonMatchResult gen_signal_tau;
         LorentzVectorM signal_tau_ref_p4;
         bool has_signal_tau = false;
-        bool has_gen_signal_tau = gen_signal_tau.match != GenLeptonMatch::NoMatch;
         if(signal_tau) {
             gen_signal_tau = gen_truth::LeptonGenMatch(signal_tau->polarP4(), genLeptons);
             signal_tau_ref_p4 = signal_tau->polarP4();
@@ -197,6 +196,8 @@ private:
                 has_signal_tau = true;
             }
         }
+        bool has_gen_signal_tau = gen_signal_tau.match != GenLeptonMatch::NoMatch;
+
         cut(has_signal_tau, "has_signal_tau");
 
         edm::Handle<edm::TriggerResults> triggerResults;
