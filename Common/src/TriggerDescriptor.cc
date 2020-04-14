@@ -57,7 +57,7 @@ TriggerDescriptorCollection::TriggerDescriptorCollection(const edm::VParameterSe
         for(size_t n = 0; n < leg_types.size(); ++n) {
             TriggerLeg leg;
             leg.type = analysis::Parse<analysis::LegType>(leg_types.at(n));
-            leg.filters = analysis::SplitValueList(filters.at(n), false);
+            leg.filters = analysis::SplitValueList(filters.at(n), false, ",");
             desc.type_mask |= static_cast<unsigned>(leg.type);
             desc.legs.push_back(leg);
         }
@@ -148,13 +148,13 @@ FullTriggerResults TriggerDescriptorCollection::matchTriggerObjectsForTag(
             const double deltaR2 = ROOT::Math::VectorUtil::DeltaR2(ref_p4, hlt_obj.polarP4());
             if(deltaR2 >= deltaR2Thr) continue;
             if(!hlt_obj.hasPathName(path_name, true, false)) continue;
-            bool passed_filters = false;
+            bool failed_filters = false;
             for(size_t leg_index = 0; leg_index < trig_desc.legs.size(); ++leg_index) {
                 const auto& trig_leg = trig_desc.legs.at(leg_index);
                 if(trig_leg.type != analysis::Parse<analysis::LegType>(legtype)) continue;
-                if(hasFilters(hlt_obj.filterLabels(), trig_leg.filters)) passed_filters = true;
+                if(!hasFilters(hlt_obj.filterLabels(), trig_leg.filters)) failed_filters = true;
             }
-            if((obj_types.at(obj_index) & trig_desc.type_mask) != 0 && passed_filters) {
+            if((obj_types.at(obj_index) & trig_desc.type_mask) != 0 && !failed_filters) {
                 if(deltaR2 < dR2_bestMatch) {
                     best_matched_obj_index = obj_index;
                     dR2_bestMatch = deltaR2;

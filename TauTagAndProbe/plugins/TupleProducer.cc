@@ -216,6 +216,7 @@ private:
                 signal_tau_ref_p4, triggerNames.triggerNames(), deltaR2Thr, "tau");
         cut(!signalTauTriggerMatch.matchResults.empty(), "tau_tag_trig_match");
 
+
         // Temporary dirty fix because size is 1
         std::vector<unsigned int> hlt_obj_to_veto = {};
         for(const auto& match_entry : signalTauTriggerMatch.matchResults) {
@@ -229,6 +230,7 @@ private:
         const LorentzVectorM met_p4(met.pt(), 0, met.phi(), 0);
         eventTuple().met_pt = static_cast<float>(met.pt());
         eventTuple().met_phi = static_cast<float>(met.phi());
+        eventTuple().muon_hasfilters = muonTriggerMatch.acceptAndMatch.to_ullong() != 0;
         eventTuple().muon_pt = muon ? static_cast<float>(muon->polarP4().pt()) : default_value;
         eventTuple().muon_eta = muon ? static_cast<float>(muon->polarP4().eta()) : default_value;
         eventTuple().muon_phi = muon ? static_cast<float>(muon->polarP4().phi()) : default_value;
@@ -245,6 +247,7 @@ private:
         eventTuple().muon_gen_vis_phi = has_gen_muon ? static_cast<float>(gen_muon.visible_p4.phi()) : default_value;
         eventTuple().muon_gen_vis_mass = has_gen_muon ? static_cast<float>(gen_muon.visible_p4.mass()) : default_value;
 
+        eventTuple().sigtau_hasfilters = signalTauTriggerMatch.acceptAndMatch.to_ullong() != 0;
         eventTuple().sigtau_pt = signal_tau ? static_cast<float>(signal_tau->polarP4().pt()) : default_value;
         eventTuple().sigtau_eta = signal_tau ? static_cast<float>(signal_tau->polarP4().eta()) : default_value;
         eventTuple().sigtau_phi = signal_tau ? static_cast<float>(signal_tau->polarP4().phi()) : default_value;
@@ -348,7 +351,7 @@ private:
             eventTuple().tau_dz_error = leadChargedHadrCand && leadChargedHadrCand->hasTrackDetails()
                     ? leadChargedHadrCand->dzError() : default_value;
 
-            eventTuple().vis_mass = static_cast<float>((muon_ref_p4 + tau_ref_p4).mass());
+            eventTuple().vis_mass = static_cast<float>((muon_ref_p4 + signal_tau_ref_p4).mass());
 
             const auto tauTriggerMatch = triggerDescriptors.matchTriggerObjects(*triggerResults, *triggerObjects,
                     tau_ref_p4, triggerNames.triggerNames(), deltaR2Thr, true, true, hlt_obj_to_veto);

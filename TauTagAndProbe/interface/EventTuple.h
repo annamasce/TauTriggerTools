@@ -26,6 +26,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     /* Tag muon variables */ \
     VAR4(Float_t, muon_pt, muon_eta, muon_phi, muon_mass) /* 4-momentum of the muon */ \
     VAR(Int_t, muon_charge) /* muon charge */ \
+    VAR(Bool_t, muon_hasfilters) /* muon charge */ \
     VAR(Float_t, muon_iso) /* muon pfRel isolation */ \
     VAR(Float_t, muon_mt) /* muon transverse mass */ \
     VAR(Int_t, muon_gen_match) /* matching of the muon with leptons on the generator level:
@@ -36,6 +37,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     /* Basic tau variables */ \
     VAR4(Float_t, sigtau_pt, sigtau_eta, sigtau_phi, sigtau_mass) /* 4-momentum of the sigtau */ \
     VAR(Int_t, sigtau_charge) /* sigtau charge */ \
+    VAR(Bool_t, sigtau_hasfilters) /* sigtau charge */ \
     VAR(Int_t, sigtau_gen_match) /* matching of the sigtau with leptons on the generator level:
                                  Electron = 1, Muon = 2, sigTauElectron = 3, sigTauMuon = 4, sigTau = 5, NoMatch = 6 */ \
     VAR(Int_t, sigtau_gen_charge) /* charge of the gen lepton that was matched with the sigtau */ \
