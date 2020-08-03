@@ -154,12 +154,12 @@ hltPaths, tagHltPaths = TriggerConfig.LoadAsVPSet(trigFile)
 
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 
-process.hltFilter = hlt.hltHighLevel.clone(
-    TriggerResultsTag = cms.InputTag("TriggerResults", "", "HLT"),
-    HLTPaths = [p + '*' for p in tagHltPaths],
-    andOr = cms.bool(True), # True (OR) accept if ANY is true, False (AND) accept if ALL are true
-    throw = cms.bool(True) # if True: throws exception if a trigger path is invalid
-)
+# process.hltFilter = hlt.hltHighLevel.clone(
+#     TriggerResultsTag = cms.InputTag("TriggerResults", "", "HLT"),
+#     HLTPaths = [p + '*' for p in tagHltPaths],
+#     andOr = cms.bool(True), # True (OR) accept if ANY is true, False (AND) accept if ALL are true
+#     throw = cms.bool(True) # if True: throws exception if a trigger path is invalid
+# )
 
 process.patTriggerUnpacker = cms.EDProducer("PATTriggerObjectStandAloneUnpacker",
     patTriggerObjectsStandAlone = cms.InputTag("slimmedPatTrigger"),
@@ -194,7 +194,6 @@ process.tupleProducer = cms.EDProducer("TauTriggerTupleProducer",
     puInfo          = cms.InputTag('slimmedAddPileupInfo'),
     genParticles    = cms.InputTag('prunedGenParticles'),
     vertices        = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    signalMuon      = cms.InputTag('selectionFilter'),
     taus            = tauSrc_InputTag,
     jets            = cms.InputTag('slimmedJets'),
     met             = metInputTag,
@@ -207,7 +206,7 @@ process.tupleProducer = cms.EDProducer("TauTriggerTupleProducer",
 
 process.p = cms.Path(
     process.summaryProducer +
-    process.hltFilter +
+    # process.hltFilter +
     process.egammaPostRecoSeq +
     process.metSequence +
     process.metFilterSequence +

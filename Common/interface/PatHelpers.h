@@ -9,6 +9,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "TauTriggerTools/Common/interface/GenTruthTools.h"
+#include "TauTriggerTools/Common/interface/CutTools.h"
 
 namespace tau_trigger {
 
@@ -29,10 +30,17 @@ struct TauEntry {
     unsigned selection{0};
 };
 
-std::vector<TauEntry> CollectTaus(const LorentzVectorM& muon_p4, const pat::TauCollection& taus,
+std::vector<TauEntry> CollectTaus(const pat::TauCollection& taus,
                                   const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr);
 
-bool PassBtagVeto(const LorentzVectorM& muon_p4, const LorentzVectorM& tau_p4, const pat::JetCollection& jets,
+std::vector<std::vector<TauEntry>> CollectTauPairs(const pat::TauCollection& taus,
+                                  const std::vector<gen_truth::LeptonMatchResult>& genLeptons, double deltaR2Thr, cuts::Cutter<>& cut);
+
+bool IsGoodBaselineTau(const pat::Tau& tau, double deltaR2Thr);
+
+bool IsBetterTauPair(std::vector<const pat::Tau*>& tau_pair_1, const std::vector<const pat::Tau*>& tau_pair_2, const std::string IdName);
+
+bool PassBtagVeto(const LorentzVectorM& tau_p4, const pat::JetCollection& jets,
                   double btagThreshold, double deltaR2Thr);
 gen_truth::LeptonMatchResult SelectGenLeg(const std::vector<gen_truth::LeptonMatchResult>& genLeptons, bool is_tau);
 

@@ -78,26 +78,10 @@ private:
         edm::Handle<pat::MuonCollection> muons;
         event.getByToken(muons_token, muons);
 
-        // Find signal muon
-        std::vector<pat::MuonRef> signalMuonCandidates;
-        for(size_t n = 0; n < muons->size(); ++n) {
-            const pat::Muon& muon = muons->at(n);
-            if(muon.polarP4().pt() > 24 && std::abs(muon.polarP4().eta()) < 2.1 && muon.isMediumMuon())
-                signalMuonCandidates.emplace_back(muons, n);
-        }
-        cut(!signalMuonCandidates.empty(), "signal_muon");
-        static const auto muonComparitor = [](const pat::MuonRef& a, const pat::MuonRef& b) {
-            const double iso_a = MuonIsolation(*a), iso_b = MuonIsolation(*b);
-            if(iso_a != iso_b) return iso_a < iso_b;
-            return a->polarP4().pt() > b->polarP4().pt();
-        };
-        std::sort(signalMuonCandidates.begin(), signalMuonCandidates.end(), muonComparitor);
-        const pat::Muon& signalMuon = *signalMuonCandidates.at(0);
-
         // Apply third lepton veto
         bool has_other_muon = false;
         for(const pat::Muon& muon : *muons) {
-            if(&muon != &signalMuon && muon.isLooseMuon() && muon.polarP4().pt() > 10
+            if(muon.isLooseMuon() && muon.polarP4().pt() > 10
                     && std::abs(muon.polarP4().eta()) < 2.4 && MuonIsolation(muon) < 0.3) {
                 has_other_muon = true;
                 break;
@@ -116,15 +100,6 @@ private:
             }
         }
         cut(!has_ele, "ele_veto");
-
-        // Apply MT cut (if enabled)
-        if(mtCut > 0) {
-            edm::Handle<pat::METCollection> metCollection;
-            event.getByToken(met_token, metCollection);
-            const pat::MET& met = metCollection->at(0);
-            const analysis::LorentzVectorM met_p4(met.pt(), 0, met.phi(), 0);
-            cut(Calculate_MT(signalMuon.polarP4(), met_p4) < mtCut, "mt_cut");
-        }
 
         // Apply b tag veto (if enabled)
         if(btagThreshold > 0) {
@@ -167,11 +142,6 @@ private:
             }
         }
         cut(pass_met_filters, "met_filters");
-
-        // Put the signal muon into the event
-        auto signalMuonOutput = std::make_unique<pat::MuonRefVector>();
-        signalMuonOutput->push_back(signalMuonCandidates.at(0));
-        event.put(std::move(signalMuonOutput));
     }
 
 private:
