@@ -20,7 +20,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "RecoTauTag/RecoTau/interface/DeepTauBase.h"
-#include "RecoTauTag/RecoTau/interface/CounterTuple.h"
+#include "TauTriggerTools/Counters/interface/CounterTuple.h"
 
 class CounterFilter : public edm::EDFilter {
 public:

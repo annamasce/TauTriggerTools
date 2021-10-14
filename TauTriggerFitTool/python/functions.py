@@ -3,26 +3,26 @@ from array import array
 from math import sqrt
 
 class functions:
-	def __init__(self,graphEffi, name, dm, itype, func, histo, graph, fitresult, CL):
-		self.graphEffi = graphEffi
-		self.name = name
-		self.func = func
-		self.histo = histo
-		self.graph = graph
-		self.dm = dm
-		self.itype = itype
-		self.fitresult = fitresult
-		self.CL =CL
+        def __init__(self,graphEffi, name, dm, itype, func, histo, graph, fitresult, CL):
+                self.graphEffi = graphEffi
+                self.name = name
+                self.func = func
+                self.histo = histo
+                self.graph = graph
+                self.dm = dm
+                self.itype = itype
+                self.fitresult = fitresult
+                self.CL =CL
 
     # This function is taken from Tyler Ruggles SF tool
-	# https://github.com/truggles/TauTriggerSFs2017/blob/master/python/helpers.py#L9-L40
-	# Function to create TH1Fs from TGraphAsymmErrors
-	# This does not preserve the asymmetric errors, only
-	# bin width and value and does a rough approximation
-	# on symmetric errors.
-	def getTH1FfromTGraphAsymmErrors( self  ) :
+        # https://github.com/truggles/TauTriggerSFs2017/blob/master/python/helpers.py#L9-L40
+        # Function to create TH1Fs from TGraphAsymmErrors
+        # This does not preserve the asymmetric errors, only
+        # bin width and value and does a rough approximation
+        # on symmetric errors.
+        def getTH1FfromTGraphAsymmErrors( self  ) :
                 
-	    # Holding vals for TH1F binning and y-vals
+            # Holding vals for TH1F binning and y-vals
                 xSpacing = array( 'd', [] )
                 yVals = array( 'd', [] )
                 yErrors = array( 'd', [] )
@@ -52,14 +52,14 @@ class functions:
                         outH.SetBinContent( bin, yVals[bin-1] )
                         outH.SetBinError( bin, yErrors[bin-1] )
                 return outH
-    	
-    	
+            
+            
         def getScaleFactorFromFunction(self):
 
                 SF = TGraphAsymmErrors()
                 for i in range(20, 450):
                         SF.SetPoint(i, i, (self.func[0].Eval(i)/self.func[1].Eval(i)))
-		
+                
                 SF.Draw("A*")
                 SF.GetXaxis().SetLimits(18,600)
                 SF.GetYaxis().SetRangeUser(0,1.5)
@@ -111,7 +111,7 @@ class functions:
                 hEffi1.SetLineWidth(6)
 
                 return  hEffi1
-		
+                
                 SFnew.SetMarkerStyle(20)
                 SFnew.SetMarkerColor(kBlack)
                 SFnew.SetLineColor(kBlue)
@@ -130,23 +130,23 @@ class functions:
                 mg.GetXaxis().SetTitle("Offline p_{T}^{#tau} [GeV]")
                 mg.GetYaxis().SetTitle("SF: Data/MC")
                 return SFnew
-	
-	
+        
+        
         def getConfidenceInterval( self): 
 
-		TVirtualFitter.GetFitter().GetConfidenceIntervals(self.histo, self.CL)
+                TVirtualFitter.GetFitter().GetConfidenceIntervals(self.histo, self.CL)
                 for i in range(0, self.graphEffi.GetN()):
                         self.graph.SetPoint(i, self.graphEffi.GetX()[i], 0)
-			TVirtualFitter.GetFitter().GetConfidenceIntervals(self.graph, self.CL)
+                        TVirtualFitter.GetFitter().GetConfidenceIntervals(self.graph, self.CL)
 
                 return self.histo, self.graph
 
-		
+                
         def createRelativeErrors(self):
 
                 # confidence interval#
                 values = self.fitresult.GetConfidenceIntervals(0.68, False)
-		interval = TGraphErrors(self.graphEffi.GetN())
+                interval = TGraphErrors(self.graphEffi.GetN())
                 ratio = TGraphAsymmErrors(self.graphEffi.GetN())
                 ratio2 = TGraphAsymmErrors(self.graphEffi.GetN())
                 for i in range(0, self.graphEffi.GetN()):

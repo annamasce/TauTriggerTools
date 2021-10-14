@@ -1,5 +1,6 @@
 <use name="root"/>
 <use name="boost"/>
+<use name="boost_filesystem"/>
 <use name="CLHEP"/>
 <use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/PatCandidates"/>

@@ -80,7 +80,7 @@ hPtNumDM = [[],[],[],[]]
 
 for ipath, trigger in enumerate(triggers):
 
-	print "bin[", trigger, "]", bin[trigger]
+	print("bin[", trigger, "]", bin[trigger])
 	hPtNum.append([])
 	hPtDen.append([])
 	# per DM
@@ -108,13 +108,13 @@ for ipath, trigger in enumerate(triggers):
 				hPtNumDM[ipath][index][ind].append(TH1F (histoname + "_Num_" + DM, "", len(binDM[trigger][DM][typ])-1, array('f',binDM[trigger][DM][typ])))
 
 for index, filename in enumerate(files):
-	print  "filename", filename
+	print ("filename", filename)
 
 	file = TFile.Open(filename)
 	tree = file.Get('TagAndProbe')
 	triggerNamesTree = file.Get("triggerNames")
 
-	print "Populating histograms"
+	print("Populating histograms")
 
 	Nevts = 0
 	for iEv in range (0, tree.GetEntries()):
@@ -169,7 +169,7 @@ for index, filename in enumerate(files):
 		weight = tree.bkgSubW*puweight
 
 		if("Run2018A" in filename or "Autumn18" in filename):
-                        HLTHPSpaths18 = [hasHLTditauPath_15or20HPS, hasHLTmutauPath_14HPS , hasHLTetauPath_14HPS ]
+			HLTHPSpaths18 = [hasHLTditauPath_15or20HPS, hasHLTmutauPath_14HPS , hasHLTetauPath_14HPS ]
 			HLTpaths18 = [hasHLTditauPath_4or5or6noHPS, hasHLTmutauPath_8noHPS, hasHLTetauPath_8noHPS]
 		elif("Run2017B" in filename or "12062018" in filename):
 			HLTpaths17 = [hasHLTditauPath_9or10or11, hasHLTmutauPath_13 , hasHLTetauPath_13 ]
@@ -362,4 +362,4 @@ for ipath, trigger in enumerate(triggers):
 				hPtDenDM[ipath][index][WPind][idm].Write(trigger +"_total_" + wp +"_" + typ + "_" + DM)
 
 file.Close()
-print "The output ROOT file has been created: ../data/" + outputname
+print("The output ROOT file has been created: ../data/" + outputname)

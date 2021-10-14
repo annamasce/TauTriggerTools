@@ -10,5 +10,6 @@
 <use name="FWCore/ServiceRegistry"/>
 <use name="HLTrigger/HLTcore"/>
 <use name="TauTriggerTools/Common"/>
+<use name="SimDataFormats/GeneratorProducts"/>
 
 <flags EDM_PLUGIN="1"/>
