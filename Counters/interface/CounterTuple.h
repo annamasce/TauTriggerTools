@@ -25,16 +25,10 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR(std::vector<Float_t>, tau_eta) /* eta of the tau */ \
     VAR(std::vector<Float_t>, tau_phi) /* phi of the tau */ \
     VAR(std::vector<Float_t>, tau_e) /* energy of the tau */ \
-    VAR(std::vector<Float_t>, tau_mediumIsoAbs) /* medium PF iso abs for hadronic Tau */ \
-    VAR(std::vector<Float_t>, tau_mediumIsoRel) /* medium PF iso rel for hadronic Tau */ \
-    VAR(std::vector<Float_t>, tau_looseIsoAbs) /* loose PF iso abs for hadronic Tau */ \
-    VAR(std::vector<Float_t>, tau_looseIsoRel) /* loose PF iso rel for hadronic Tau */ \
-    VAR(std::vector<Float_t>, tau_tightIsoAbs) /* tight PF iso abs for hadronic Tau */ \
-    VAR(std::vector<Float_t>, tau_tightIsoRel) /* tight PF iso rel for hadronic Tau */ \
+    VAR(std::vector<Float_t>, tau_vz) /* vz of the tau */ \
     VAR(std::vector<Float_t>, deepTau_VSe) /* deepTau_VSe raw discriminator */ \
     VAR(std::vector<Float_t>, deepTau_VSmu) /* deepTau_VSmu raw discriminator */ \
     VAR(std::vector<Float_t>, deepTau_VSjet) /* deepTau_VSjet raw discriminator */ \
-    VAR(std::vector<Int_t>, tau_decayModeFindingNewDMs) /* new decayMode for tau */ \
     VAR(std::vector<bool>, tau_passedLastFilter) /* bool if the passed the last Filter */ \
     /**/
 
@@ -60,3 +54,11 @@ template<>
 constexpr int DefaultFillValue<int>() { return -999; }
 
 } // namespace counter_tau
+
+// VAR(std::vector<Float_t>, tau_mediumIsoAbs) /* medium PF iso abs for hadronic Tau */ 
+// VAR(std::vector<Float_t>, tau_mediumIsoRel) /* medium PF iso rel for hadronic Tau */ 
+// VAR(std::vector<Int_t>, tau_decayModeFindingNewDMs) /* new decayMode for tau */ 
+// VAR(std::vector<Float_t>, tau_looseIsoAbs) /* loose PF iso abs for hadronic Tau */ \
+// VAR(std::vector<Float_t>, tau_looseIsoRel) /* loose PF iso rel for hadronic Tau */ \
+// VAR(std::vector<Float_t>, tau_tightIsoAbs) /* tight PF iso abs for hadronic Tau */ \
+// VAR(std::vector<Float_t>, tau_tightIsoRel) /* tight PF iso rel for hadronic Tau */ \
