@@ -19,36 +19,85 @@ def add_reg_tag(name, useReg):
         return name + "Reg"
     return name
 
-def update(process, useReg=True, resetWP=False, addCounters=False):
-    process.options.wantSummary = cms.untracked.bool(True)
+def add_deepTau_sequence(process, working_points, useReg):
 
-    ## Gen counter
-    process.genCounter = cms.EDFilter( "CounterFilter",
-        isMC = cms.bool(True), #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(True), #from outside
-        position = cms.string("gen"),
-        deepTauVSe = cms.InputTag('try1'),
-        deepTauVSmu = cms.InputTag('try2'),
-        deepTauVSjet = cms.InputTag('try3'),
-        # isoAbs = cms.InputTag('try4'),
-        # isoRel = cms.InputTag('try5'),
-        original_taus = cms.InputTag('try6'),
-        taus = cms.InputTag('try14'),
-        puInfo = cms.InputTag('try7'),
-        vertices = cms.InputTag('try8'),
-        # decayModeFindingNewDM = cms.InputTag('try9'),
-        genParticles = cms.InputTag('genParticles')
+    # New L1 filter corresponding to BigOR filters in tau paths
+    process.hltL1sTauDeepTauOR = process.hltL1sTauVeryBigOR.clone(
+        L1SeedsLogicalExpression = cms.string("L1_DoubleIsoTau32er2p1 OR L1_DoubleIsoTau34er2p1 OR L1_DoubleIsoTau36er2p1 OR L1_DoubleTau70er2p1 OR L1_IsoTau40er2p1_ETMHF100 OR L1_IsoTau40er2p1_ETMHF110 OR L1_IsoTau40er2p1_ETMHF80 OR L1_IsoTau40er2p1_ETMHF90 OR L1_LooseIsoEG22er2p1_IsoTau26er2p1_dR_Min0p3 OR L1_LooseIsoEG22er2p1_Tau70er2p1_dR_Min0p3 OR L1_LooseIsoEG24er2p1_IsoTau27er2p1_dR_Min0p3 OR L1_Mu18er2p1_Tau24er2p1 OR L1_Mu18er2p1_Tau26er2p1 OR L1_SingleTau120er2p1 OR L1_SingleTau130er2p1"),
     )
 
-    if addCounters:
-        process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(1, process.genCounter)
+    process.hltHpsL1JetsHLTForDeepTauInput = process.hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg.clone(
+        L1TauTrigger = cms.InputTag( "hltL1sTauDeepTauOR" ),
+        JetSrc = cms.InputTag(add_reg_tag('hltHpsPFTauProducer', useReg)),
+        ReduceTauContent = cms.bool(False),
+        KeepOriginalVertex = cms.bool(True),
+    )
+
+    process.hpsPFTauPrimaryVertexProducerForDeepTau = PFTauPrimaryVertexProducer.clone(
+        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        ElectronTag = "hltEgammaCandidates",
+        MuonTag = add_reg_tag("hltMuons", useReg),
+        PVTag = "hltPixelVertices",
+        beamSpot = "hltOnlineBeamSpot",
+        discriminators = [
+            cms.PSet(
+                discriminator = cms.InputTag(add_reg_tag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMs', useReg)),
+                selectionCut = cms.double(0.5)
+            )
+        ],
+        cut = "pt > 18.0 & abs(eta) < 2.4",
+        qualityCuts = PFTauQualityCuts
+    )
+
+    process.hpsPFTauSecondaryVertexProducerForDeepTau = PFTauSecondaryVertexProducer.clone(
+        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+    )
+    process.hpsPFTauTransverseImpactParametersForDeepTau = PFTauTransverseImpactParameters.clone(
+        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        PFTauPVATag = "hpsPFTauPrimaryVertexProducerForDeepTau",
+        PFTauSVATag = "hpsPFTauSecondaryVertexProducerForDeepTau",
+        useFullCalculation = True
+    )
 
     process.hltFixedGridRhoFastjetAllTau = cms.EDProducer( "FixedGridRhoProducerFastjet",
         gridSpacing = cms.double( 0.55 ),
         maxRapidity = cms.double( 5.0 ),
         # pfCandidatesTag = cms.InputTag( "hltParticleFlowForTausReg" )
         pfCandidatesTag = cms.InputTag(add_reg_tag("hltParticleFlowForTaus", useReg))
+    )
+
+    chargedIsolationQualityCuts = PFTauQualityCuts.clone(
+        isolationQualityCuts = cms.PSet( 
+            maxDeltaZ = cms.double( 0.2 ),
+            minTrackPt = cms.double( 0.5 ),
+            minGammaEt = cms.double( 0.5 ),
+            minTrackHits = cms.uint32( 3 ),
+            minTrackPixelHits = cms.uint32( 0 ),
+            maxTrackChi2 = cms.double( 100.0 ),
+            maxTransverseImpactParameter = cms.double( 0.1 ),
+            useTracksInsteadOfPFHadrons = cms.bool( False )
+        ),
+        primaryVertexSrc = cms.InputTag( "hltPixelVertices" ),
+        signalQualityCuts = cms.PSet( 
+            maxDeltaZ = cms.double( 0.2 ),
+            minTrackPt = cms.double( 0.0 ),
+            minGammaEt = cms.double( 0.5 ),
+            minTrackHits = cms.uint32( 3 ),
+            minTrackPixelHits = cms.uint32( 0 ),
+            maxTrackChi2 = cms.double( 1000.0 ),
+            maxTransverseImpactParameter = cms.double( 0.2 ),
+            useTracksInsteadOfPFHadrons = cms.bool( False ),
+            minNeutralHadronEt = cms.double( 1.0 )
+        ),
+        vxAssocQualityCuts = cms.PSet( 
+            minTrackPt = cms.double( 0.0 ),
+            minGammaEt = cms.double( 0.5 ),
+            minTrackHits = cms.uint32( 3 ),
+            minTrackPixelHits = cms.uint32( 0 ),
+            maxTrackChi2 = cms.double( 1000.0 ),
+            maxTransverseImpactParameter = cms.double( 0.2 ),
+            useTracksInsteadOfPFHadrons = cms.bool( False )
+        ),
     )
 
     PFTauQualityCuts.primaryVertexSrc = cms.InputTag("hltPixelVertices")
@@ -112,91 +161,11 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         customOuterCone = 0.3
     )
 
-    process.hpsPFTauPrimaryVertexProducerForDeepTau = PFTauPrimaryVertexProducer.clone(
-        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
-        ElectronTag = "hltEgammaCandidates",
-        MuonTag = add_reg_tag("hltMuons", useReg),
-        PVTag = "hltPixelVertices",
-        beamSpot = "hltOnlineBeamSpot",
-        discriminators = [
-            cms.PSet(
-                discriminator = cms.InputTag(add_reg_tag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMs', useReg)),
-                selectionCut = cms.double(0.5)
-            )
-        ],
-        cut = "pt > 18.0 & abs(eta) < 2.4",
-        qualityCuts = PFTauQualityCuts
-    )
-
-    process.hpsPFTauSecondaryVertexProducerForDeepTau = PFTauSecondaryVertexProducer.clone(
-        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
-    )
-    process.hpsPFTauTransverseImpactParametersForDeepTau = PFTauTransverseImpactParameters.clone(
-        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
-        PFTauPVATag = "hpsPFTauPrimaryVertexProducerForDeepTau",
-        PFTauSVATag = "hpsPFTauSecondaryVertexProducerForDeepTau",
-        useFullCalculation = True
-    )
-
-    chargedIsolationQualityCuts = PFTauQualityCuts.clone(
-        isolationQualityCuts = cms.PSet( 
-            maxDeltaZ = cms.double( 0.2 ),
-            minTrackPt = cms.double( 0.5 ),
-            minGammaEt = cms.double( 0.5 ),
-            minTrackHits = cms.uint32( 3 ),
-            minTrackPixelHits = cms.uint32( 0 ),
-            maxTrackChi2 = cms.double( 100.0 ),
-            maxTransverseImpactParameter = cms.double( 0.1 ),
-            useTracksInsteadOfPFHadrons = cms.bool( False )
-        ),
-        primaryVertexSrc = cms.InputTag( "hltPixelVertices" ),
-        signalQualityCuts = cms.PSet( 
-            maxDeltaZ = cms.double( 0.2 ),
-            minTrackPt = cms.double( 0.0 ),
-            minGammaEt = cms.double( 0.5 ),
-            minTrackHits = cms.uint32( 3 ),
-            minTrackPixelHits = cms.uint32( 0 ),
-            maxTrackChi2 = cms.double( 1000.0 ),
-            maxTransverseImpactParameter = cms.double( 0.2 ),
-            useTracksInsteadOfPFHadrons = cms.bool( False ),
-            minNeutralHadronEt = cms.double( 1.0 )
-        ),
-        vxAssocQualityCuts = cms.PSet( 
-            minTrackPt = cms.double( 0.0 ),
-            minGammaEt = cms.double( 0.5 ),
-            minTrackHits = cms.uint32( 3 ),
-            minTrackPixelHits = cms.uint32( 0 ),
-            maxTrackChi2 = cms.double( 1000.0 ),
-            maxTransverseImpactParameter = cms.double( 0.2 ),
-            useTracksInsteadOfPFHadrons = cms.bool( False )
-        ),
-    )
-
-    # New L1 filter corresponding to BigOR filters in tau paths
-    process.hltL1sTauDeepTauOR = process.hltL1sTauVeryBigOR.clone(
-        L1SeedsLogicalExpression = cms.string("L1_DoubleIsoTau32er2p1 OR L1_DoubleIsoTau34er2p1 OR L1_DoubleIsoTau36er2p1 OR L1_DoubleTau70er2p1 OR L1_IsoTau40er2p1_ETMHF100 OR L1_IsoTau40er2p1_ETMHF110 OR L1_IsoTau40er2p1_ETMHF80 OR L1_IsoTau40er2p1_ETMHF90 OR L1_LooseIsoEG22er2p1_IsoTau26er2p1_dR_Min0p3 OR L1_LooseIsoEG22er2p1_Tau70er2p1_dR_Min0p3 OR L1_LooseIsoEG24er2p1_IsoTau27er2p1_dR_Min0p3 OR L1_Mu18er2p1_Tau24er2p1 OR L1_Mu18er2p1_Tau26er2p1 OR L1_SingleTau120er2p1 OR L1_SingleTau130er2p1"),
-    )
-
-    process.hltHpsL1JetsHLTForDeepTauInput = process.hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg.clone(
-        L1TauTrigger = cms.InputTag( "hltL1sTauDeepTauOR" ),
-        JetSrc = cms.InputTag(add_reg_tag('hltHpsPFTauProducer', useReg)),
-        ReduceTauContent = cms.bool(False),
-        KeepOriginalVertex = cms.bool(True),
-    )
-
     file_names = [
     				'core:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_core.pb',
     				'inner:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_inner.pb',
     				'outer:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_outer.pb',
     			]
-
-    def getLinExpression(x1, x2, y1, y2):
-        return "(((({3}-{2})/({1}-{0}))*(pt-{0}))+{2})".format(x1, x2, y1, y2)
-
-    val1, val2 = ("0.49948551", "0.125")
-    working_points = ["{0}*(pt < 35)+".format(val1)+getLinExpression("35", "300", val1, val2)+ "*(35 <= pt && pt < 300) + {0}*(pt >= 300)".format(val2)]
-    if resetWP:
-        working_points = ["-1."]
 
     process.deepTauProducer = DeepTau.clone(
         taus = 'hltHpsL1JetsHLTForDeepTauInput',
@@ -214,6 +183,46 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         VSmuWP = working_points,
         VSjetWP = working_points     
     )	
+
+    # Add DeepTauProducer
+    process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hltHpsL1JetsHLTForDeepTauInput + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
+    return process
+
+def update(process, useReg=True, resetWP=False, addCounters=False):
+    process.options.wantSummary = cms.untracked.bool(True)
+
+    ## Gen counter
+    process.genCounter = cms.EDFilter( "CounterFilter",
+        isMC = cms.bool(True), #from outside
+        store_hist = cms.bool(False), #from outside
+        store_both = cms.bool(True), #from outside
+        position = cms.string("gen"),
+        deepTauVSe = cms.InputTag('try1'),
+        deepTauVSmu = cms.InputTag('try2'),
+        deepTauVSjet = cms.InputTag('try3'),
+        # isoAbs = cms.InputTag('try4'),
+        # isoRel = cms.InputTag('try5'),
+        original_taus = cms.InputTag('try6'),
+        taus = cms.InputTag('try14'),
+        puInfo = cms.InputTag('try7'),
+        vertices = cms.InputTag('try8'),
+        # decayModeFindingNewDM = cms.InputTag('try9'),
+        genParticles = cms.InputTag('genParticles')
+    )
+
+    if addCounters:
+        process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(1, process.genCounter)
+
+    def getLinExpression(x1, x2, y1, y2):
+        return "(((({3}-{2})/({1}-{0}))*(pt-{0}))+{2})".format(x1, x2, y1, y2)
+
+    val1, val2 = ("0.49948551", "0.125")
+    working_points = ["{0}*(pt < 35)+".format(val1)+getLinExpression("35", "300", val1, val2)+ "*(35 <= pt && pt < 300) + {0}*(pt >= 300)".format(val2)]
+    if resetWP:
+        working_points = ["-1."]
+
+    ## Add deepTau sequence
+    process = add_deepTau_sequence(process, working_points=working_points, useReg=useReg)
 
     ## Final counter
     process.jetsFilter = cms.EDFilter( "CounterFilter",
@@ -233,9 +242,6 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         # decayModeFindingNewDM = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsReg'),
         genParticles = cms.InputTag('genParticles')
     )
-
-    # Add DeepTauProducer
-    process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hltHpsL1JetsHLTForDeepTauInput + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
     
     process.hltHpsSelectedPFTausTrackPt1DeepTau35Isolation = process.hltHpsSelectedPFTausTrackPt1MediumChargedIsolationReg.clone(
         src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
