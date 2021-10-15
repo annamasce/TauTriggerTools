@@ -172,8 +172,13 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         ),
     )
 
+    # New L1 filter corresponding to BigOR filters in tau paths
+    process.hltL1sTauDeepTauOR = process.hltL1sTauVeryBigOR.clone(
+        L1SeedsLogicalExpression = cms.string("L1_DoubleIsoTau32er2p1 OR L1_DoubleIsoTau34er2p1 OR L1_DoubleIsoTau36er2p1 OR L1_DoubleTau70er2p1 OR L1_IsoTau40er2p1_ETMHF100 OR L1_IsoTau40er2p1_ETMHF110 OR L1_IsoTau40er2p1_ETMHF80 OR L1_IsoTau40er2p1_ETMHF90 OR L1_LooseIsoEG22er2p1_IsoTau26er2p1_dR_Min0p3 OR L1_LooseIsoEG22er2p1_Tau70er2p1_dR_Min0p3 OR L1_LooseIsoEG24er2p1_IsoTau27er2p1_dR_Min0p3 OR L1_Mu18er2p1_Tau24er2p1 OR L1_Mu18er2p1_Tau26er2p1 OR L1_SingleTau120er2p1 OR L1_SingleTau130er2p1"),
+    )
+
     process.hltHpsL1JetsHLTForDeepTauInput = process.hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg.clone(
-        L1TauTrigger = cms.InputTag( "hltL1sTauVeryBigOR" ),
+        L1TauTrigger = cms.InputTag( "hltL1sTauDeepTauOR" ),
         JetSrc = cms.InputTag(add_reg_tag('hltHpsPFTauProducer', useReg)),
         ReduceTauContent = cms.bool(False),
         KeepOriginalVertex = cms.bool(True),
@@ -230,7 +235,7 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
     )
 
     # Add DeepTauProducer
-    process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauVeryBigOR + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hltHpsL1JetsHLTForDeepTauInput + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
+    process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hltHpsL1JetsHLTForDeepTauInput + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
     
     process.hltHpsSelectedPFTausTrackPt1DeepTau35Isolation = process.hltHpsSelectedPFTausTrackPt1MediumChargedIsolationReg.clone(
         src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
