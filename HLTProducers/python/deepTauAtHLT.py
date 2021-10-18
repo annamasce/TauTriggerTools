@@ -188,8 +188,7 @@ def add_deepTau_sequence(process, working_points, useReg):
     process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hltHpsL1JetsHLTForDeepTauInput + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
     return process
 
-def update(process, useReg=True, resetWP=False, addCounters=False):
-    process.options.wantSummary = cms.untracked.bool(True)
+def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
 
     ## Gen counter
     process.genCounter = cms.EDFilter( "CounterFilter",
@@ -200,47 +199,19 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         deepTauVSe = cms.InputTag('try1'),
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
-        # isoAbs = cms.InputTag('try4'),
-        # isoRel = cms.InputTag('try5'),
         original_taus = cms.InputTag('try6'),
         taus = cms.InputTag('try14'),
         puInfo = cms.InputTag('try7'),
         vertices = cms.InputTag('try8'),
-        # decayModeFindingNewDM = cms.InputTag('try9'),
         genParticles = cms.InputTag('genParticles')
     )
 
     if addCounters:
         process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(1, process.genCounter)
 
-    def getLinExpression(x1, x2, y1, y2):
-        return "(((({3}-{2})/({1}-{0}))*(pt-{0}))+{2})".format(x1, x2, y1, y2)
-
-    val1, val2 = ("0.49948551", "0.125")
-    working_points = ["{0}*(pt < 35)+".format(val1)+getLinExpression("35", "300", val1, val2)+ "*(35 <= pt && pt < 300) + {0}*(pt >= 300)".format(val2)]
-    if resetWP:
-        working_points = ["-1."]
-
-    ## Add deepTau sequence
-    process = add_deepTau_sequence(process, working_points=working_points, useReg=useReg)
-
     ## Final counter
-    process.jetsFilter = cms.EDFilter( "CounterFilter",
-        isMC = cms.bool(True), #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(False), #from outside
-        position = cms.string("final"),
-        deepTauVSe = cms.InputTag('deepTauProducer', 'VSe'),
-        deepTauVSmu = cms.InputTag('deepTauProducer', 'VSmu'),
-        deepTauVSjet = cms.InputTag('deepTauProducer', 'VSjet'),
-        # isoAbs = cms.InputTag('try1'),
-        # isoRel = cms.InputTag('try2'),
-        original_taus = cms.InputTag('hltHpsL1JetsHLTForDeepTauInput'),
-        taus = cms.InputTag('hltHpsDoublePFTau35TrackPt1DeepTau35IsolationDz02'),
-        puInfo = cms.InputTag('addPileupInfo','','HLT'),
-        vertices = cms.InputTag('hltPixelVertices'),
-        # decayModeFindingNewDM = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsReg'),
-        genParticles = cms.InputTag('genParticles')
+    process.jetsFilterDiTau = process.jetsFilter.clone(
+        taus = "hltHpsDoublePFTau35TrackPt1DeepTau35IsolationDz02"
     )
     
     process.hltHpsSelectedPFTausTrackPt1DeepTau35Isolation = process.hltHpsSelectedPFTausTrackPt1MediumChargedIsolationReg.clone(
@@ -288,7 +259,105 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
     process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4 += (process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsSelectedPFTausTrackPt1DeepTau35Isolation + process.hltHpsDoublePFTau35TrackPt1DeepTau35Isolation + process.hltHpsL1JetsHLTDoublePFTauTrackPt1DeepTauMatch + process.hltHpsDoublePFTau35TrackPt1DeepTauL1HLTMatched + process.hltHpsDoublePFTau35TrackPt1DeepTau35IsolationDz02 + process.HLTEndSequence)
 
     if addCounters:
-        process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(-1, process.jetsFilter)
+        process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(-1, process.jetsFilterDiTau)
+
+    return process
+
+def customiseEleTauForDeepTau(process, working_points, addCounters):
+
+    ## Final counter
+    process.jetsFilterEleTau = process.jetsFilter.clone(
+        taus = "hltHpsOverlapFilterIsoEle24WPTightGsfDeepTauPFTau30"
+    )
+
+    process.hltHpsSelectedPFTausTrackFindingDeepTau = process.hltHpsSelectedPFTausTrackFindingLooseChargedIsolation.clone(
+        src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+        discriminators = cms.VPSet( 
+            # cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauTrackFindingDiscriminator" ),
+            #             selectionCut = cms.double( 0.5 )
+            #  ),
+            ),
+        discriminatorContainers = cms.VPSet( 
+            cms.PSet(  
+                discriminator = cms.InputTag( "deepTauProducer", "VSjet" ),
+                rawValues = cms.vstring(),
+                selectionCuts = cms.vdouble(),
+                workingPoints = cms.vstring(working_points),
+            )
+        )
+    )
+
+    process.hltHpsPFTau30TrackDeepTau = process.hltHpsPFTau30TrackLooseChargedIso.clone(
+        inputTag = cms.InputTag( "hltHpsSelectedPFTausTrackFindingDeepTau" ),
+    )
+
+    process.hltHpsL1JetsHLTPFTauTrackDeepTauMatch = process.hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch.clone(
+        JetSrc = cms.InputTag( "hltHpsSelectedPFTausTrackFindingDeepTau" ),
+    )
+
+    process.hltHpsSelectedPFTau30DeepTauL1HLTMatched = process.hltHpsSelectedPFTau30LooseChargedIsolationL1HLTMatched.clone(
+        inputTag = cms.InputTag( "hltHpsL1JetsHLTPFTauTrackDeepTauMatch" ),
+    )
+
+    process.hltHpsOverlapFilterIsoEle24WPTightGsfDeepTauPFTau30 = process.hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30.clone(
+        originTag2 = cms.VInputTag( "hltHpsSelectedPFTausTrackFindingDeepTau" ),
+        inputTag2 = cms.InputTag( "hltHpsSelectedPFTau30DeepTauL1HLTMatched" ),
+    )
+
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.HLTHPSLooseChargedIsoPFTau30Sequence)
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch)
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.hltHpsSelectedPFTau30LooseChargedIsolationL1HLTMatched)
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30)
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.HLTEndSequence)
+
+    process.HLTHPSDeepTauPFTau30Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsPFTau30 + process.hltHpsSelectedPFTausTrackFindingDeepTau + process.hltHpsPFTau30TrackDeepTau)
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1 += (process.HLTHPSDeepTauPFTau30Sequence + process.hltHpsL1JetsHLTPFTauTrackDeepTauMatch + process.hltHpsSelectedPFTau30DeepTauL1HLTMatched + process.hltHpsOverlapFilterIsoEle24WPTightGsfDeepTauPFTau30 + process.HLTEndSequence)
+
+    if addCounters:
+        process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau)
+
+    return process
+
+
+def update(process, useReg=True, resetWP=False, addCounters=False):
+    process.options.wantSummary = cms.untracked.bool(True)
+
+    ## Final counter -> taus InputTag to be customised for each path
+    process.jetsFilter = cms.EDFilter( "CounterFilter",
+        isMC = cms.bool(True), #from outside
+        store_hist = cms.bool(False), #from outside
+        store_both = cms.bool(False), #from outside
+        position = cms.string("final_EleTau"),
+        deepTauVSe = cms.InputTag('deepTauProducer', 'VSe'),
+        deepTauVSmu = cms.InputTag('deepTauProducer', 'VSmu'),
+        deepTauVSjet = cms.InputTag('deepTauProducer', 'VSjet'),
+        original_taus = cms.InputTag('hltHpsL1JetsHLTForDeepTauInput'),
+        taus = cms.InputTag(''),
+        puInfo = cms.InputTag('addPileupInfo','','HLT'),
+        vertices = cms.InputTag('hltPixelVertices'),
+        genParticles = cms.InputTag('genParticles')
+    )
+
+    ## Define working points for deepTau
+    def getLinExpression(x1, x2, y1, y2):
+        return "(((({3}-{2})/({1}-{0}))*(pt-{0}))+{2})".format(x1, x2, y1, y2)
+
+    val1, val2 = ("0.49948551", "0.125")
+    working_points = ["{0}*(pt < 35)+".format(val1)+getLinExpression("35", "300", val1, val2)+ "*(35 <= pt && pt < 300) + {0}*(pt >= 300)".format(val2)]
+    if resetWP:
+        working_points = ["-1."]
+    print("WP:", working_points)
+
+    ## Add deepTau sequence
+    process = add_deepTau_sequence(process, working_points=working_points, useReg=useReg)
+
+    ## Customise di-tau path
+    process = customiseDiTauForDeepTau(process, useReg=useReg, working_points=working_points, addCounters=addCounters)
+
+    ## Customise ele+tau path
+    process = customiseEleTauForDeepTau(process, working_points=working_points, addCounters=addCounters)
+
+    if addCounters:
         process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
     return process

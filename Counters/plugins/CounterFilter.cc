@@ -105,7 +105,6 @@ private:
             event.getByToken(vertices_token, vertices);
             (*counterTuple)().npv = static_cast<int>(vertices->size());
 
-            std::cout << "Vertex taken" << std::endl;
             edm::Handle<TauDiscriminatorContainer> deepTau_VSe;
             event.getByToken(deepTauVSe_inputToken, deepTau_VSe);
 
