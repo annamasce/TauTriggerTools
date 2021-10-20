@@ -33,6 +33,7 @@ public:
         isMC(cfg.getParameter<bool>("isMC")),
         store_hist(cfg.getParameter<bool>("store_hist")),
         store_both(cfg.getParameter<bool>("store_both")),
+        use_deepTau(cfg.getParameter<bool>("use_deepTau")),
         position(cfg.getParameter<std::string>("position")),
         deepTauVSe_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSe"))),
         deepTauVSmu_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSmu"))),
@@ -106,13 +107,16 @@ private:
             (*counterTuple)().npv = static_cast<int>(vertices->size());
 
             edm::Handle<TauDiscriminatorContainer> deepTau_VSe;
-            event.getByToken(deepTauVSe_inputToken, deepTau_VSe);
 
             edm::Handle<TauDiscriminatorContainer> deepTau_VSmu;
-            event.getByToken(deepTauVSmu_inputToken, deepTau_VSmu);
 
             edm::Handle<TauDiscriminatorContainer> deepTau_VSjet;
-            event.getByToken(deepTauVSjet_inputToken, deepTau_VSjet);
+
+            if(use_deepTau){
+                event.getByToken(deepTauVSe_inputToken, deepTau_VSe);
+                event.getByToken(deepTauVSmu_inputToken, deepTau_VSmu);
+                event.getByToken(deepTauVSjet_inputToken, deepTau_VSjet);
+            }
 
             // edm::Handle<TauDiscriminatorContainer> isoAbs;
             // event.getByToken(isoAbs_inputToken, isoAbs);
@@ -183,10 +187,11 @@ private:
                 // (*counterTuple)().tau_looseIsoRel.push_back(static_cast<float>((*isoRel)[tauRef].workingPoints.at(0)));
                 // (*counterTuple)().tau_tightIsoAbs.push_back(static_cast<float>((*isoAbs)[tauRef].workingPoints.at(2)));
                 // (*counterTuple)().tau_tightIsoRel.push_back(static_cast<float>((*isoRel)[tauRef].workingPoints.at(2)));
-
-                (*counterTuple)().deepTau_VSe.push_back(static_cast<float>((*deepTau_VSe)[tauRef].rawValues.at(0)));
-                (*counterTuple)().deepTau_VSmu.push_back(static_cast<float>((*deepTau_VSmu)[tauRef].rawValues.at(0)));
-                (*counterTuple)().deepTau_VSjet.push_back(static_cast<float>((*deepTau_VSjet)[tauRef].rawValues.at(0)));
+                if(use_deepTau){
+                    (*counterTuple)().deepTau_VSe.push_back(static_cast<float>((*deepTau_VSe)[tauRef].rawValues.at(0)));
+                    (*counterTuple)().deepTau_VSmu.push_back(static_cast<float>((*deepTau_VSmu)[tauRef].rawValues.at(0)));
+                    (*counterTuple)().deepTau_VSjet.push_back(static_cast<float>((*deepTau_VSjet)[tauRef].rawValues.at(0)));
+                }
                 // (*counterTuple)().tau_decayModeFindingNewDMs.push_back(decayModesNew->value(orig_tau_index));
 
                 bool passed_lastFilter = false;
@@ -223,7 +228,7 @@ private:
     }
 
 private:
-    const bool isMC, store_hist, store_both;
+    const bool isMC, store_hist, store_both, use_deepTau;
     std::string position;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSe_inputToken;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSmu_inputToken;

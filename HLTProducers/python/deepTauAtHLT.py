@@ -196,6 +196,7 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(True), #from outside
         position = cms.string("gen"),
+        use_deepTau = cms.bool(False),
         deepTauVSe = cms.InputTag('try1'),
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
@@ -211,6 +212,7 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
 
     ## Final counter
     process.jetsFilterDiTau = process.jetsFilter.clone(
+        position = cms.string("final_DiTau"),
         taus = "hltHpsDoublePFTau35TrackPt1DeepTau35IsolationDz02"
     )
     
@@ -267,6 +269,7 @@ def customiseEleTauForDeepTau(process, working_points, addCounters):
 
     ## Final counter
     process.jetsFilterEleTau = process.jetsFilter.clone(
+        position = cms.string("final_EleTau"),
         taus = "hltHpsOverlapFilterIsoEle24WPTightGsfDeepTauPFTau30"
     )
 
@@ -318,6 +321,90 @@ def customiseEleTauForDeepTau(process, working_points, addCounters):
 
     return process
 
+def customiseMuTauForDeepTau(process, working_points, addCounters):
+
+    ## Final counter
+    process.jetsFilterMuTau = process.jetsFilter.clone(
+        position = cms.string("final_MuTau"),
+        taus = "hltHpsOverlapFilterIsoMu20DeepTauPFTau27L1Seeded"
+    )
+
+    process.hltHpsSelectedPFTausTrackFindingDeepTau = process.hltHpsSelectedPFTausTrackFindingLooseChargedIsolation.clone(
+        src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+        discriminators = cms.VPSet( 
+            # cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauTrackFindingDiscriminator" ),
+            #             selectionCut = cms.double( 0.5 )
+            #  ),
+            ),
+        discriminatorContainers = [ 
+            cms.PSet(  
+                discriminator = cms.InputTag( "deepTauProducer", "VSjet" ),
+                rawValues = cms.vstring(),
+                selectionCuts = cms.vdouble(),
+                workingPoints = cms.vstring(working_points),
+            )
+        ]
+    )
+
+    process.hltHpsPFTau27TrackDeepTau = process.hltHpsPFTau27TrackLooseChargedIso.clone(
+        inputTag = cms.InputTag( "hltHpsSelectedPFTausTrackFindingDeepTau" ),
+    )
+
+    process.hltHpsPFTauDeepTauAgainstMuonDiscriminator = process.hltHpsPFTauAgainstMuonDiscriminator.clone(
+        PFTauProducer = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+    )
+
+    process.hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon = process.hltHpsSelectedPFTausTrackFindingLooseChargedIsolationAgainstMuon.clone(
+        src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+        discriminators = cms.VPSet( 
+            # cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauTrackFindingDiscriminator" ),
+            # selectionCut = cms.double( 0.5 )
+            # ),
+            cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauDeepTauAgainstMuonDiscriminator" ),
+                        selectionCut = cms.double( 0.5 )
+            )
+        ),
+        discriminatorContainers = [ 
+            cms.PSet(  
+                discriminator = cms.InputTag( "deepTauProducer", "VSjet" ),
+                rawValues = cms.vstring(),
+                selectionCuts = cms.vdouble(),
+                workingPoints = cms.vstring(working_points),
+            )
+        ]
+    )
+
+    process.hltHpsPFTau27TrackDeepTauAgainstMuon = process.hltHpsPFTau27TrackLooseChargedIsoAgainstMuon.clone(
+        inputTag = cms.InputTag( "hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon" ),
+    )
+
+    process.hltHpsL1JetsHLTPFTauTrackDeepTauAgainstMuonMatch = process.hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch.clone(
+        JetSrc = cms.InputTag( "hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon" ),
+    )
+
+    process.hltHpsSelectedPFTau27DeepTauAgainstMuonL1HLTMatched = process.hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched.clone(
+        inputTag = cms.InputTag( "hltHpsL1JetsHLTPFTauTrackDeepTauAgainstMuonMatch" ),
+    )
+
+    process.hltHpsOverlapFilterIsoMu20DeepTauPFTau27L1Seeded = process.hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded.clone(
+        originTag2 = cms.VInputTag( 'hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon' ),
+        inputTag2 = cms.InputTag( "hltHpsSelectedPFTau27DeepTauAgainstMuonL1HLTMatched" ),
+    )
+
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.HLTHPSLooseChargedIsoAntiMuonPFTau27Sequence)
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch)
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched)
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded)
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.HLTEndSequence)
+
+    process.HLTHPSDeepTauAntiMuonPFTau27Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsPFTau27 + process.hltHpsSelectedPFTausTrackFindingDeepTau + process.hltHpsPFTau27TrackDeepTau + process.hltHpsPFTauDeepTauAgainstMuonDiscriminator + process.hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon + process.hltHpsPFTau27TrackDeepTauAgainstMuon)
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4 += (process.HLTHPSDeepTauAntiMuonPFTau27Sequence + process.hltHpsL1JetsHLTPFTauTrackDeepTauAgainstMuonMatch + process.hltHpsSelectedPFTau27DeepTauAgainstMuonL1HLTMatched + process.hltHpsOverlapFilterIsoMu20DeepTauPFTau27L1Seeded + process.HLTEndSequence)
+
+    if addCounters:
+        process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.insert(-1, process.jetsFilterMuTau)
+
+    return process
+
 
 def update(process, useReg=True, resetWP=False, addCounters=False):
     process.options.wantSummary = cms.untracked.bool(True)
@@ -327,7 +414,8 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         isMC = cms.bool(True), #from outside
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(False), #from outside
-        position = cms.string("final_EleTau"),
+        position = cms.string("final"),
+        use_deepTau = cms.bool(True),
         deepTauVSe = cms.InputTag('deepTauProducer', 'VSe'),
         deepTauVSmu = cms.InputTag('deepTauProducer', 'VSmu'),
         deepTauVSjet = cms.InputTag('deepTauProducer', 'VSjet'),
@@ -356,6 +444,9 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
 
     ## Customise ele+tau path
     process = customiseEleTauForDeepTau(process, working_points=working_points, addCounters=addCounters)
+
+    ## Customise mu+tau path
+    process = customiseMuTauForDeepTau(process, working_points=working_points, addCounters=addCounters)
 
     if addCounters:
         process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
