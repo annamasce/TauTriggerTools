@@ -273,6 +273,10 @@ def customiseEleTauForDeepTau(process, working_points, addCounters):
         taus = "hltHpsOverlapFilterIsoEle24WPTightGsfDeepTauPFTau30"
     )
 
+    process.hltHpsPFTau30ForDeepTau = process.hltHpsPFTau30.clone(
+        inputTag = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+    )
+
     process.hltHpsSelectedPFTausTrackFindingDeepTau = process.hltHpsSelectedPFTausTrackFindingLooseChargedIsolation.clone(
         src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
         discriminators = cms.VPSet( 
@@ -313,7 +317,7 @@ def customiseEleTauForDeepTau(process, working_points, addCounters):
     process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30)
     process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.remove(process.HLTEndSequence)
 
-    process.HLTHPSDeepTauPFTau30Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsPFTau30 + process.hltHpsSelectedPFTausTrackFindingDeepTau + process.hltHpsPFTau30TrackDeepTau)
+    process.HLTHPSDeepTauPFTau30Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsPFTau30ForDeepTau + process.hltHpsSelectedPFTausTrackFindingDeepTau + process.hltHpsPFTau30TrackDeepTau)
     process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1 += (process.HLTHPSDeepTauPFTau30Sequence + process.hltHpsL1JetsHLTPFTauTrackDeepTauMatch + process.hltHpsSelectedPFTau30DeepTauL1HLTMatched + process.hltHpsOverlapFilterIsoEle24WPTightGsfDeepTauPFTau30 + process.HLTEndSequence)
 
     if addCounters:
@@ -327,6 +331,10 @@ def customiseMuTauForDeepTau(process, working_points, addCounters):
     process.jetsFilterMuTau = process.jetsFilter.clone(
         position = cms.string("final_MuTau"),
         taus = "hltHpsOverlapFilterIsoMu20DeepTauPFTau27L1Seeded"
+    )
+
+    process.hltHpsPFTau27ForDeepTau = process.hltHpsPFTau27.clone(
+         inputTag = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
     )
 
     process.hltHpsSelectedPFTausTrackFindingDeepTau = process.hltHpsSelectedPFTausTrackFindingLooseChargedIsolation.clone(
@@ -397,7 +405,7 @@ def customiseMuTauForDeepTau(process, working_points, addCounters):
     process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded)
     process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.remove(process.HLTEndSequence)
 
-    process.HLTHPSDeepTauAntiMuonPFTau27Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsPFTau27 + process.hltHpsSelectedPFTausTrackFindingDeepTau + process.hltHpsPFTau27TrackDeepTau + process.hltHpsPFTauDeepTauAgainstMuonDiscriminator + process.hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon + process.hltHpsPFTau27TrackDeepTauAgainstMuon)
+    process.HLTHPSDeepTauAntiMuonPFTau27Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltHpsPFTau27ForDeepTau + process.hltHpsSelectedPFTausTrackFindingDeepTau + process.hltHpsPFTau27TrackDeepTau + process.hltHpsPFTauDeepTauAgainstMuonDiscriminator + process.hltHpsSelectedPFTausTrackFindingDeepTauAgainstMuon + process.hltHpsPFTau27TrackDeepTauAgainstMuon)
     process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4 += (process.HLTHPSDeepTauAntiMuonPFTau27Sequence + process.hltHpsL1JetsHLTPFTauTrackDeepTauAgainstMuonMatch + process.hltHpsSelectedPFTau27DeepTauAgainstMuonL1HLTMatched + process.hltHpsOverlapFilterIsoMu20DeepTauPFTau27L1Seeded + process.HLTEndSequence)
 
     if addCounters:
@@ -405,6 +413,105 @@ def customiseMuTauForDeepTau(process, working_points, addCounters):
 
     return process
 
+def customiseTauMETForDeepTau(process, working_points, addCounters):
+
+    ## Final counter
+    process.jetsFilterTauMET = process.jetsFilter.clone(
+        position = cms.string("final_TauMET"),
+        taus = "hltSelectedPFTau50DeepTauL1HLTMatched"
+    )
+
+    process.hltPFTau50ForDeepTau = process.hltPFTau50.clone(
+        inputTag = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+    )
+
+    process.hltSelectedPFTausDeepTau = process.hltSelectedPFTausTrackPt30MediumAbsOrRelIsolation1Prong.clone(
+        src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+        discriminators = cms.VPSet( 
+        ),
+        discriminatorContainers = [ 
+            cms.PSet(  
+                discriminator = cms.InputTag( "deepTauProducer", "VSjet" ),
+                rawValues = cms.vstring(),
+                selectionCuts = cms.vdouble(),
+                workingPoints = cms.vstring(working_points),
+            )
+        ]
+    )
+
+    process.hltPFTau50DeepTau = process.hltPFTau50TrackPt30MediumAbsOrRelIso1Prong.clone(
+        inputTag = cms.InputTag( "hltSelectedPFTausDeepTau" ),
+    )
+
+    process.hltL1JetsHLTPFTau50DeepTauMatch = process.hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch.clone(
+        JetSrc = cms.InputTag( "hltSelectedPFTausDeepTau" ),
+    )
+
+    process.hltSelectedPFTau50DeepTauL1HLTMatched = process.hltSelectedPFTau50MediumChargedIsolationL1HLTMatched.clone(
+        inputTag = cms.InputTag( "hltL1JetsHLTPFTau50DeepTauMatch" ),
+    )
+
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.remove(process.HLTMediumChargedIsoPFTau50Trk30OnePrSequence)
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.remove(process.hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch)
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.remove(process.hltSelectedPFTau50MediumChargedIsolationL1HLTMatched)
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.remove(process.HLTEndSequence)
+
+    process.HLTDeepTauPFTau50Sequence = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltPFTau50ForDeepTau + process.hltSelectedPFTausDeepTau + process.hltPFTau50DeepTau)
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12 += (process.HLTDeepTauPFTau50Sequence + process.hltL1JetsHLTPFTau50DeepTauMatch + process.hltSelectedPFTau50DeepTauL1HLTMatched + process.HLTEndSequence)
+    
+    if addCounters:
+        process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.insert(-1, process.jetsFilterTauMET)
+
+    return process
+
+def customiseHighPtTauForDeepTau(process, working_points, addCounters):
+
+    ## Final counter
+    process.jetsFilterHighPtTau = process.jetsFilter.clone(
+        position = cms.string("final_HighPtTau"),
+        taus = "hltSelectedPFTau180MediumChargedIsolationL1HLTMatched"
+    )
+
+    process.hltSelectedPFTausDeepTauHighPtRelaxedIsoIsolation = process.hltSelectedPFTausTrackPt50AbsOrRelMediumHighPtRelaxedIsoIsolation.clone(
+        src = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
+        discriminators = cms.VPSet( 
+        ),
+        discriminatorContainers = [ 
+            cms.PSet(  
+                discriminator = cms.InputTag( "deepTauProducer", "VSjet" ),
+                rawValues = cms.vstring(),
+                selectionCuts = cms.vdouble(),
+                workingPoints = cms.vstring(working_points),
+            )
+        ]
+    )
+
+    process.hltPFTau180DeepTauHighPtRelaxedIso = process.hltPFTau180TrackPt50LooseAbsOrRelMediumHighPtRelaxedIsoIso.clone(
+        inputTag = cms.InputTag( "hltSelectedPFTausDeepTauHighPtRelaxedIsoIsolation" ),
+    )
+
+    process.hltL1JetsHLTSinglePFTauDeepTauMatch = process.hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch.clone(
+        JetSrc = cms.InputTag( "hltSelectedPFTausDeepTauHighPtRelaxedIsoIsolation" ),
+    )
+
+    process.hltSelectedPFTau180MediumChargedIsolationL1HLTMatched = process.hltSelectedPFTau180MediumChargedIsolationL1HLTMatched.clone(
+        inputTag = cms.InputTag( "hltL1JetsHLTSinglePFTauDeepTauMatch" ),
+    )
+
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.remove(process.hltPFTau180Track)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.remove(process.HLTMediumChargedIsoPFTauHighPtRelaxedIsoTrk50)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.remove(process.hltPFTau180TrackPt50LooseAbsOrRelMediumHighPtRelaxedIsoIso)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.remove(process.hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.remove(process.hltSelectedPFTau180MediumChargedIsolationL1HLTMatched)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.remove(process.HLTEndSequence)
+
+    process.HLTDeepTauPFTauHighPtRelaxedIso = cms.Sequence(process.HLTHPSDeepTauIsoPFTauSequence + process.hltSelectedPFTausDeepTauHighPtRelaxedIsoIsolation)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12 += (process.HLTDeepTauPFTauHighPtRelaxedIso + process.hltPFTau180DeepTauHighPtRelaxedIso + process.hltL1JetsHLTSinglePFTauDeepTauMatch + process.hltSelectedPFTau180MediumChargedIsolationL1HLTMatched + process.HLTEndSequence)
+    
+    if addCounters:
+        process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau)
+
+    return process
 
 def update(process, useReg=True, resetWP=False, addCounters=False):
     process.options.wantSummary = cms.untracked.bool(True)
@@ -447,6 +554,12 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
 
     ## Customise mu+tau path
     process = customiseMuTauForDeepTau(process, working_points=working_points, addCounters=addCounters)
+
+    ## Customise tau+MET path
+    process = customiseTauMETForDeepTau(process, working_points=working_points, addCounters=addCounters)
+
+    ## Customise High-pt path
+    process = customiseHighPtTauForDeepTau(process, working_points=working_points, addCounters=addCounters)
 
     if addCounters:
         process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
