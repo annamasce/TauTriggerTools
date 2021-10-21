@@ -38,14 +38,11 @@ public:
         deepTauVSe_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSe"))),
         deepTauVSmu_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSmu"))),
         deepTauVSjet_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSjet"))),
-        // isoAbs_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("isoAbs"))),
-        // isoRel_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("isoRel"))),
         original_taus_token(mayConsume<std::vector<reco::PFTau>>(cfg.getParameter<edm::InputTag>("original_taus"))),
-        // taus_token(mayConsume<std::vector<reco::PFTau>>(cfg.getParameter<edm::InputTag>("taus"))),
         taus_token(mayConsume<trigger::TriggerFilterObjectWithRefs>(cfg.getParameter<edm::InputTag>("taus"))),
+        track_taus_token(mayConsume<trigger::TriggerFilterObjectWithRefs>(cfg.getParameter<edm::InputTag>("track_taus"))),
         puInfo_token(mayConsume<std::vector<PileupSummaryInfo>>(cfg.getParameter<edm::InputTag>("puInfo"))),
         vertices_token(mayConsume<std::vector<reco::Vertex> >(cfg.getParameter<edm::InputTag>("vertices"))),
-        // decayMode_token(consumes<reco::PFTauDiscriminator>(cfg.getParameter<edm::InputTag>("decayModeFindingNewDM"))),
         genParticles_token(mayConsume<std::vector<reco::GenParticle>>(cfg.getParameter<edm::InputTag>("genParticles")))
     {
         std::string full_name = position+"_counter";
@@ -118,26 +115,20 @@ private:
                 event.getByToken(deepTauVSjet_inputToken, deepTau_VSjet);
             }
 
-            // edm::Handle<TauDiscriminatorContainer> isoAbs;
-            // event.getByToken(isoAbs_inputToken, isoAbs);
-
-            // edm::Handle<TauDiscriminatorContainer> isoRel;
-            // event.getByToken(isoRel_inputToken, isoRel);
-
             edm::Handle<std::vector<reco::PFTau>> original_taus;
             event.getByToken(original_taus_token, original_taus);
-
-            // edm::Handle<std::vector<reco::PFTau>> taus;
-            // event.getByToken(taus_token, taus);
-
-            // edm::Handle<reco::PFTauDiscriminator> decayModesNew;
-            // event.getByToken(decayMode_token, decayModesNew);
 
             edm::Handle<trigger::TriggerFilterObjectWithRefs> finalTaus;
             event.getByToken(taus_token, finalTaus);
 
             trigger::VRpftau tauCandRefVec;
             finalTaus->getObjects(trigger::TriggerTau, tauCandRefVec);
+
+            edm::Handle<trigger::TriggerFilterObjectWithRefs> trackTaus;
+            event.getByToken(track_taus_token, trackTaus);
+
+            trigger::VRpftau tauCandRefVec_track;
+            finalTaus->getObjects(trigger::TriggerTau, tauCandRefVec_track);
 
             edm::Handle<std::vector<reco::GenParticle>> hGenParticles;
             if(isMC) {
@@ -174,25 +165,22 @@ private:
                     (*counterTuple)().gen_tau_e.push_back(default_value);
                 }
 
-
-
                 (*counterTuple)().tau_pt.push_back(static_cast<float>(original_tau.polarP4().pt()));
                 (*counterTuple)().tau_eta.push_back(static_cast<float>(original_tau.polarP4().eta()));
                 (*counterTuple)().tau_phi.push_back(static_cast<float>(original_tau.polarP4().phi()));
                 (*counterTuple)().tau_e.push_back(static_cast<float>(original_tau.polarP4().e()));
                 (*counterTuple)().tau_vz.push_back(static_cast<float>(original_tau.vz()));
-                // (*counterTuple)().tau_mediumIsoAbs.push_back(static_cast<float>((*isoAbs)[tauRef].workingPoints.at(1)));
-                // (*counterTuple)().tau_mediumIsoRel.push_back(static_cast<float>((*isoRel)[tauRef].workingPoints.at(1)));
-                // (*counterTuple)().tau_looseIsoAbs.push_back(static_cast<float>((*isoAbs)[tauRef].workingPoints.at(0)));
-                // (*counterTuple)().tau_looseIsoRel.push_back(static_cast<float>((*isoRel)[tauRef].workingPoints.at(0)));
-                // (*counterTuple)().tau_tightIsoAbs.push_back(static_cast<float>((*isoAbs)[tauRef].workingPoints.at(2)));
-                // (*counterTuple)().tau_tightIsoRel.push_back(static_cast<float>((*isoRel)[tauRef].workingPoints.at(2)));
+
                 if(use_deepTau){
                     (*counterTuple)().deepTau_VSe.push_back(static_cast<float>((*deepTau_VSe)[tauRef].rawValues.at(0)));
                     (*counterTuple)().deepTau_VSmu.push_back(static_cast<float>((*deepTau_VSmu)[tauRef].rawValues.at(0)));
                     (*counterTuple)().deepTau_VSjet.push_back(static_cast<float>((*deepTau_VSjet)[tauRef].rawValues.at(0)));
                 }
-                // (*counterTuple)().tau_decayModeFindingNewDMs.push_back(decayModesNew->value(orig_tau_index));
+                else{
+                    (*counterTuple)().deepTau_VSe.push_back(default_value);
+                    (*counterTuple)().deepTau_VSmu.push_back(default_value);
+                    (*counterTuple)().deepTau_VSjet.push_back(default_value);
+                }
 
                 bool passed_lastFilter = false;
                 for (unsigned int iTau = 0; iTau < tauCandRefVec.size(); iTau++) {
@@ -204,6 +192,17 @@ private:
                 }
 
                 (*counterTuple)().tau_passedLastFilter.push_back(passed_lastFilter);
+
+                bool passed_trackFilter = false;
+                for (unsigned int iTau = 0; iTau < tauCandRefVec_track.size(); iTau++) {
+                    const double deltaR = ROOT::Math::VectorUtil::DeltaR(original_tau.polarP4(),tauCandRefVec_track[iTau]->p4());
+                    if(deltaR < 0.01){
+                        passed_trackFilter = true;
+                        break;
+                    }
+                }
+
+                (*counterTuple)().tau_passedTrackFilter.push_back(passed_trackFilter);
 
             }
 
@@ -237,6 +236,7 @@ private:
     // const edm::EDGetTokenT<TauDiscriminatorContainer> isoRel_inputToken;
     edm::EDGetTokenT<std::vector<reco::PFTau>> original_taus_token;
     edm::EDGetTokenT<trigger::TriggerFilterObjectWithRefs> taus_token;
+    edm::EDGetTokenT<trigger::TriggerFilterObjectWithRefs> track_taus_token;
     edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_token;
     edm::EDGetTokenT<std::vector<reco::Vertex>> vertices_token;
     // edm::EDGetTokenT<reco::PFTauDiscriminator> decayMode_token;
