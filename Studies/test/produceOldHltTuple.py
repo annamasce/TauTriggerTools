@@ -163,14 +163,8 @@ else:
     from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
     process = customizeHLTforMC(process)
 
-
-#from applyL2TauTag import update
-from TauTriggerTools.HLTProducers.applyL2TauTag import update as update_L2
-process = update_L2(process)
-# #process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
-
-from TauTriggerTools.HLTProducers.deepTauAtHLT import update as update_deepTau
-process = update_deepTau(process, useReg=False, resetWP=True, addCounters=True)
+from TauTriggerTools.HLTProducers.deepTauAtHLT import update_oldHLT as update
+process = update(process)
 
 # End of customisation functions
 

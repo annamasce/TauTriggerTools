@@ -21,6 +21,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 #include "TauTriggerTools/Common/interface/GenTruthTools.h"
 
 #include "DataFormats/TauReco/interface/PFTau.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
 #include "RecoTauTag/RecoTau/interface/DeepTauBase.h"
 #include "TauTriggerTools/Counters/interface/CounterTuple.h"
 
@@ -34,6 +35,7 @@ public:
         store_hist(cfg.getParameter<bool>("store_hist")),
         store_both(cfg.getParameter<bool>("store_both")),
         use_deepTau(cfg.getParameter<bool>("use_deepTau")),
+        store_MET(cfg.getParameter<bool>("store_MET")),
         position(cfg.getParameter<std::string>("position")),
         deepTauVSe_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSe"))),
         deepTauVSmu_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSmu"))),
@@ -41,6 +43,7 @@ public:
         original_taus_token(mayConsume<std::vector<reco::PFTau>>(cfg.getParameter<edm::InputTag>("original_taus"))),
         taus_token(mayConsume<trigger::TriggerFilterObjectWithRefs>(cfg.getParameter<edm::InputTag>("taus"))),
         track_taus_token(mayConsume<trigger::TriggerFilterObjectWithRefs>(cfg.getParameter<edm::InputTag>("track_taus"))),
+        MET_token(mayConsume<std::vector<reco::CaloMET>>(cfg.getParameter<edm::InputTag>("MET"))),
         puInfo_token(mayConsume<std::vector<PileupSummaryInfo>>(cfg.getParameter<edm::InputTag>("puInfo"))),
         vertices_token(mayConsume<std::vector<reco::Vertex> >(cfg.getParameter<edm::InputTag>("vertices"))),
         genParticles_token(mayConsume<std::vector<reco::GenParticle>>(cfg.getParameter<edm::InputTag>("genParticles")))
@@ -104,15 +107,25 @@ private:
             (*counterTuple)().npv = static_cast<int>(vertices->size());
 
             edm::Handle<TauDiscriminatorContainer> deepTau_VSe;
-
             edm::Handle<TauDiscriminatorContainer> deepTau_VSmu;
-
             edm::Handle<TauDiscriminatorContainer> deepTau_VSjet;
-
             if(use_deepTau){
                 event.getByToken(deepTauVSe_inputToken, deepTau_VSe);
                 event.getByToken(deepTauVSmu_inputToken, deepTau_VSmu);
                 event.getByToken(deepTauVSjet_inputToken, deepTau_VSjet);
+            }
+
+            edm::Handle<std::vector<reco::CaloMET>> met;
+            if(store_MET){
+                event.getByToken(MET_token, met);
+                for(size_t met_index = 0; met_index < met->size(); ++met_index) {
+                    const reco::CaloMET& met_cand = met->at(met_index);
+                    (*counterTuple)().met_pt.push_back(static_cast<float>(met_cand.polarP4().pt()));
+                }
+
+            }
+            else{
+                (*counterTuple)().met_pt.push_back(default_value);
             }
 
             edm::Handle<std::vector<reco::PFTau>> original_taus;
@@ -145,6 +158,7 @@ private:
             (*counterTuple)().run  = event.id().run();
             (*counterTuple)().lumi = event.id().luminosityBlock();
             (*counterTuple)().evt  = event.id().event();
+
 
             for(size_t orig_tau_index = 0; orig_tau_index < original_taus->size(); ++orig_tau_index) {
                 const reco::PFTau& original_tau = original_taus->at(orig_tau_index);
@@ -227,7 +241,7 @@ private:
     }
 
 private:
-    const bool isMC, store_hist, store_both, use_deepTau;
+    const bool isMC, store_hist, store_both, use_deepTau, store_MET;
     std::string position;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSe_inputToken;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSmu_inputToken;
@@ -237,6 +251,7 @@ private:
     edm::EDGetTokenT<std::vector<reco::PFTau>> original_taus_token;
     edm::EDGetTokenT<trigger::TriggerFilterObjectWithRefs> taus_token;
     edm::EDGetTokenT<trigger::TriggerFilterObjectWithRefs> track_taus_token;
+    edm::EDGetTokenT<std::vector<reco::CaloMET>> MET_token;
     edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_token;
     edm::EDGetTokenT<std::vector<reco::Vertex>> vertices_token;
     // edm::EDGetTokenT<reco::PFTauDiscriminator> decayMode_token;

@@ -21,6 +21,7 @@ def add_reg_tag(name, useReg):
 
 def add_deepTau_sequence(process, working_points, useReg):
 
+
     # New L1 filter corresponding to BigOR filters in tau paths
     process.hltL1sTauDeepTauOR = process.hltL1sTauVeryBigOR.clone(
         L1SeedsLogicalExpression = cms.string("L1_DoubleIsoTau32er2p1 OR L1_DoubleIsoTau34er2p1 OR L1_DoubleIsoTau36er2p1 OR L1_DoubleTau70er2p1 OR L1_IsoTau40er2p1_ETMHF100 OR L1_IsoTau40er2p1_ETMHF110 OR L1_IsoTau40er2p1_ETMHF80 OR L1_IsoTau40er2p1_ETMHF90 OR L1_LooseIsoEG22er2p1_IsoTau26er2p1_dR_Min0p3 OR L1_LooseIsoEG22er2p1_Tau70er2p1_dR_Min0p3 OR L1_LooseIsoEG24er2p1_IsoTau27er2p1_dR_Min0p3 OR L1_Mu18er2p1_Tau24er2p1 OR L1_Mu18er2p1_Tau26er2p1 OR L1_SingleTau120er2p1 OR L1_SingleTau130er2p1"),
@@ -162,10 +163,10 @@ def add_deepTau_sequence(process, working_points, useReg):
     )
 
     file_names = [
-    				'core:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_core.pb',
-    				'inner:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_inner.pb',
-    				'outer:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_outer.pb',
-    			]
+                    'core:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_core.pb',
+                    'inner:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_inner.pb',
+                    'outer:RecoTauTag/TrainingFiles/data/DeepTauId/deepTau_2017v2p6_e6_outer.pb',
+                ]
 
     process.deepTauProducer = DeepTau.clone(
         taus = 'hltHpsL1JetsHLTForDeepTauInput',
@@ -195,6 +196,7 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
         isMC = cms.bool(True), #from outside
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(True), #from outside
+        store_MET = cms.bool(False),
         position = cms.string("gen"),
         use_deepTau = cms.bool(False),
         deepTauVSe = cms.InputTag('try1'),
@@ -203,8 +205,9 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
         original_taus = cms.InputTag('try4'),
         taus = cms.InputTag('try5'),
         track_taus = cms.InputTag('try6'),
-        puInfo = cms.InputTag('try7'),
-        vertices = cms.InputTag('try8'),
+        MET = cms.InputTag('try7'),
+        puInfo = cms.InputTag('try8'),
+        vertices = cms.InputTag('try9'),
         genParticles = cms.InputTag('genParticles')
     )
 
@@ -421,10 +424,14 @@ def customiseTauMETForDeepTau(process, working_points, addCounters):
 
     ## Final counter
     process.jetsFilterTauMET = process.jetsFilter.clone(
+        store_MET = cms.bool(True),
         position = cms.string("final_TauMET"),
         taus = cms.InputTag("hltSelectedPFTau50DeepTauL1HLTMatched"),
-        track_taus = cms.InputTag("hltSelectedPFTausTrackPt30")
+        track_taus = cms.InputTag("hltSelectedPFTausTrackPt30"),
+        MET = cms.InputTag("hltMet")
     )
+
+    process.hltMET100.MinPt = cms.double( 80.0 )
 
     process.hltPFTau50ForDeepTau = process.hltPFTau50.clone(
         inputTag = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
@@ -555,12 +562,14 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         store_both = cms.bool(False), #from outside
         position = cms.string("final"),
         use_deepTau = cms.bool(True),
+        store_MET = cms.bool(False),
         deepTauVSe = cms.InputTag('deepTauProducer', 'VSe'),
         deepTauVSmu = cms.InputTag('deepTauProducer', 'VSmu'),
         deepTauVSjet = cms.InputTag('deepTauProducer', 'VSjet'),
         original_taus = cms.InputTag('hltHpsL1JetsHLTForDeepTauInput'),
         taus = cms.InputTag(''),
         track_taus = cms.InputTag(''),
+        MET = cms.InputTag(''),
         puInfo = cms.InputTag('addPileupInfo','','HLT'),
         vertices = cms.InputTag('hltPixelVertices'),
         genParticles = cms.InputTag('genParticles')
@@ -611,3 +620,105 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
         process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
     return process
+
+def update_oldHLT(process):
+    process.options.wantSummary = cms.untracked.bool(True)
+
+    ## Gen counter
+    process.genCounter = cms.EDFilter( "CounterFilter",
+        isMC = cms.bool(True), #from outside
+        store_hist = cms.bool(False), #from outside
+        store_both = cms.bool(True), #from outside
+        store_MET = cms.bool(False),
+        position = cms.string("gen"),
+        use_deepTau = cms.bool(False),
+        deepTauVSe = cms.InputTag('try1'),
+        deepTauVSmu = cms.InputTag('try2'),
+        deepTauVSjet = cms.InputTag('try3'),
+        original_taus = cms.InputTag('try4'),
+        taus = cms.InputTag('try5'),
+        track_taus = cms.InputTag('try6'),
+        MET = cms.InputTag('try7'),
+        puInfo = cms.InputTag('try8'),
+        vertices = cms.InputTag('try9'),
+        genParticles = cms.InputTag('genParticles')
+    )
+
+    process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(1, process.genCounter)
+
+    ## Final counter -> taus InputTag to be customised for each path
+    process.jetsFilter = cms.EDFilter( "CounterFilter",
+        isMC = cms.bool(True), #from outside
+        store_hist = cms.bool(False), #from outside
+        store_both = cms.bool(False), #from outside
+        position = cms.string("final"),
+        use_deepTau = cms.bool(False),
+        store_MET = cms.bool(False),
+        deepTauVSe = cms.InputTag(""),
+        deepTauVSmu = cms.InputTag(""),
+        deepTauVSjet = cms.InputTag(""),
+        original_taus = cms.InputTag(""),
+        taus = cms.InputTag(''),
+        track_taus = cms.InputTag(''),
+        MET = cms.InputTag(''),
+        puInfo = cms.InputTag('addPileupInfo','','HLT'),
+        vertices = cms.InputTag('hltPixelVertices'),
+        genParticles = cms.InputTag('genParticles')
+    )
+
+    ## Final counter Di-Tau
+    process.jetsFilterDiTau = process.jetsFilter.clone(
+        position = cms.string("final_DiTau"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg"),
+        taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg")        
+    )
+
+    process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(-1, process.jetsFilterDiTau)
+
+    ## Final counter EleTau
+    process.jetsFilterEleTau = process.jetsFilter.clone(
+        position = cms.string("final_EleTau"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch"),
+        taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch")
+    )
+
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau)
+
+    ## Final counter MuTau
+    process.jetsFilterMuTau = process.jetsFilter.clone(
+        position = cms.string("final_MuTau"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch"),
+        taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch")
+    )
+
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.insert(-1, process.jetsFilterMuTau)
+
+    ## Final counter TauMET
+    process.jetsFilterTauMET = process.jetsFilter.clone(
+        store_MET = cms.bool(True),
+        position = cms.string("final_TauMET"),
+        original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
+        track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        MET = cms.InputTag("hltMet")
+    )
+
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.insert(-1, process.jetsFilterTauMET)
+
+    ## Final counter High-pt Tau
+    process.jetsFilterHighPtTau = process.jetsFilter.clone(
+        position = cms.string("final_HighPtTau"),
+        original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched"),
+        track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
+    )
+
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau)
+
+    process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
+
+    return process
+
