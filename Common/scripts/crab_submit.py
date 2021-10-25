@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Submit jobs on CRAB.
 # This file is part of https://github.com/cms-tau-pog/TauTriggerTools.
 
@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='Submit jobs on CRAB.',
 parser.add_argument('--workArea', required=True, type=str, help="Working area")
 parser.add_argument('--cfg', required=True, type=str, help="CMSSW configuration file")
 parser.add_argument('--site', required=True, type=str, help="Site for stage out.")
-parser.add_argument('--output', required=True, type=str, help="output path after /store/user/USERNAME")
+parser.add_argument('--output', required=True, type=str, help="output path after /store")
 parser.add_argument('--blacklist', required=False, type=str, default="",
 					help="list of sites where the jobs shouldn't run")
 parser.add_argument('--whitelist', required=False, type=str, default="",
@@ -35,12 +35,12 @@ args = parser.parse_args()
 
 for job_file in args.job_file:
     cmd = 'crab_submit_file.py --jobFile "{}"'.format(job_file)
-    for arg_name,arg_value in vars(args).iteritems():
+    for arg_name,arg_value in vars(args).items():
         if arg_name != 'job_file' and type(arg_value) != bool and (type(arg_value) != str or len(arg_value)):
             cmd += ' --{} {} '.format(arg_name, arg_value)
         elif type(arg_value) == bool:
             cmd += ' --{} '.format(arg_name)
-    print '> {}'.format(cmd)
+    print('> {}'.format(cmd))
     result = subprocess.call([cmd], shell=True)
     if result != 0:
         print('ERROR: failed to submit jobs from "{}"'.format(job_file))
