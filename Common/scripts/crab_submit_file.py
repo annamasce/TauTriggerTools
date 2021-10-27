@@ -36,7 +36,7 @@ args = parser.parse_args()
 from CRABClient.UserUtilities import config, ClientException
 from CRABClient.UserUtilities import getUsernameFromCRIC as getUsername
 from CRABAPI.RawCommand import crabCommand
-# from httplib import HTTPException
+from http.client import HTTPException
 
 config = config()
 
@@ -46,6 +46,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = args.cfg
 config.JobType.maxMemoryMB = args.maxMemory
 config.JobType.numCores = args.numCores
+config.JobType.allowUndistributedCMSSW = True
 
 config.Data.inputDBS = args.inputDBS
 config.Data.allowNonValidInputDataset = args.allowNonValid

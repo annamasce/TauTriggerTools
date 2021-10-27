@@ -34,15 +34,20 @@ def add_deepTau_sequence(process, working_points, useReg):
         KeepOriginalVertex = cms.bool(True),
     )
 
+    process.hltHpsPFTauDiscriminationByDecayModeFindingNewDMsForDeepTau = process.hltHpsPFTauDiscriminationByDecayModeFindingNewDMs.clone(
+        PFTauProducer = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" )
+    )
+
     process.hpsPFTauPrimaryVertexProducerForDeepTau = PFTauPrimaryVertexProducer.clone(
-        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        # PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        PFTauTag = "hltHpsL1JetsHLTForDeepTauInput",
         ElectronTag = "hltEgammaCandidates",
         MuonTag = add_reg_tag("hltMuons", useReg),
         PVTag = "hltPixelVertices",
         beamSpot = "hltOnlineBeamSpot",
         discriminators = [
             cms.PSet(
-                discriminator = cms.InputTag(add_reg_tag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMs', useReg)),
+                discriminator = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsForDeepTau'),
                 selectionCut = cms.double(0.5)
             )
         ],
@@ -51,10 +56,12 @@ def add_deepTau_sequence(process, working_points, useReg):
     )
 
     process.hpsPFTauSecondaryVertexProducerForDeepTau = PFTauSecondaryVertexProducer.clone(
-        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        # PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        PFTauTag = "hltHpsL1JetsHLTForDeepTauInput",
     )
     process.hpsPFTauTransverseImpactParametersForDeepTau = PFTauTransverseImpactParameters.clone(
-        PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        # PFTauTag = add_reg_tag("hltHpsPFTauProducer", useReg),
+        PFTauTag = "hltHpsL1JetsHLTForDeepTauInput",
         PFTauPVATag = "hpsPFTauPrimaryVertexProducerForDeepTau",
         PFTauSVATag = "hpsPFTauSecondaryVertexProducerForDeepTau",
         useFullCalculation = True
@@ -107,7 +114,7 @@ def add_deepTau_sequence(process, working_points, useReg):
     requireDecayMode = cms.PSet(
         BooleanOperator = cms.string("and"),
         decayMode = cms.PSet(
-            Producer = cms.InputTag(add_reg_tag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMs', useReg)),
+            Producer = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsForDeepTau'),
             cut = cms.double(0.5)
         )
     )
@@ -186,7 +193,7 @@ def add_deepTau_sequence(process, working_points, useReg):
     )	
 
     # Add DeepTauProducer
-    process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hltHpsL1JetsHLTForDeepTauInput + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
+    process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hltHpsL1JetsHLTForDeepTauInput + process.hltHpsPFTauDiscriminationByDecayModeFindingNewDMsForDeepTau + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
     return process
 
 def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
@@ -718,7 +725,8 @@ def update_oldHLT(process):
 
     process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau)
 
-    process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
+    if addCounters:
+        process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
     return process
 
