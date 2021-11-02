@@ -196,11 +196,11 @@ def add_deepTau_sequence(process, working_points, useReg):
     process.HLTHPSDeepTauIsoPFTauSequence = cms.Sequence(process.hltL1sTauDeepTauOR + process.hltHpsL1JetsHLTForDeepTauInput + process.hltHpsPFTauDiscriminationByDecayModeFindingNewDMsForDeepTau + process.hpsPFTauPrimaryVertexProducerForDeepTau + process.hpsPFTauSecondaryVertexProducerForDeepTau + process.hpsPFTauTransverseImpactParametersForDeepTau + process.hltFixedGridRhoFastjetAllTau + process.hpsPFTauBasicDiscriminatorsForDeepTau + process.hpsPFTauBasicDiscriminatorsdR03ForDeepTau + process.deepTauProducer)
     return process
 
-def customiseDiTauForDeepTau(process, useReg, working_points, addCounters):
+def customiseDiTauForDeepTau(process, useReg, working_points, addCounters, isMC):
 
     ## Gen counter
     process.genCounter = cms.EDFilter( "CounterFilter",
-        isMC = cms.bool(True), #from outside
+        isMC = isMC, #from outside
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(True), #from outside
         store_MET = cms.bool(False),
@@ -559,12 +559,16 @@ def customiseHighPtTauForDeepTau(process, working_points, addCounters):
 
     return process
 
-def update(process, useReg=True, resetWP=False, addCounters=False):
+def update(process, useReg=True, resetWP=False, addCounters=False, isData=False):
     process.options.wantSummary = cms.untracked.bool(True)
+
+    isMC = cms.bool(True)
+    if isData:
+        isMC = cms.bool(False)
 
     ## Final counter -> taus InputTag to be customised for each path
     process.jetsFilter = cms.EDFilter( "CounterFilter",
-        isMC = cms.bool(True), #from outside
+        isMC = isMC, #from outside
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(False), #from outside
         position = cms.string("final"),
@@ -609,7 +613,7 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
     )
 
     ## Customise di-tau path
-    process = customiseDiTauForDeepTau(process, useReg=useReg, working_points=working_points, addCounters=addCounters)
+    process = customiseDiTauForDeepTau(process, useReg=useReg, working_points=working_points, addCounters=addCounters, isMC=isMC)
 
     ## Customise ele+tau path
     process = customiseEleTauForDeepTau(process, working_points=working_points, addCounters=addCounters)
@@ -628,12 +632,16 @@ def update(process, useReg=True, resetWP=False, addCounters=False):
 
     return process
 
-def update_oldHLT(process):
+def update_oldHLT(process, isData=False):
     process.options.wantSummary = cms.untracked.bool(True)
+
+    isMC = cms.bool(True)
+    if isData:
+        isMC = cms.bool(False)
 
     ## Gen counter
     process.genCounter = cms.EDFilter( "CounterFilter",
-        isMC = cms.bool(True), #from outside
+        isMC = isMC, #from outside
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(True), #from outside
         store_MET = cms.bool(False),
@@ -655,7 +663,7 @@ def update_oldHLT(process):
 
     ## Final counter -> taus InputTag to be customised for each path
     process.jetsFilter = cms.EDFilter( "CounterFilter",
-        isMC = cms.bool(True), #from outside
+        isMC = isMC, #from outside
         store_hist = cms.bool(False), #from outside
         store_both = cms.bool(False), #from outside
         position = cms.string("final"),
@@ -725,8 +733,7 @@ def update_oldHLT(process):
 
     process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau)
 
-    if addCounters:
-        process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
+    process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
     return process
 

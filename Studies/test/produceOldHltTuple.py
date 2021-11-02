@@ -32,8 +32,8 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-process.load('HLTrigger.Configuration.HLT_User_cff')
-# process.load('HLTrigger.Configuration.HLT_GRun_cff')
+# process.load('HLTrigger.Configuration.HLT_User_cff')
+process.load('HLTrigger.Configuration.HLT_GRun_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -156,15 +156,19 @@ associatePatAlgosToolsTask(process)
 
 if isData:
     # Customisation from command line
-    from HLTrigger.Configuration.customizeHLTforCMSSW import customisePixelGainForRun2Input,synchronizeHCALHLTofflineRun3on2018data
-    process = customisePixelGainForRun2Input(process)
-    process = synchronizeHCALHLTofflineRun3on2018data(process)
+    from HLTrigger.Configuration.customizeHLTforCMSSW import customiseFor2018Input
+    process = customiseFor2018Input(process)
 else:
     from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
     process = customizeHLTforMC(process)
 
+# customise tracking for Run3
+from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+process = customizeHLTforRun3Tracking(process)
 from TauTriggerTools.HLTProducers.deepTauAtHLT import update_oldHLT as update
-process = update(process)
+process = update(process, isData=isData)
+
+process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
 
 # End of customisation functions
 
