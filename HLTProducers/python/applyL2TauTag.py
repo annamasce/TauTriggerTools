@@ -56,7 +56,8 @@ def update(process):
         nExpected = 2,
         L1TauSrc = cms.InputTag('hltL1sDoubleTauBigOR'),
         L2Outcomes = ('hltL2TauTagNNProducer', 'DoubleTau'),
-        DiscrWP = cms.double(thWp[working_point])
+        DiscrWP = thWp[working_point],
+        l1TauPtThreshold = 250,
     )
     process.hltL2IsoTauTagNNFilter = l2TauTagFilter.clone(
         nExpected = 1,
@@ -71,7 +72,7 @@ def update(process):
         DiscrWP = cms.double(thWp[working_point])
     )
     # L2 updated Sequence
-    process.hltL2TauTagNNSequence = cms.Sequence(process.HLTDoCaloSequence + cms.ignore(process.hltL1sDoubleTauBigOR) + cms.ignore(process.hltL1sIsoTau40erETMHF90To120) + cms.ignore(process.hltL1sSingleTau) + process.hltL2TauTagNNProducer)
+    process.hltL2TauTagNNSequence = cms.Sequence(process.HLTDoCaloSequence + cms.ignore(process.hltL1sDoubleTauBigOR) + cms.ignore(process.hltL1sIsoTau40erETMHF90To120) + cms.ignore(process.hltL1sSingleTau) + process.hltL2TauTagNNProducer, process.HLTDoLocalPixelTask, process.HLTRecoPixelTracksTask, process.HLTRecopixelvertexingTask)
 
 
     # Regional -> Global customization

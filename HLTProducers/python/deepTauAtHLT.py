@@ -438,7 +438,7 @@ def customiseTauMETForDeepTau(process, working_points, addCounters):
         MET = cms.InputTag("hltMet")
     )
 
-    process.hltMET100.MinPt = cms.double( 80.0 )
+    # process.hltMET100.MinPt = cms.double( 80.0 )
 
     process.hltPFTau50ForDeepTau = process.hltPFTau50.clone(
         inputTag = cms.InputTag( "hltHpsL1JetsHLTForDeepTauInput" ),
@@ -681,57 +681,162 @@ def update_oldHLT(process, isData=False):
         genParticles = cms.InputTag('genParticles')
     )
 
-    ## Final counter Di-Tau
-    process.jetsFilterDiTau = process.jetsFilter.clone(
-        position = cms.string("final_DiTau"),
+    ## Final counter HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4
+    process.jetsFilterDiTau_medium = process.jetsFilter.clone(
+        position = cms.string("final_HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg"),
         taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
         track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg")        
     )
 
-    process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(-1, process.jetsFilterDiTau)
+    process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(-1, process.jetsFilterDiTau_medium)
 
-    ## Final counter EleTau
-    process.jetsFilterEleTau = process.jetsFilter.clone(
-        position = cms.string("final_EleTau"),
+    ## Final counter HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v1
+    process.jetsFilterDiTau_tight35 = process.jetsFilter.clone(
+        position = cms.string("final_HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v1"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg"),
+        taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1TightChargedIsolationDz02Reg"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg")        
+    )
+
+    process. HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v1.insert(-1, process.jetsFilterDiTau_tight35)
+
+    ## Final counter HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1
+    process.jetsFilterDiTau_tight40 = process.jetsFilter.clone(
+        position = cms.string("final_HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg"),
+        taus = cms.InputTag("hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg")        
+    )
+
+    process. HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1.insert(-1, process.jetsFilterDiTau_tight40)
+
+    ## Final counter HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1
+    process.jetsFilterEleTau_loose = process.jetsFilter.clone(
+        position = cms.string("final_HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30"),
         track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch")
     )
 
-    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau)
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau_loose)
 
-    ## Final counter MuTau
-    process.jetsFilterMuTau = process.jetsFilter.clone(
-        position = cms.string("final_MuTau"),
+    ## Final counter HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v1
+    process.jetsFilterEleTau_medium = process.jetsFilter.clone(
+        position = cms.string("final_HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v1"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoPFTau30"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationMatch")
+    )
+
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau_medium)
+
+    ## Final counter HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v1
+    process.jetsFilterEleTau_tight = process.jetsFilter.clone(
+        position = cms.string("final_HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v1"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationMatch"),
+        taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoPFTau30"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationMatch")
+    )
+
+    process.HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau_tight)
+
+
+    ## Final counter HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4
+    process.jetsFilterMuTau_loose = process.jetsFilter.clone(
+        position = cms.string("final_HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
         track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch")
     )
 
-    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.insert(-1, process.jetsFilterMuTau)
+    process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.insert(-1, process.jetsFilterMuTau_loose)
 
-    ## Final counter TauMET
-    process.jetsFilterTauMET = process.jetsFilter.clone(
+    ## Final counter HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v1
+    process.jetsFilterMuTau_medium = process.jetsFilter.clone(
+        position = cms.string("final_HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v1"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationAgainstMuonMatch"),
+        taus = cms.InputTag("hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationAgainstMuonMatch")
+    )
+
+    process.HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterMuTau_medium)
+
+    ## Final counter HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v1
+    process.jetsFilterMuTau_tight = process.jetsFilter.clone(
+        position = cms.string("final_HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v1"),
+        original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationAgainstMuonMatch"),
+        taus = cms.InputTag("hltHpsOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded"),
+        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationAgainstMuonMatch")
+    )
+
+    process.HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterMuTau_tight)
+
+    ## Final counter HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12
+    process.jetsFilterTauMET_100 = process.jetsFilter.clone(
         store_MET = cms.bool(True),
-        position = cms.string("final_TauMET"),
+        position = cms.string("final_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12"),
         original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
         track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
         MET = cms.InputTag("hltMet")
     )
 
-    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.insert(-1, process.jetsFilterTauMET)
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12.insert(-1, process.jetsFilterTauMET_100)
 
-    ## Final counter High-pt Tau
-    process.jetsFilterHighPtTau = process.jetsFilter.clone(
-        position = cms.string("final_HighPtTau"),
+    ## Final counter HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET110_v8
+    process.jetsFilterTauMET_110 = process.jetsFilter.clone(
+        store_MET = cms.bool(True),
+        position = cms.string("final_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET110_v8"),
+        original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
+        track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        MET = cms.InputTag("hltMet")
+    )
+
+    process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET110_v8.insert(-1, process.jetsFilterTauMET_110)
+
+     ## Final counter HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET120_v8
+    process.jetsFilterTauMET_120 = process.jetsFilter.clone(
+        store_MET = cms.bool(True),
+        position = cms.string("final_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET120_v8"),
+        original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
+        track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        MET = cms.InputTag("hltMet")
+    )
+
+    process. HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET120_v8.insert(-1, process.jetsFilterTauMET_120)
+
+    ## Final counter HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12
+    process.jetsFilterHighPtTau_180 = process.jetsFilter.clone(
+        position = cms.string("final_HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12"),
         original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched"),
         track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
     )
 
-    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau)
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau_180)
+
+    ## Final counter HLT_MediumChargedIsoPFTau200HighPtRelaxedIso_Trk50_eta2p1_v12
+    process.jetsFilterHighPtTau_200 = process.jetsFilter.clone(
+        position = cms.string("final_HLT_MediumChargedIsoPFTau200HighPtRelaxedIso_Trk50_eta2p1_v12"),
+        original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltSelectedPFTau200MediumChargedIsolationL1HLTMatched"),
+        track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
+    )
+
+    process.HLT_MediumChargedIsoPFTau200HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau_200)
+
+     ## Final counter HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12
+    process.jetsFilterHighPtTau_220 = process.jetsFilter.clone(
+        position = cms.string("final_HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12"),
+        original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
+        taus = cms.InputTag("hltSelectedPFTau220MediumChargedIsolationL1HLTMatched"),
+        track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
+    )
+
+    process.HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau_220)
 
     process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
