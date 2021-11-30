@@ -206,6 +206,9 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters, isMC)
         store_MET = cms.bool(False),
         position = cms.string("gen"),
         use_deepTau = cms.bool(False),
+        use_L2NN = cms.bool(False),
+        L2NNoutput = cms.InputTag('try10'),
+        l1taus = cms.InputTag(""),
         deepTauVSe = cms.InputTag('try1'),
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
@@ -215,7 +218,9 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters, isMC)
         MET = cms.InputTag('try7'),
         puInfo = cms.InputTag('try8'),
         vertices = cms.InputTag('try9'),
-        genParticles = cms.InputTag('genParticles')
+        genParticles = cms.InputTag('genParticles'),
+        genMETcalo = cms.InputTag('genMetCalo'),
+        genMETtrue = cms.InputTag('genMetTrue')
     )
 
     if addCounters:
@@ -223,6 +228,9 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters, isMC)
 
     ## Final counter
     process.jetsFilterDiTau = process.jetsFilter.clone(
+        use_L2NN = cms.bool(True),
+        L2NNoutput = ('hltL2TauTagNNProducer', 'DoubleTau'),
+        l1taus = cms.InputTag("hltL1sDoubleTauBigOR"),
         position = cms.string("final_DiTau"),
         taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1DeepTau35IsolationDz02"),
         track_taus = cms.InputTag("hltHpsL1JetsHLTForDeepTauInput")        
@@ -431,6 +439,9 @@ def customiseTauMETForDeepTau(process, working_points, addCounters):
 
     ## Final counter
     process.jetsFilterTauMET = process.jetsFilter.clone(
+        use_L2NN = cms.bool(True),
+        L2NNoutput = ("hltL2TauTagNNProducer", "TauMET"),
+        l1taus = cms.InputTag("hltL1sIsoTau40erETMHF90To120"),
         store_MET = cms.bool(True),
         position = cms.string("final_TauMET"),
         taus = cms.InputTag("hltSelectedPFTau50DeepTauL1HLTMatched"),
@@ -500,6 +511,9 @@ def customiseHighPtTauForDeepTau(process, working_points, addCounters):
 
     ## Final counter
     process.jetsFilterHighPtTau = process.jetsFilter.clone(
+        use_L2NN = cms.bool(True),
+        L2NNoutput = ("hltL2TauTagNNProducer", "SingleTau"),
+        l1taus = cms.InputTag("hltL1sSingleTau"),
         position = cms.string("final_HighPtTau"),
         taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched"),
         track_taus = cms.InputTag("hltSelectedPFTausTrackPt50")
@@ -573,7 +587,10 @@ def update(process, useReg=True, resetWP=False, addCounters=False, isData=False)
         store_both = cms.bool(False), #from outside
         position = cms.string("final"),
         use_deepTau = cms.bool(True),
+        use_L2NN = cms.bool(False),
         store_MET = cms.bool(False),
+        L2NNoutput = cms.InputTag(''),
+        l1taus = cms.InputTag(""),
         deepTauVSe = cms.InputTag('deepTauProducer', 'VSe'),
         deepTauVSmu = cms.InputTag('deepTauProducer', 'VSmu'),
         deepTauVSjet = cms.InputTag('deepTauProducer', 'VSjet'),
@@ -583,7 +600,9 @@ def update(process, useReg=True, resetWP=False, addCounters=False, isData=False)
         MET = cms.InputTag(''),
         puInfo = cms.InputTag('addPileupInfo','','HLT'),
         vertices = cms.InputTag('hltPixelVertices'),
-        genParticles = cms.InputTag('genParticles')
+        genParticles = cms.InputTag('genParticles'),
+        genMETcalo = cms.InputTag('genMetCalo'),
+        genMETtrue = cms.InputTag('genMetTrue')
     )
 
     ## Define working points for deepTau
@@ -647,6 +666,9 @@ def update_oldHLT(process, isData=False):
         store_MET = cms.bool(False),
         position = cms.string("gen"),
         use_deepTau = cms.bool(False),
+        use_L2NN = cms.bool(False),
+        L2NNoutput = cms.InputTag('try10'),
+        l1taus = cms.InputTag(""),
         deepTauVSe = cms.InputTag('try1'),
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
@@ -656,7 +678,9 @@ def update_oldHLT(process, isData=False):
         MET = cms.InputTag('try7'),
         puInfo = cms.InputTag('try8'),
         vertices = cms.InputTag('try9'),
-        genParticles = cms.InputTag('genParticles')
+        genParticles = cms.InputTag('genParticles'),
+        genMETcalo = cms.InputTag('genMetCalo'),
+        genMETtrue = cms.InputTag('genMetTrue')
     )
 
     process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(1, process.genCounter)
@@ -668,7 +692,10 @@ def update_oldHLT(process, isData=False):
         store_both = cms.bool(False), #from outside
         position = cms.string("final"),
         use_deepTau = cms.bool(False),
+        use_L2NN = cms.bool(False),
         store_MET = cms.bool(False),
+        L2NNoutput = cms.InputTag(""),
+        l1taus = cms.InputTag(""),
         deepTauVSe = cms.InputTag(""),
         deepTauVSmu = cms.InputTag(""),
         deepTauVSjet = cms.InputTag(""),
@@ -678,7 +705,9 @@ def update_oldHLT(process, isData=False):
         MET = cms.InputTag(''),
         puInfo = cms.InputTag('addPileupInfo','','HLT'),
         vertices = cms.InputTag('hltPixelVertices'),
-        genParticles = cms.InputTag('genParticles')
+        genParticles = cms.InputTag('genParticles'),
+        genMETcalo = cms.InputTag('genMetCalo'),
+        genMETtrue = cms.InputTag('genMetTrue')
     )
 
     ## Final counter HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4

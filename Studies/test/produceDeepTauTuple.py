@@ -163,9 +163,9 @@ else:
     from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
     process = customizeHLTforMC(process)
 
-# customise tracking for Run3
-from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
-process = customizeHLTforRun3Tracking(process)
+# # customise tracking for Run3
+# from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+# process = customizeHLTforRun3Tracking(process)
 #from applyL2TauTag import update
 from TauTriggerTools.HLTProducers.applyL2TauTag import update as update_L2
 process = update_L2(process)

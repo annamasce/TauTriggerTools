@@ -11,13 +11,19 @@ def insertL2TauSequence(process, path, ref_module, L2TauNNfilter):
 
 
 def update(process):
+    # thWp = {
+    #         'Tight': 0.180858813224404,
+    #         'Medium': 0.12267940863785043,
+    #         'Loose': 0.08411243185219064,
+    # }
+
+    # working_point = "Tight"
     thWp = {
-            'Tight': 0.180858813224404,
-            'Medium': 0.12267940863785043,
-            'Loose': 0.08411243185219064,
+            'DoubleTau': -1,
+            'TauMET': -1,
+            'SingleTau': -1,
     }
 
-    working_point = "Tight"
     graphPath = 'RecoTauTag/TrainingFiles/data/L2TauNNTag/L2TauTag_Run3v1.pb'
 
     normalizationDict = 'RecoTauTag/TrainingFiles/data/L2TauNNTag/NormalizationDict.json'
@@ -33,7 +39,7 @@ def update(process):
                 L1TauTrigger =cms.InputTag('hltL1sDoubleTauBigOR'),
             ),
             cms.PSet(
-                L1CollectionName = cms.string('IsoTau'),
+                L1CollectionName = cms.string('TauMET'),
                 L1TauTrigger =cms.InputTag('hltL1sIsoTau40erETMHF90To120'),
             ),
             cms.PSet(
@@ -56,20 +62,23 @@ def update(process):
         nExpected = 2,
         L1TauSrc = cms.InputTag('hltL1sDoubleTauBigOR'),
         L2Outcomes = ('hltL2TauTagNNProducer', 'DoubleTau'),
-        DiscrWP = thWp[working_point],
+        # DiscrWP = thWp[working_point],
+        DiscrWP = thWp['DoubleTau'],
         l1TauPtThreshold = 250,
     )
-    process.hltL2IsoTauTagNNFilter = l2TauTagFilter.clone(
+    process.hltL2TauMETTagNNFilter = l2TauTagFilter.clone(
         nExpected = 1,
         L1TauSrc = cms.InputTag('hltL1sIsoTau40erETMHF90To120'),
-        L2Outcomes = ('hltL2TauTagNNProducer', 'IsoTau'),
-        DiscrWP = cms.double(thWp[working_point])
+        L2Outcomes = ('hltL2TauTagNNProducer', 'TauMET'),
+        # DiscrWP = cms.double(thWp[working_point])
+        DiscrWP = cms.double(thWp['TauMET'])
     )
     process.hltL2SingleTauTagNNFilter = l2TauTagFilter.clone(
         nExpected = 1,
         L1TauSrc = cms.InputTag('hltL1sSingleTau'),
         L2Outcomes = ('hltL2TauTagNNProducer', 'SingleTau'),
-        DiscrWP = cms.double(thWp[working_point])
+        # DiscrWP = cms.double(thWp[working_point])
+        DiscrWP = cms.double(thWp['SingleTau'])
     )
     # L2 updated Sequence
     process.hltL2TauTagNNSequence = cms.Sequence(process.HLTDoCaloSequence + cms.ignore(process.hltL1sDoubleTauBigOR) + cms.ignore(process.hltL1sIsoTau40erETMHF90To120) + cms.ignore(process.hltL1sSingleTau) + process.hltL2TauTagNNProducer, process.HLTDoLocalPixelTask, process.HLTRecoPixelTracksTask, process.HLTRecopixelvertexingTask)
@@ -105,7 +114,7 @@ def update(process):
 
     # Add L2 sequence
     insertL2TauSequence(process, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.hltPreDoubleMediumChargedIsoPFTauHPS35Trk1eta2p1Reg, process.hltL2DoubleTauTagNNFilter)
-    insertL2TauSequence(process, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.hltPreMediumChargedIsoPFTau50Trk30eta2p11prMET100, process.hltL2IsoTauTagNNFilter)
+    insertL2TauSequence(process, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.hltPreMediumChargedIsoPFTau50Trk30eta2p11prMET100, process.hltL2TauMETTagNNFilter)
     insertL2TauSequence(process, process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12, process.hltPreMediumChargedIsoPFTau180HighPtRelaxedIsoTrk50eta2p1, process.hltL2SingleTauTagNNFilter)
 
     old_diTau_paths = ['HLT_IsoMu24_eta2p1_TightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v1', 'HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_CrossL1_v1','HLT_IsoMu24_eta2p1_TightChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_CrossL1_v1','HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v4','HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS30_Trk1_eta2p1_Reg_CrossL1_v1','HLT_DoubleMediumChargedIsoPFTauHPS30_L1MaxMass_Trk1_eta2p1_Reg_v1','HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v1','HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v1','HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_v1','HLT_DoubleMediumChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1','HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1','HLT_DoubleMediumChargedIsoPFTauHPS40_Trk1_TightID_eta2p1_Reg_v1','HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_TightID_eta2p1_Reg_v1']

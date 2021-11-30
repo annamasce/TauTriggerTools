@@ -32,6 +32,12 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR(std::vector<Float_t>, met_pt) /* pt of the MET */ \
     VAR(std::vector<bool>, tau_passedLastFilter) /* bool if the passed the last Filter */ \
     VAR(std::vector<bool>, tau_passedTrackFilter) /* bool if the passed the trackFinding Filter */ \
+    VAR(std::vector<Float_t>, gen_met_calo_pt) /* pt of the gen met calo */ \
+    VAR(std::vector<Float_t>, gen_met_calo_phi) /* phi of the gen met calo*/ \
+    VAR(std::vector<Float_t>, gen_met_true_pt) /* pt of the gen met true */ \
+    VAR(std::vector<Float_t>, gen_met_true_phi) /* phi of the gen met true */ \
+    VAR(std::vector<Float_t>, l2nn_output) /* output of L2 NN */ \
+    VAR(std::vector<Float_t>, l1_pt) /* L1 tau pt */ \
     /**/
 
 #define VAR(type, name) DECLARE_BRANCH_VARIABLE(type, name)
