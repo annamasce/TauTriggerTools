@@ -32,8 +32,8 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-# process.load('HLTrigger.Configuration.HLT_User_cff')
-process.load('HLTrigger.Configuration.HLT_GRun_cff')
+process.load('HLTrigger.Configuration.HLT_User_cff')
+# process.load('HLTrigger.Configuration.HLT_GRun_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -144,7 +144,7 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 
 # Schedule definition
 process.schedule = cms.Schedule()
-process.schedule.extend(process.HLTSchedule)
+# process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
@@ -166,15 +166,26 @@ else:
 # # customise tracking for Run3
 # from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
 # process = customizeHLTforRun3Tracking(process)
-#from applyL2TauTag import update
-from TauTriggerTools.HLTProducers.applyL2TauTag import update as update_L2
-process = update_L2(process)
 
-from TauTriggerTools.HLTProducers.deepTauAtHLT import update as update_deepTau
-process = update_deepTau(process, useReg=False, resetWP=True, addCounters=True, isData=isData)
+# #from applyL2TauTag import update
+# from TauTriggerTools.HLTProducers.applyL2TauTag import update as update_L2
+# process = update_L2(process)
 
-process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
+# from TauTriggerTools.HLTProducers.deepTauAtHLT import update as update_deepTau
+# process = update_deepTau(process, useReg=False, resetWP=True, addCounters=True, isData=isData)
 
+from TauTriggerTools.HLTProducers.deepTauAtHLT import add_counters
+process = add_counters(process, isData=isData, resetWP=True)
+
+# process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
+process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_DoubleMediumDeepTauIsoPFTauHPS35_L2NN_eta2p1_v1, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseDeepTauPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v1, process.HLT_LooseDeepTauPFTauHPS180_L2NN_eta2p1_v1, process.HLT_LooseDeepTauPFTauHPS50_L2NN_eta2p1_MET100_v1, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
+
+# Add customization for Patatrack trigger
+from HLTrigger.Configuration.customizeHLTforPatatrack import customizeHLTforPatatrackTriplets
+process = customizeHLTforPatatrackTriplets(process)
+process.HLTL2TauTagNNSequence._tasks.add(process.HLTDoLocalPixelTask)
+process.HLTL2TauTagNNSequence._tasks.add(process.HLTRecoPixelTracksTask)
+process.HLTL2TauTagNNSequence._tasks.add(process.HLTRecopixelvertexingTask)
 
 # End of customisation functions
 
