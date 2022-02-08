@@ -178,7 +178,7 @@ from TauTriggerTools.HLTProducers.deepTauAtHLT import add_counters
 process = add_counters(process, isData=isData, resetWP=True)
 
 # process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
-process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_DoubleMediumDeepTauIsoPFTauHPS35_L2NN_eta2p1_v1, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseDeepTauPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v1, process.HLT_LooseDeepTauPFTauHPS180_L2NN_eta2p1_v1, process.HLT_LooseDeepTauPFTauHPS50_L2NN_eta2p1_MET100_v1, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
+process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_DoubleMediumDeepTauIsoPFTauHPS35_L2NN_eta2p1_v1, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseDeepTauPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v1, process.HLT_LooseDeepTauPFTauHPS180_L2NN_eta2p1_v1, process.HLT_LooseDeepTauPFTauHPS50_eta2p1_MET100_v1, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
 
 # Add customization for Patatrack trigger
 from HLTrigger.Configuration.customizeHLTforPatatrack import customizeHLTforPatatrackTriplets
@@ -187,16 +187,16 @@ process.HLTL2TauTagNNSequence._tasks.add(process.HLTDoLocalPixelTask)
 process.HLTL2TauTagNNSequence._tasks.add(process.HLTRecoPixelTracksTask)
 process.HLTL2TauTagNNSequence._tasks.add(process.HLTRecopixelvertexingTask)
 
-process.hltL1TauMatchedPixelTracksAndCaloJets = cms.EDProducer('TrackFilterForTauReg',
-    L1Taus = cms.InputTag('hltL1sTauVeryBigOR'),
-    pixelTracks = cms.InputTag('hltPixelTracks'),
-    caloJets = cms.InputTag('hltAK4CaloJetsPFEt5'),
-    maxDeltaR_pixelTrack = cms.double(0.8),
-    maxDeltaR_caloJet = cms.double(0.4),
-    minPt_caloJet = cms.double(20),
-)
+# process.hltL1TauMatchedPixelTracksAndCaloJets = cms.EDProducer('TrackFilterForTauReg',
+#     L1Taus = cms.InputTag('hltL1sTauVeryBigOR'),
+#     pixelTracks = cms.InputTag('hltPixelTracks'),
+#     caloJets = cms.InputTag('hltAK4CaloJetsPFEt5'),
+#     maxDeltaR_pixelTrack = cms.double(0.8),
+#     maxDeltaR_caloJet = cms.double(0.4),
+#     minPt_caloJet = cms.double(20),
+# )
 
-process.HLTIterativeTrackingIter02TauReg.insert(0, process.hltL1TauMatchedPixelTracksAndCaloJets)
+# process.HLTIterativeTrackingIter02TauReg.insert(0, process.hltL1TauMatchedPixelTracksAndCaloJets)
 
 # End of customisation functions
 

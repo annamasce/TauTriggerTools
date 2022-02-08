@@ -892,6 +892,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
         original_taus = cms.InputTag('try4'),
+        decayModeFindingNewDM = cms.InputTag('try11'),
         taus = cms.InputTag('try5'),
         track_taus = cms.InputTag('try6'),
         MET = cms.InputTag('try7'),
@@ -918,6 +919,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         deepTauVSe = cms.InputTag('hltHpsPFTauDeepTauProducer', 'VSe'),
         deepTauVSmu = cms.InputTag('hltHpsPFTauDeepTauProducer', 'VSmu'),
         deepTauVSjet = cms.InputTag('hltHpsPFTauDeepTauProducer', 'VSjet'),
+        decayModeFindingNewDM = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsL1matched'),
         original_taus = cms.InputTag('hltHpsL1JetsHLTForDeepTauInput'),
         taus = cms.InputTag(''),
         track_taus = cms.InputTag("hltHpsL1JetsHLTForDeepTauInput"),
@@ -1014,9 +1016,9 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
 
     ## Tau-MET customisation
     process.jetsFilterTauMET = process.jetsFilter.clone(
-        use_L2NN = cms.bool(True),
+        # use_L2NN = cms.bool(True),
         store_MET = cms.bool(True),
-        L2NNoutput = ('hltL2TauTagNNProducer', 'IsoTau'),
+        # L2NNoutput = ('hltL2TauTagNNProducer', 'IsoTau'),
         l1taus = cms.InputTag("hltL1sIsoTau40erETMHF90To120"),
         position = cms.string("final_TauMET"),
         taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"),  
@@ -1024,7 +1026,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
     )
 
     if resetWP:
-        process.hltL2IsoTauTagNNFilter.DiscrWP = cms.double(-1.)
+        # process.hltL2IsoTauTagNNFilter.DiscrWP = cms.double(-1.)
         process.hltHpsSelectedPFTausLooseTauMETWPDeepTau.discriminatorContainers = cms.VPSet( 
             cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauDeepTauProducer", "VSjet" ),
                 rawValues = cms.vstring(  ),
@@ -1033,7 +1035,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
             )
         )
 
-    process.HLT_LooseDeepTauPFTauHPS50_L2NN_eta2p1_MET100_v1.insert(-1, process.jetsFilterTauMET)
+    process.HLT_LooseDeepTauPFTauHPS50_eta2p1_MET100_v1.insert(-1, process.jetsFilterTauMET)
 
     process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 

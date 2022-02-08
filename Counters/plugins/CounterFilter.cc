@@ -42,6 +42,7 @@ public:
         deepTauVSe_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSe"))),
         deepTauVSmu_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSmu"))),
         deepTauVSjet_inputToken(mayConsume<TauDiscriminatorContainer>(cfg.getParameter<edm::InputTag>("deepTauVSjet"))),
+        decayMode_token(consumes<reco::PFTauDiscriminator>(cfg.getParameter<edm::InputTag>("decayModeFindingNewDM"))),
         L2NNoutput_token(mayConsume<std::vector<float>>(cfg.getParameter<edm::InputTag>("L2NNoutput"))),
         l1taus_token(mayConsume<trigger::TriggerFilterObjectWithRefs>(cfg.getParameter<edm::InputTag>("l1taus"))),
         original_taus_token(mayConsume<std::vector<reco::PFTau>>(cfg.getParameter<edm::InputTag>("original_taus"))),
@@ -136,6 +137,9 @@ private:
                 event.getByToken(deepTauVSmu_inputToken, deepTau_VSmu);
                 event.getByToken(deepTauVSjet_inputToken, deepTau_VSjet);
             }
+
+            edm::Handle<reco::PFTauDiscriminator> decayModesNew;
+            event.getByToken(decayMode_token, decayModesNew);
 
             edm::Handle<std::vector<float>> L2NNoutput;
             l1t::TauVectorRef l1Taus;
@@ -247,6 +251,7 @@ private:
                 (*counterTuple)().tau_phi.push_back(static_cast<float>(original_tau.polarP4().phi()));
                 (*counterTuple)().tau_e.push_back(static_cast<float>(original_tau.polarP4().e()));
                 (*counterTuple)().tau_vz.push_back(static_cast<float>(original_tau.vz()));
+                (*counterTuple)().tau_decayModeFindingNewDMs.push_back(decayModesNew->value(orig_tau_index));
 
                 if(use_deepTau){
                     (*counterTuple)().deepTau_VSe.push_back(static_cast<float>((*deepTau_VSe)[tauRef].rawValues.at(0)));
@@ -309,6 +314,7 @@ private:
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSe_inputToken;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSmu_inputToken;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSjet_inputToken;
+    const edm::EDGetTokenT<reco::PFTauDiscriminator> decayMode_token;
     const edm::EDGetTokenT<std::vector<float>> L2NNoutput_token;
     edm::EDGetTokenT<trigger::TriggerFilterObjectWithRefs> l1taus_token;
     edm::EDGetTokenT<std::vector<reco::PFTau>> original_taus_token;
