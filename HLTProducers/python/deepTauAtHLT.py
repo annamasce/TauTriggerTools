@@ -871,7 +871,7 @@ def update_oldHLT(process, isData=False):
 
     return process
 
-def add_counters(process, isData=False, resetWP=True):
+def add_counters(process, isData=False, resetWP=True, useReg=False):
 
     isMC = cms.bool(True)
     if isData:
@@ -956,6 +956,7 @@ def add_counters(process, isData=False, resetWP=True):
     ## Ele-Tau customisation
     process.jetsFilterEleTau = process.jetsFilter.clone(
         position = cms.string("final_EleTau"),
+        l1taus = cms.InputTag("hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseETauWPDeepTauPFTau30"),       
     )
 
@@ -975,6 +976,7 @@ def add_counters(process, isData=False, resetWP=True):
     ## Mu-Tau customisation
     process.jetsFilterMuTau = process.jetsFilter.clone(
         position = cms.string("final_MuTau"),
+        l1taus = cms.InputTag("hltL1sBigORMu18erTauXXer2p1"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseMuTauWPDeepTauPFTau27L1Seeded"),       
     )
 

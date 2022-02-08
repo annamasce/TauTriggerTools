@@ -187,6 +187,17 @@ process.HLTL2TauTagNNSequence._tasks.add(process.HLTDoLocalPixelTask)
 process.HLTL2TauTagNNSequence._tasks.add(process.HLTRecoPixelTracksTask)
 process.HLTL2TauTagNNSequence._tasks.add(process.HLTRecopixelvertexingTask)
 
+process.hltL1TauMatchedPixelTracksAndCaloJets = cms.EDProducer('TrackFilterForTauReg',
+    L1Taus = cms.InputTag('hltL1sTauVeryBigOR'),
+    pixelTracks = cms.InputTag('hltPixelTracks'),
+    caloJets = cms.InputTag('hltAK4CaloJetsPFEt5'),
+    maxDeltaR_pixelTrack = cms.double(0.8),
+    maxDeltaR_caloJet = cms.double(0.4),
+    minPt_caloJet = cms.double(20),
+)
+
+process.HLTIterativeTrackingIter02TauReg.insert(0, process.hltL1TauMatchedPixelTracksAndCaloJets)
+
 # End of customisation functions
 
 # Customisation from command line

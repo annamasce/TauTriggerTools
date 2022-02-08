@@ -38,6 +38,9 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR(std::vector<Float_t>, gen_met_true_phi) /* phi of the gen met true */ \
     VAR(std::vector<Float_t>, l2nn_output) /* output of L2 NN */ \
     VAR(std::vector<Float_t>, l1_pt) /* L1 tau pt */ \
+    VAR(std::vector<Float_t>, l1_eta) /* L1 tau eta */ \
+    VAR(std::vector<Float_t>, l1_phi) /* L1 tau phi */ \
+    VAR(std::vector<Float_t>, l1_hwIso) /* L1 tau hwIso */ \
     /**/
 
 #define VAR(type, name) DECLARE_BRANCH_VARIABLE(type, name)

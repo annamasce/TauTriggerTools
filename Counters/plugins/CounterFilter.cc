@@ -139,14 +139,18 @@ private:
 
             edm::Handle<std::vector<float>> L2NNoutput;
             l1t::TauVectorRef l1Taus;
-            if(use_L2NN){
-                event.getByToken(L2NNoutput_token, L2NNoutput);
-                auto const& l1TriggeredTaus = event.get(l1taus_token);
-                l1TriggeredTaus.getObjects(trigger::TriggerL1Tau, l1Taus);
-                for(size_t i=0; i<L2NNoutput->size(); i++){
+            auto const& l1TriggeredTaus = event.get(l1taus_token);
+            l1TriggeredTaus.getObjects(trigger::TriggerL1Tau, l1Taus);
+            if(use_L2NN) event.getByToken(L2NNoutput_token, L2NNoutput);
+            for(size_t i=0; i<l1Taus.size(); i++){
+                if (use_L2NN) {
                     (*counterTuple)().l2nn_output.push_back(static_cast<float>(L2NNoutput->at(i)));
-                    (*counterTuple)().l1_pt.push_back(static_cast<float>(l1Taus[i]->pt()));
+                    std::cout << "L2 score: " << L2NNoutput->at(i) << std::endl;
                 }
+                (*counterTuple)().l1_pt.push_back(static_cast<float>(l1Taus[i]->pt()));
+                (*counterTuple)().l1_eta.push_back(static_cast<float>(l1Taus[i]->eta()));
+                (*counterTuple)().l1_phi.push_back(static_cast<float>(l1Taus[i]->phi()));
+                (*counterTuple)().l1_hwIso.push_back(static_cast<float>(l1Taus[i]->hwIso()));
             }
             
             edm::Handle<std::vector<reco::CaloMET>> met;
