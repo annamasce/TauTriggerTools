@@ -19,6 +19,7 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
 #include "TauTriggerTools/Common/interface/CutTools.h"
 #include "TauTriggerTools/Common/interface/PatHelpers.h"
 #include "TauTriggerTools/Common/interface/GenTruthTools.h"
+#include "TauTriggerTools/Common/interface/GenLepton.h"
 
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
@@ -33,8 +34,7 @@ public:
 
     CounterFilter(const edm::ParameterSet& cfg) :
         isMC(cfg.getParameter<bool>("isMC")),
-        store_hist(cfg.getParameter<bool>("store_hist")),
-        store_both(cfg.getParameter<bool>("store_both")),
+        gen_level(cfg.getParameter<bool>("gen_level")),
         use_deepTau(cfg.getParameter<bool>("use_deepTau")),
         use_L2NN(cfg.getParameter<bool>("use_L2NN")),
         store_MET(cfg.getParameter<bool>("store_MET")),
@@ -56,17 +56,7 @@ public:
         genMETtrue_token(mayConsume<std::vector<reco::GenMET>>(cfg.getParameter<edm::InputTag>("genMETtrue")))
     {
         std::string full_name = position+"_counter";
-        std::string full_name_hist = position+"_counter_hist";
-        if(store_hist){
-            counter = std::make_shared<TH1F>(full_name_hist.c_str(),full_name_hist.c_str(),2,-0.5,1.5);
-        }
-        else if(store_both){
-            counter = std::make_shared<TH1F>(full_name_hist.c_str(),full_name_hist.c_str(),2,-0.5,1.5);
-            counterTuple = std::make_shared<counter_tau::CounterTuple>(full_name, &edm::Service<TFileService>()->file(), false);
-        }
-        else{
-            counterTuple = std::make_shared<counter_tau::CounterTuple>(full_name, &edm::Service<TFileService>()->file(), false);
-        }
+        counterTuple = std::make_shared<counter_tau::CounterTuple>(full_name, &edm::Service<TFileService>()->file(), false);
     }
 
 private:
@@ -77,12 +67,7 @@ private:
     {
         bool result = true;
 
-        if(store_hist){
-            counter->Fill(1);
-        }
-        else if(store_both){
-            counter->Fill(1);
-
+        if(gen_level){
             (*counterTuple)().run  = event.id().run();
             (*counterTuple)().lumi = event.id().luminosityBlock();
             (*counterTuple)().evt  = event.id().event();
@@ -92,15 +77,24 @@ private:
                 event.getByToken(genParticles_token, hGenParticles);
                 genParticles = hGenParticles.isValid() ? hGenParticles.product() : nullptr;
 
-                std::vector<analysis::gen_truth::LeptonMatchResult> lepton_results = analysis::gen_truth::CollectGenLeptons(*genParticles);
+                std::vector<reco_tau::gen_truth::GenLepton> lepton_results = reco_tau::gen_truth::GenLepton::fromGenParticleCollection(*genParticles);
 
                 for(unsigned n = 0; n < lepton_results.size(); ++n){
                     const auto gen_match = lepton_results.at(n);
-                    (*counterTuple)().lepton_gen_match.push_back(static_cast<int>(gen_match.match));
-                    (*counterTuple)().gen_tau_pt.push_back(static_cast<float>(gen_match.visible_p4.pt()));
-                    (*counterTuple)().gen_tau_eta.push_back(static_cast<float>(gen_match.visible_p4.eta()));
-                    (*counterTuple)().gen_tau_phi.push_back(static_cast<float>(gen_match.visible_p4.phi()));
-                    (*counterTuple)().gen_tau_e.push_back(static_cast<float>(gen_match.visible_p4.e()));
+                    (*counterTuple)().lepton_gen_match.push_back(static_cast<int>(gen_match.kind()));
+                    (*counterTuple)().gen_tau_charge.push_back(static_cast<int>(gen_match.charge()));
+                    (*counterTuple)().gen_tau_pt.push_back(static_cast<float>(gen_match.visibleP4().pt()));
+                    (*counterTuple)().gen_tau_eta.push_back(static_cast<float>(gen_match.visibleP4().eta()));
+                    (*counterTuple)().gen_tau_phi.push_back(static_cast<float>(gen_match.visibleP4().phi()));
+                    (*counterTuple)().gen_tau_e.push_back(static_cast<float>(gen_match.visibleP4().e()));
+                    (*counterTuple)().gen_tau_pt_rad.push_back(static_cast<float>(gen_match.radiatedP4().pt()));
+                    (*counterTuple)().gen_tau_eta_rad.push_back(static_cast<float>(gen_match.radiatedP4().eta()));
+                    (*counterTuple)().gen_tau_phi_rad.push_back(static_cast<float>(gen_match.radiatedP4().phi()));
+                    (*counterTuple)().gen_tau_e_rad.push_back(static_cast<float>(gen_match.radiatedP4().e()));
+                    (*counterTuple)().gen_tau_nChargedHadrons.push_back(static_cast<int>(gen_match.nChargedHadrons()));
+                    (*counterTuple)().gen_tau_nNeutralHadrons.push_back(static_cast<int>(gen_match.nNeutralHadrons()));
+                    (*counterTuple)().gen_tau_nFinalStateElectrons.push_back(static_cast<int>(gen_match.nFinalStateElectrons()));
+                    (*counterTuple)().gen_tau_nFinalStateMuons.push_back(static_cast<int>(gen_match.nFinalStateMuons()));
 
                 }
 
@@ -149,7 +143,6 @@ private:
             for(size_t i=0; i<l1Taus.size(); i++){
                 if (use_L2NN) {
                     (*counterTuple)().l2nn_output.push_back(static_cast<float>(L2NNoutput->at(i)));
-                    std::cout << "L2 score: " << L2NNoutput->at(i) << std::endl;
                 }
                 (*counterTuple)().l1_pt.push_back(static_cast<float>(l1Taus[i]->pt()));
                 (*counterTuple)().l1_eta.push_back(static_cast<float>(l1Taus[i]->eta()));
@@ -227,23 +220,76 @@ private:
                 (*counterTuple)().gen_met_true_phi.push_back(default_value);
             }
 
+            std::vector<reco_tau::gen_truth::GenLepton> lepton_results;            
+            if(genParticles){
+                lepton_results = reco_tau::gen_truth::GenLepton::fromGenParticleCollection(*genParticles);
+            }
+
             for(size_t orig_tau_index = 0; orig_tau_index < original_taus->size(); ++orig_tau_index) {
                 const reco::PFTau& original_tau = original_taus->at(orig_tau_index);
                 edm::Ref<reco::PFTauCollection> tauRef(original_taus, orig_tau_index);
 
-                if(genParticles) {
-                    const auto gen_match = analysis::gen_truth::LeptonGenMatch(original_tau.polarP4(), *genParticles);
-                    (*counterTuple)().lepton_gen_match.push_back(static_cast<int>(gen_match.match));
-                    (*counterTuple)().gen_tau_pt.push_back(static_cast<float>(gen_match.visible_p4.pt()));
-                    (*counterTuple)().gen_tau_eta.push_back(static_cast<float>(gen_match.visible_p4.eta()));
-                    (*counterTuple)().gen_tau_phi.push_back(static_cast<float>(gen_match.visible_p4.phi()));
-                    (*counterTuple)().gen_tau_e.push_back(static_cast<float>(gen_match.visible_p4.e()));
+                if(genParticles){
+                    bool matched = false;
+                    int match_id = 6;
+                    reco_tau::gen_truth::GenLepton gen_match;
+                    double deltaR_thr = 0.2;
+                    for(size_t gen_index = 0; gen_index < lepton_results.size(); ++gen_index){
+                        const auto total_vis_p4 = lepton_results.at(gen_index).visibleP4() + lepton_results.at(gen_index).radiatedP4();
+                        const double deltaR = ROOT::Math::VectorUtil::DeltaR(original_tau.polarP4(),total_vis_p4);
+                        if(deltaR < deltaR_thr){
+                            matched = true;
+                            gen_match = lepton_results.at(gen_index);
+                            deltaR_thr = deltaR;
+                        }
+                    } // loop over gen leptons
+                    if(matched){
+                        (*counterTuple)().lepton_gen_match.push_back(static_cast<int>(gen_match.kind()));
+                        (*counterTuple)().gen_tau_charge.push_back(static_cast<int>(gen_match.charge()));
+                        (*counterTuple)().gen_tau_pt.push_back(static_cast<float>(gen_match.visibleP4().pt()));
+                        (*counterTuple)().gen_tau_eta.push_back(static_cast<float>(gen_match.visibleP4().eta()));
+                        (*counterTuple)().gen_tau_phi.push_back(static_cast<float>(gen_match.visibleP4().phi()));
+                        (*counterTuple)().gen_tau_e.push_back(static_cast<float>(gen_match.visibleP4().e()));
+                        (*counterTuple)().gen_tau_pt_rad.push_back(static_cast<float>(gen_match.radiatedP4().pt()));
+                        (*counterTuple)().gen_tau_eta_rad.push_back(static_cast<float>(gen_match.radiatedP4().eta()));
+                        (*counterTuple)().gen_tau_phi_rad.push_back(static_cast<float>(gen_match.radiatedP4().phi()));
+                        (*counterTuple)().gen_tau_e_rad.push_back(static_cast<float>(gen_match.radiatedP4().e()));
+                        (*counterTuple)().gen_tau_nChargedHadrons.push_back(static_cast<int>(gen_match.nChargedHadrons()));
+                        (*counterTuple)().gen_tau_nNeutralHadrons.push_back(static_cast<int>(gen_match.nNeutralHadrons()));
+                        (*counterTuple)().gen_tau_nFinalStateElectrons.push_back(static_cast<int>(gen_match.nFinalStateElectrons()));
+                        (*counterTuple)().gen_tau_nFinalStateMuons.push_back(static_cast<int>(gen_match.nFinalStateMuons()));
+                    }
+                    else{
+                        (*counterTuple)().lepton_gen_match.push_back(match_id);
+                        (*counterTuple)().gen_tau_charge.push_back(0.);
+                        (*counterTuple)().gen_tau_pt.push_back(0.);
+                        (*counterTuple)().gen_tau_eta.push_back(0.);
+                        (*counterTuple)().gen_tau_phi.push_back(0.);
+                        (*counterTuple)().gen_tau_e.push_back(0.);
+                        (*counterTuple)().gen_tau_pt_rad.push_back(0.);
+                        (*counterTuple)().gen_tau_eta_rad.push_back(0.);
+                        (*counterTuple)().gen_tau_phi_rad.push_back(0.);
+                        (*counterTuple)().gen_tau_e_rad.push_back(0.);
+                        (*counterTuple)().gen_tau_nChargedHadrons.push_back(0);
+                        (*counterTuple)().gen_tau_nNeutralHadrons.push_back(0);
+                        (*counterTuple)().gen_tau_nFinalStateElectrons.push_back(0);
+                        (*counterTuple)().gen_tau_nFinalStateMuons.push_back(0);
+                    }                    
                 } else {
                     (*counterTuple)().lepton_gen_match.push_back(default_int_value);
+                    (*counterTuple)().gen_tau_charge.push_back(default_int_value);
                     (*counterTuple)().gen_tau_pt.push_back(default_value);
                     (*counterTuple)().gen_tau_eta.push_back(default_value);
                     (*counterTuple)().gen_tau_phi.push_back(default_value);
                     (*counterTuple)().gen_tau_e.push_back(default_value);
+                    (*counterTuple)().gen_tau_pt_rad.push_back(default_value);
+                    (*counterTuple)().gen_tau_eta_rad.push_back(default_value);
+                    (*counterTuple)().gen_tau_phi_rad.push_back(default_value);
+                    (*counterTuple)().gen_tau_e_rad.push_back(default_value);
+                    (*counterTuple)().gen_tau_nChargedHadrons.push_back(default_int_value);
+                    (*counterTuple)().gen_tau_nNeutralHadrons.push_back(default_int_value);
+                    (*counterTuple)().gen_tau_nFinalStateElectrons.push_back(default_int_value);
+                    (*counterTuple)().gen_tau_nFinalStateMuons.push_back(default_int_value);
                 }
 
                 (*counterTuple)().tau_pt.push_back(static_cast<float>(original_tau.polarP4().pt()));
@@ -286,7 +332,7 @@ private:
 
                 (*counterTuple)().tau_passedTrackFilter.push_back(passed_trackFilter);
 
-            }
+            } // loop over original taus
 
             counterTuple->Fill();
         }
@@ -296,20 +342,11 @@ private:
 
     void endJob()
     {
-        if(store_hist){
-            //counter->Write();
-            edm::Service<TFileService>()->file().WriteTObject(counter.get());
-        }
-        else if(store_both){
-            edm::Service<TFileService>()->file().WriteTObject(counter.get());
-            counterTuple->Write();
-        }
-        else
-            counterTuple->Write();
+        counterTuple->Write();
     }
 
 private:
-    const bool isMC, store_hist, store_both, use_deepTau, use_L2NN, store_MET;
+    const bool isMC, gen_level, use_deepTau, use_L2NN, store_MET;
     std::string position;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSe_inputToken;
     const edm::EDGetTokenT<TauDiscriminatorContainer> deepTauVSmu_inputToken;

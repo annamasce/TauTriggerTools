@@ -17,10 +17,19 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR(Int_t, npv) /* number of primary vertices */ \
     VAR(Float_t, npu) /* number of in-time pu interactions added to the event */ \
     VAR(std::vector<Int_t>, lepton_gen_match) /* gen match info */ \
-    VAR(std::vector<Float_t>, gen_tau_pt) /* pt of the gen tau */ \
-    VAR(std::vector<Float_t>, gen_tau_eta) /* eta of the gen tau */ \
-    VAR(std::vector<Float_t>, gen_tau_phi) /* phi of the gen tau */ \
-    VAR(std::vector<Float_t>, gen_tau_e) /* energy of the gen tau */ \
+    VAR(std::vector<Int_t>, gen_tau_charge) /* charge of gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_pt) /* vis pt of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_eta) /* vis eta of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_phi) /* vis phi of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_e) /* vis energy of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_pt_rad) /* rad pt of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_eta_rad) /* rad eta of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_phi_rad) /* rad phi of the gen tau */ \
+    VAR(std::vector<Float_t>, gen_tau_e_rad) /* rad energy of the gen tau */ \
+    VAR(std::vector<Int_t>, gen_tau_nChargedHadrons) \
+    VAR(std::vector<Int_t>, gen_tau_nNeutralHadrons) \
+    VAR(std::vector<Int_t>, gen_tau_nFinalStateElectrons) \
+    VAR(std::vector<Int_t>, gen_tau_nFinalStateMuons) \
     VAR(std::vector<Float_t>, tau_pt) /* pt of the tau */ \
     VAR(std::vector<Float_t>, tau_eta) /* eta of the tau */ \
     VAR(std::vector<Float_t>, tau_phi) /* phi of the tau */ \

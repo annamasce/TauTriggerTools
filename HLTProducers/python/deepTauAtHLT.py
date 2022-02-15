@@ -201,8 +201,7 @@ def customiseDiTauForDeepTau(process, useReg, working_points, addCounters, isMC)
     ## Gen counter
     process.genCounter = cms.EDFilter( "CounterFilter",
         isMC = isMC, #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(True), #from outside
+        gen_level = cms.bool(True), #from outside
         store_MET = cms.bool(False),
         position = cms.string("gen"),
         use_deepTau = cms.bool(False),
@@ -583,8 +582,7 @@ def update(process, useReg=True, resetWP=False, addCounters=False, isData=False)
     ## Final counter -> taus InputTag to be customised for each path
     process.jetsFilter = cms.EDFilter( "CounterFilter",
         isMC = isMC, #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(False), #from outside
+        gen_level = cms.bool(False), #from outside
         position = cms.string("final"),
         use_deepTau = cms.bool(True),
         use_L2NN = cms.bool(False),
@@ -661,8 +659,7 @@ def update_oldHLT(process, isData=False):
     ## Gen counter
     process.genCounter = cms.EDFilter( "CounterFilter",
         isMC = isMC, #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(True), #from outside
+        gen_level = cms.bool(True), #from outside
         store_MET = cms.bool(False),
         position = cms.string("gen"),
         use_deepTau = cms.bool(False),
@@ -688,8 +685,7 @@ def update_oldHLT(process, isData=False):
     ## Final counter -> taus InputTag to be customised for each path
     process.jetsFilter = cms.EDFilter( "CounterFilter",
         isMC = isMC, #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(False), #from outside
+        gen_level = cms.bool(False), #from outside
         position = cms.string("final"),
         use_deepTau = cms.bool(False),
         use_L2NN = cms.bool(False),
@@ -880,8 +876,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
     ## Gen counter
     process.genCounter = cms.EDFilter( "CounterFilter",
         isMC = isMC, #from outside
-        store_hist = cms.bool(False), #from outside
-        store_both = cms.bool(True), #from outside
+        gen_level = cms.bool(True), #from outside
         store_MET = cms.bool(False),
         position = cms.string("gen"),
         use_deepTau = cms.bool(False),
@@ -908,8 +903,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
      ## Final counter -> taus InputTag to be customised for each path
     process.jetsFilter = cms.EDFilter( "CounterFilter",
         isMC = isMC, 
-        store_hist = cms.bool(False), 
-        store_both = cms.bool(False), 
+        gen_level = cms.bool(False), 
         position = cms.string("final"),
         use_deepTau = cms.bool(True),
         use_L2NN = cms.bool(False),
