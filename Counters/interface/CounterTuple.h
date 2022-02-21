@@ -38,7 +38,6 @@ This file is part of https://github.com/cms-tau-pog/TauTriggerTools. */
     VAR(std::vector<Float_t>, deepTau_VSe) /* deepTau_VSe raw discriminator */ \
     VAR(std::vector<Float_t>, deepTau_VSmu) /* deepTau_VSmu raw discriminator */ \
     VAR(std::vector<Float_t>, deepTau_VSjet) /* deepTau_VSjet raw discriminator */ \
-    VAR(std::vector<Int_t>, tau_decayModeFindingNewDMs) /* new decayMode for tau */ \
     VAR(std::vector<Float_t>, met_pt) /* pt of the MET */ \
     VAR(std::vector<bool>, tau_passedLastFilter) /* bool if the passed the last Filter */ \
     VAR(std::vector<bool>, tau_passedTrackFilter) /* bool if the passed the trackFinding Filter */ \

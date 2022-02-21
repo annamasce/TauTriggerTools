@@ -670,6 +670,7 @@ def update_oldHLT(process, isData=False):
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
         original_taus = cms.InputTag('try4'),
+        # decayModeFindingNewDM = cms.InputTag('try11')
         taus = cms.InputTag('try5'),
         track_taus = cms.InputTag('try6'),
         MET = cms.InputTag('try7'),
@@ -684,8 +685,8 @@ def update_oldHLT(process, isData=False):
 
     ## Final counter -> taus InputTag to be customised for each path
     process.jetsFilter = cms.EDFilter( "CounterFilter",
-        isMC = isMC, #from outside
-        gen_level = cms.bool(False), #from outside
+        isMC = isMC, 
+        gen_level = cms.bool(False), 
         position = cms.string("final"),
         use_deepTau = cms.bool(False),
         use_L2NN = cms.bool(False),
@@ -696,6 +697,7 @@ def update_oldHLT(process, isData=False):
         deepTauVSmu = cms.InputTag(""),
         deepTauVSjet = cms.InputTag(""),
         original_taus = cms.InputTag(""),
+        # decayModeFindingNewDM = cms.InputTag(""),
         taus = cms.InputTag(''),
         track_taus = cms.InputTag(''),
         MET = cms.InputTag(''),
@@ -711,7 +713,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg"),
         taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1MediumChargedIsolationMatchReg")        
+        track_taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1MediumChargedIsolationDz02Reg")        
     )
 
     process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4.insert(-1, process.jetsFilterDiTau_medium)
@@ -721,7 +723,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg"),
         taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1TightChargedIsolationDz02Reg"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg")        
+        track_taus = cms.InputTag("hltHpsDoublePFTau35TrackPt1TightChargedIsolationDz02Reg")        
     )
 
     process. HLT_DoubleTightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v1.insert(-1, process.jetsFilterDiTau_tight35)
@@ -731,7 +733,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg"),
         taus = cms.InputTag("hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTDoublePFTauTrackPt1TightChargedIsolationMatchReg")        
+        track_taus = cms.InputTag("hltHpsDoublePFTau40TrackPt1TightChargedIsolationDz02Reg")        
     )
 
     process. HLT_DoubleTightChargedIsoPFTauHPS40_Trk1_eta2p1_Reg_v1.insert(-1, process.jetsFilterDiTau_tight40)
@@ -741,7 +743,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationMatch")
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseIsoPFTau30")
     )
 
     process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau_loose)
@@ -751,7 +753,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoPFTau30"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationMatch")
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfMediumIsoPFTau30")
     )
 
     process.HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau_medium)
@@ -761,7 +763,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoPFTau30"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationMatch")
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfTightIsoPFTau30")
     )
 
     process.HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterEleTau_tight)
@@ -772,7 +774,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackLooseChargedIsolationAgainstMuonMatch")
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded")
     )
 
     process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4.insert(-1, process.jetsFilterMuTau_loose)
@@ -782,7 +784,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationAgainstMuonMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackMediumChargedIsolationAgainstMuonMatch")
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoMu20MediumChargedIsoPFTau27L1Seeded")
     )
 
     process.HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterMuTau_medium)
@@ -792,7 +794,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v1"),
         original_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationAgainstMuonMatch"),
         taus = cms.InputTag("hltHpsOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded"),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTPFTauTrackTightChargedIsolationAgainstMuonMatch")
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoMu20TightChargedIsoPFTau27L1Seeded")
     )
 
     process.HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v1.insert(-1, process.jetsFilterMuTau_tight)
@@ -803,7 +805,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12"),
         original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
-        track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        track_taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
         MET = cms.InputTag("hltMet")
     )
 
@@ -815,7 +817,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET110_v8"),
         original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
-        track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        track_taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
         MET = cms.InputTag("hltMet")
     )
 
@@ -827,7 +829,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET120_v8"),
         original_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
-        track_taus = cms.InputTag("hltL1JetsHLTPFTau50Track30MediumChargedIsolationMatch"),
+        track_taus = cms.InputTag("hltSelectedPFTau50MediumChargedIsolationL1HLTMatched"),
         MET = cms.InputTag("hltMet")
     )
 
@@ -838,7 +840,7 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12"),
         original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched"),
-        track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
+        track_taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched")
     )
 
     process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau_180)
@@ -848,20 +850,30 @@ def update_oldHLT(process, isData=False):
         position = cms.string("final_HLT_MediumChargedIsoPFTau200HighPtRelaxedIso_Trk50_eta2p1_v12"),
         original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau200MediumChargedIsolationL1HLTMatched"),
-        track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
+        track_taus = cms.InputTag("hltSelectedPFTau200MediumChargedIsolationL1HLTMatched")
     )
 
     process.HLT_MediumChargedIsoPFTau200HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau_200)
 
-     ## Final counter HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12
+    ## Final counter HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12
     process.jetsFilterHighPtTau_220 = process.jetsFilter.clone(
         position = cms.string("final_HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12"),
         original_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch"),
         taus = cms.InputTag("hltSelectedPFTau220MediumChargedIsolationL1HLTMatched"),
-        track_taus = cms.InputTag("hltL1JetsHLTSinglePFTauTrackMediumChargedIsolationMatch")
+        track_taus = cms.InputTag("hltSelectedPFTau220MediumChargedIsolationL1HLTMatched")
     )
 
     process.HLT_MediumChargedIsoPFTau220HighPtRelaxedIso_Trk50_eta2p1_v12.insert(-1, process.jetsFilterHighPtTau_220)
+
+    ## Final counter HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v11
+    process.jetsFilterHighPtTau_1pr = process.jetsFilter.clone(
+        position = cms.string("final_HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v11"),
+        original_taus = cms.InputTag("hltL1JetsHLTPFTauTrackMediumChargedIsolationMatch1Prong"),
+        taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched1Prong"),
+        track_taus = cms.InputTag("hltSelectedPFTau180MediumChargedIsolationL1HLTMatched1Prong")
+    )
+
+    process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_1pr_v11.insert(-1, process.jetsFilterHighPtTau_1pr)
 
     process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
@@ -887,7 +899,7 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         deepTauVSmu = cms.InputTag('try2'),
         deepTauVSjet = cms.InputTag('try3'),
         original_taus = cms.InputTag('try4'),
-        decayModeFindingNewDM = cms.InputTag('try11'),
+        # decayModeFindingNewDM = cms.InputTag('try11'),
         taus = cms.InputTag('try5'),
         track_taus = cms.InputTag('try6'),
         MET = cms.InputTag('try7'),
@@ -913,10 +925,9 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         deepTauVSe = cms.InputTag('hltHpsPFTauDeepTauProducer', 'VSe'),
         deepTauVSmu = cms.InputTag('hltHpsPFTauDeepTauProducer', 'VSmu'),
         deepTauVSjet = cms.InputTag('hltHpsPFTauDeepTauProducer', 'VSjet'),
-        decayModeFindingNewDM = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsL1matched'),
+        # decayModeFindingNewDM = cms.InputTag('hltHpsPFTauDiscriminationByDecayModeFindingNewDMsL1matched'),
         original_taus = cms.InputTag('hltHpsL1JetsHLTForDeepTauInput'),
         taus = cms.InputTag(''),
-        track_taus = cms.InputTag("hltHpsL1JetsHLTForDeepTauInput"),
         MET = cms.InputTag(''),
         puInfo = cms.InputTag('addPileupInfo','','HLT'),
         vertices = cms.InputTag('hltPixelVertices'),
@@ -934,7 +945,8 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         L2NNoutput = ('hltL2TauTagNNProducer', 'DoubleTau'),
         l1taus = cms.InputTag("hltL1sDoubleTauBigOR"),
         position = cms.string("final_DiTau"),
-        taus = cms.InputTag("hltHpsDoublePFTau35MediumDitauWPDeepTauDz02"),       
+        taus = cms.InputTag("hltHpsDoublePFTau35MediumDitauWPDeepTauDz02"),   
+        track_taus = cms.InputTag("hltHpsDoublePFTau35MediumDitauWPDeepTauDz02"),    
     )
 
     if resetWP:
@@ -953,7 +965,8 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
     process.jetsFilterEleTau = process.jetsFilter.clone(
         position = cms.string("final_EleTau"),
         l1taus = cms.InputTag("hltL1sBigORLooseIsoEGXXerIsoTauYYerdRMin0p3"),
-        taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseETauWPDeepTauPFTau30"),       
+        taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseETauWPDeepTauPFTau30"), 
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoEle24WPTightGsfLooseETauWPDeepTauPFTau30"),      
     )
 
     if resetWP:
@@ -973,7 +986,8 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
     process.jetsFilterMuTau = process.jetsFilter.clone(
         position = cms.string("final_MuTau"),
         l1taus = cms.InputTag("hltL1sBigORMu18erTauXXer2p1"),
-        taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseMuTauWPDeepTauPFTau27L1Seeded"),       
+        taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseMuTauWPDeepTauPFTau27L1Seeded"),
+        track_taus = cms.InputTag("hltHpsOverlapFilterIsoMu20LooseMuTauWPDeepTauPFTau27L1Seeded"),        
     )
 
     if resetWP:
@@ -993,7 +1007,8 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         L2NNoutput = ('hltL2TauTagNNProducer', 'SingleTau'),
         l1taus = cms.InputTag("hltL1sSingleTau"),
         position = cms.string("final_HighPtTau"),
-        taus = cms.InputTag("hltSelectedPFTau180LooseSingleTauWPDeepTauL1HLTMatched"),        
+        taus = cms.InputTag("hltSelectedPFTau180LooseSingleTauWPDeepTauL1HLTMatched"),
+        track_taus = cms.InputTag("hltSelectedPFTau180LooseSingleTauWPDeepTauL1HLTMatched"),        
     )
 
     if resetWP:
@@ -1015,7 +1030,8 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
         # L2NNoutput = ('hltL2TauTagNNProducer', 'IsoTau'),
         l1taus = cms.InputTag("hltL1sIsoTau40erETMHF90To120"),
         position = cms.string("final_TauMET"),
-        taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"),  
+        taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"), 
+        track_taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"),   
         MET = cms.InputTag("hltMet")      
     )
 
