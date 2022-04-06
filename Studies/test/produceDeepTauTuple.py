@@ -71,8 +71,8 @@ else:
     #process.source.fileNames = cms.untracked.vstring('file:/store/mc/Run3Winter20DRPremixMiniAOD/VBFHToTauTau_M125_TuneCUETP8M1_14TeV_powheg_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v1/20000/F2760E46-A3DB-DA4F-A6EC-525C10EDCBC7.root') # 1000 evts
     #process.source.fileNames = cms.untracked.vstring('file:/store/mc/Run3Winter20DRPremixMiniAOD/VBFHToTauTau_M125_TuneCUETP8M1_14TeV_powheg_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v1/20000/657F58E7-64E3-AA4D-B505-6D0F39997487.root')
     # process.source.fileNames = cms.untracked.vstring('file:/eos/cms/store/group/phys_tau/amascell/005b56c1-0107-46b3-9740-1c6efc559295.root')
-    process.source.fileNames = cms.untracked.vstring('file:/eos/cms/store/group/phys_tau/TauTrigger/store/mc/Run3Winter20DRPremixMiniAOD/VBFHToTauTau_M125_TuneCUETP8M1_14TeV_powheg_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v1/20000/28DC45D2-CB46-6D48-A100-379B076BFE1D.root')
-    # process.source.fileNames = cms.untracked.vstring('/store/mc/Run3Winter21DRMiniAOD/VBFHToTauTau_M125_TuneCP5_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW/FlatPU30to80FEVT_112X_mcRun3_2021_realistic_v16-v1/270000/434ff3bc-f045-4662-a793-2206c25de018.root')
+    # process.source.fileNames = cms.untracked.vstring('file:/eos/cms/store/group/phys_tau/TauTrigger/store/mc/Run3Winter20DRPremixMiniAOD/VBFHToTauTau_M125_TuneCUETP8M1_14TeV_powheg_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v1/20000/28DC45D2-CB46-6D48-A100-379B076BFE1D.root')
+    process.source.fileNames = cms.untracked.vstring('/store/mc/Run3Summer21DRPremix/VBFHToTauTau_M125_TuneCP5_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW/120X_mcRun3_2021_realistic_v6-v2/30000/00dbda61-e142-4d8a-aa8e-886c3c79fdc4.root')
 
 
 if len(options.lumiFile) > 0:
@@ -135,8 +135,8 @@ from HLTrigger.Configuration.CustomConfigs import ProcessName
 process = ProcessName(process)
 
 from Configuration.AlCa.GlobalTag import GlobalTag
-GlobalTagName = 'auto:run3_hlt' if isData else 'auto:run3_mc_GRun'
-process.GlobalTag = GlobalTag(process.GlobalTag, GlobalTagName, '')
+GlobalTagName = 'auto:phase1_2021_realistic' if isData else 'auto:run3_hlt'
+process.GlobalTag = GlobalTag(process.GlobalTag, globaltag = GlobalTagName, conditions = 'L1Menu_Collisions2022_v0_1_8_xml,L1TUtmTriggerMenuRcd,,,9999-12-31 23:59:59.000')
 
 # Path and EndPath definitions
 process.endjob_step = cms.EndPath(process.endOfProcess)
@@ -178,7 +178,7 @@ from TauTriggerTools.HLTProducers.deepTauAtHLT import add_counters
 process = add_counters(process, isData=isData, resetWP=True)
 
 # process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v4, process.HLT_DoubleMediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_v4, process.HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v12, process.HLT_MediumChargedIsoPFTau180HighPtRelaxedIso_Trk50_eta2p1_v12, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
-process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_DoubleMediumDeepTauIsoPFTauHPS35_L2NN_eta2p1_v1, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseDeepTauPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v1, process.HLT_LooseDeepTauPFTauHPS180_L2NN_eta2p1_v1, process.HLT_LooseDeepTauPFTauHPS50_eta2p1_MET100_v1, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
+process.schedule = cms.Schedule(*[ process.HLTriggerFirstPath, process.HLT_DoubleMediumDeepTauIsoPFTauHPS35_L2NN_eta2p1_v1, process.HLT_Ele24_eta2p1_WPTight_Gsf_LooseDeepTauPFTauHPS30_eta2p1_CrossL1_v1, process.HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1_v1, process.HLT_LooseDeepTauPFTauHPS180_L2NN_eta2p1_v1, process.HLTriggerFinalPath, process.endjob_step ], tasks=[process.patAlgosToolsTask])
 
 # # Add customization for Patatrack trigger
 # from HLTrigger.Configuration.customizeHLTforPatatrack import customizeHLTforPatatrackTriplets

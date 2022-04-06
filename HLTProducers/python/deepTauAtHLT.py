@@ -1023,29 +1023,29 @@ def add_counters(process, isData=False, resetWP=True, useReg=False):
 
     process.HLT_LooseDeepTauPFTauHPS180_L2NN_eta2p1_v1.insert(-1, process.jetsFilterHighPtTau)
 
-    ## Tau-MET customisation
-    process.jetsFilterTauMET = process.jetsFilter.clone(
-        # use_L2NN = cms.bool(True),
-        store_MET = cms.bool(True),
-        # L2NNoutput = ('hltL2TauTagNNProducer', 'IsoTau'),
-        l1taus = cms.InputTag("hltL1sIsoTau40erETMHF90To120"),
-        position = cms.string("final_TauMET"),
-        taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"), 
-        track_taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"),   
-        MET = cms.InputTag("hltMet")      
-    )
+    # ## Tau-MET customisation
+    # process.jetsFilterTauMET = process.jetsFilter.clone(
+    #     # use_L2NN = cms.bool(True),
+    #     store_MET = cms.bool(True),
+    #     # L2NNoutput = ('hltL2TauTagNNProducer', 'IsoTau'),
+    #     l1taus = cms.InputTag("hltL1sIsoTau40erETMHF90To120"),
+    #     position = cms.string("final_TauMET"),
+    #     taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"), 
+    #     track_taus = cms.InputTag("hltHpsSelectedPFTau50LooseTauMETWPDeepTauL1HLTMatched"),   
+    #     MET = cms.InputTag("hltMet")      
+    # )
 
-    if resetWP:
-        # process.hltL2IsoTauTagNNFilter.DiscrWP = cms.double(-1.)
-        process.hltHpsSelectedPFTausLooseTauMETWPDeepTau.discriminatorContainers = cms.VPSet( 
-            cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauDeepTauProducer", "VSjet" ),
-                rawValues = cms.vstring(  ),
-                selectionCuts = cms.vdouble(  ),
-                workingPoints = cms.vstring('-1.')
-            )
-        )
+    # if resetWP:
+    #     # process.hltL2IsoTauTagNNFilter.DiscrWP = cms.double(-1.)
+    #     process.hltHpsSelectedPFTausLooseTauMETWPDeepTau.discriminatorContainers = cms.VPSet( 
+    #         cms.PSet(  discriminator = cms.InputTag( "hltHpsPFTauDeepTauProducer", "VSjet" ),
+    #             rawValues = cms.vstring(  ),
+    #             selectionCuts = cms.vdouble(  ),
+    #             workingPoints = cms.vstring('-1.')
+    #         )
+    #     )
 
-    process.HLT_LooseDeepTauPFTauHPS50_eta2p1_MET100_v1.insert(-1, process.jetsFilterTauMET)
+    # process.HLT_LooseDeepTauPFTauHPS50_eta2p1_MET100_v1.insert(-1, process.jetsFilterTauMET)
 
     process.TFileService = cms.Service("TFileService", fileName = cms.string("histo.root"))
 
